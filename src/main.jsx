@@ -1,6 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Globe } from './Globe.jsx'
 import './styles.css'
+
+const globeMarkers = [
+  { id: 'india', location: [19.0760, 72.8777], label: 'Mumbai, India — HQ' },
+  { id: 'uae', location: [25.2048, 55.2708], label: 'Dubai, UAE' },
+  { id: 'vietnam', location: [10.8231, 106.6297], label: 'Ho Chi Minh City, Vietnam' },
+  { id: 'china', location: [31.2304, 121.4737], label: 'Shanghai, China' }
+]
+const globeArcs = [
+  { id: 'india-uae', from: [19.0760, 72.8777], to: [25.2048, 55.2708] },
+  { id: 'india-vietnam', from: [19.0760, 72.8777], to: [10.8231, 106.6297] },
+  { id: 'india-china', from: [19.0760, 72.8777], to: [31.2304, 121.4737] }
+]
 
 const Icon = ({ name, size = 20 }) => {
   const paths = {
@@ -113,8 +126,11 @@ function PageTitle({ eyebrow, title, accent, copy, mark }) {
   )
 }
 
-function Home({ selectProduct }) {
+function Home({ selectProduct, theme }) {
   const homeProducts = [products[0], products[3], products[1]]
+  const globeTheme = theme === 'dark'
+    ? { dark: 1, baseColor: [0.07, 0.21, 0.15], markerColor: [0.86, 0.93, 0.42], arcColor: [0.86, 0.93, 0.42], glowColor: [0.04, 0.09, 0.07], mapBrightness: 6 }
+    : { dark: 0, baseColor: [1, 1, 1], markerColor: [0.04, 0.48, 0.29], arcColor: [0.04, 0.48, 0.29], glowColor: [0.94, 0.95, 0.91], mapBrightness: 10 }
   return <>
     <section className="home-hero">
       <div className="hero-media" aria-hidden="true"/>
@@ -178,6 +194,28 @@ function Home({ selectProduct }) {
                 <b>{value}</b><span>{label}</span>
               </Reveal>
             ))}
+        </div>
+      </div>
+    </section>
+
+    <section className="global-footprint section">
+      <div className="container">
+        <Reveal as="div" className="section-head">
+          <div><Eyebrow>WHERE WE OPERATE</Eyebrow><h2>A truly global<br/><em>footprint.</em></h2></div>
+        </Reveal>
+        <div className="globe-layout">
+          <Reveal as="div" delay={100} className="globe-stage">
+            <Globe markers={globeMarkers} arcs={globeArcs} {...globeTheme}/>
+          </Reveal>
+          <Reveal as="div" delay={160} className="globe-legend">
+            <ul>
+              <li><i/> India — Headquarters</li>
+              <li><i/> United Arab Emirates</li>
+              <li><i/> Vietnam</li>
+              <li><i/> China</li>
+            </ul>
+            <p>Sourcing, quality control and logistics are coordinated from our India headquarters, with operational footprints across the UAE, Vietnam and China.</p>
+          </Reveal>
         </div>
       </div>
     </section>
@@ -762,7 +800,7 @@ function App() {
   const selectProduct = (slug) => goTo(`product/${slug}`)
   const product = route.startsWith('product/') ? products.find(p => p.slug === route.split('/')[1]) : null
   const pages = {
-    home: <Home selectProduct={selectProduct}/>,
+    home: <Home selectProduct={selectProduct} theme={theme}/>,
     about: <About/>,
     services: <Services/>,
     products: <Products selectProduct={selectProduct}/>,
