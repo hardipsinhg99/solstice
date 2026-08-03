@@ -1,19 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Globe } from './Globe.jsx'
+import { globeMarkers, globeArcs } from './data/globe.js'
+import { products } from './data/products.js'
+import { navItems } from './data/navigation.js'
+import { contactFaq, chatFaq } from './data/faqs.js'
+import { HERO_VIDEO_SRC, ENQUIRY_EMAIL, FORM_ENDPOINT, FORM_ACCESS_KEY } from './lib/constants.js'
 import './styles/index.css'
-
-const globeMarkers = [
-  { id: 'india', location: [19.0760, 72.8777], label: 'Mumbai, India - HQ' },
-  { id: 'uae', location: [25.2048, 55.2708], label: 'Dubai, UAE' },
-  { id: 'vietnam', location: [10.8231, 106.6297], label: 'Ho Chi Minh City, Vietnam' },
-  { id: 'china', location: [31.2304, 121.4737], label: 'Shanghai, China' }
-]
-const globeArcs = [
-  { id: 'india-uae', from: [19.0760, 72.8777], to: [25.2048, 55.2708] },
-  { id: 'india-vietnam', from: [19.0760, 72.8777], to: [10.8231, 106.6297] },
-  { id: 'india-china', from: [19.0760, 72.8777], to: [31.2304, 121.4737] }
-]
 
 const Icon = ({ name, size = 20 }) => {
   const paths = {
@@ -34,17 +27,6 @@ const Icon = ({ name, size = 20 }) => {
   }
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>
 }
-
-const products = [
-  { slug: 'mangoes', name: 'Mangoes', type: 'Fresh fruit', image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=1000&q=88', description: 'Seasonal Indian mangoes selected for colour, maturity and eating quality.', varieties: ['Kesar', 'Alphonso', 'Banganapalli'], season: 'April – July (peak season)', origin: 'Gujarat, Maharashtra, Andhra Pradesh', packaging: '4kg, 5kg & 10kg export cartons', certification: 'Phytosanitary certificate on every shipment' },
-  { slug: 'pomegranates', name: 'Pomegranates', type: 'Fresh fruit', image: 'https://images.unsplash.com/photo-1541344999736-83eca272f6fc?auto=format&fit=crop&w=1000&q=88', description: 'Fresh pomegranates carefully selected for vibrant appearance and condition.', varieties: ['Bhagwa'], season: 'September – February', origin: 'Maharashtra, Karnataka', packaging: '4kg & 5kg telescopic cartons', certification: 'Phytosanitary certificate on every shipment' },
-  { slug: 'grapes', name: 'Table Grapes', type: 'Fresh fruit', image: 'https://images.unsplash.com/photo-1596363505729-4190a9506133?auto=format&fit=crop&w=1000&q=88', description: 'Fresh table grapes sourced during the Indian season for export enquiries.', varieties: ['Green grapes', 'Black grapes'], season: 'January – April', origin: 'Nashik (Maharashtra), Karnataka', packaging: '4.5kg vented export cartons', certification: 'Phytosanitary certificate on every shipment' },
-  { slug: 'onions', name: 'Onions', type: 'Fresh vegetable', image: 'https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=1000&q=88', description: 'Export-oriented onions selected and packed according to buyer requirements.', varieties: ['Red onion'], season: 'Year-round, peak Nov – Mar', origin: 'Maharashtra, Gujarat, Madhya Pradesh', packaging: '10kg, 20kg & 25kg mesh bags', certification: 'Phytosanitary certificate on every shipment' },
-  { slug: 'okra', name: 'Okra', type: 'Fresh vegetable', image: 'https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=1000&q=88', description: 'Fresh okra for buyers seeking Indian vegetables in seasonal programmes.', varieties: ['Fresh okra'], season: 'March – November', origin: 'Gujarat, Karnataka', packaging: '4kg & 5kg vented cartons', certification: 'Phytosanitary certificate on every shipment' },
-  { slug: 'mixed-vegetables', name: 'Seasonal Vegetables', type: 'Fresh vegetable', image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1000&q=88', description: 'A selection of seasonal Indian vegetables, subject to market and availability.', varieties: ['Enquire with requirements'], season: 'Seasonal, subject to availability', origin: 'Multiple growing regions across India', packaging: 'Pack format confirmed per requirement', certification: 'Phytosanitary certificate on every shipment' }
-]
-
-const navItems = [['home', 'Home'], ['about', 'About us'], ['services', 'Services'], ['products', 'Products'], ['team', 'Team'], ['gallery', 'Gallery'], ['contact', 'Contact us']]
 
 const goTo = (route) => { window.location.hash = route === 'home' ? '' : route }
 
@@ -69,8 +51,6 @@ function Reveal({ as: Tag = 'div', delay = 0, className = '', style, children, .
   const [ref, inView] = useInView()
   return <Tag ref={ref} className={['reveal', inView && 'in', className].filter(Boolean).join(' ')} style={{ transitionDelay: `${delay}ms`, ...style }} {...rest}>{children}</Tag>
 }
-
-const HERO_VIDEO_SRC = '/hero/hero.mp4'
 
 // Decides whether the hero video may exist at all. Gating happens here rather than
 // in CSS because display:none still downloads the file - a component that never
@@ -704,15 +684,6 @@ function Gallery() {
   </>
 }
 
-const contactFaq = [
-  { q: 'What products do you export?', a: 'Fresh fruits and vegetables, spices and select essential food products, sourced from growing regions across India.' },
-  { q: 'Which countries do you operate in?', a: 'We are headquartered in India with operational footprints across the UAE, Vietnam and China, and work with buyers in other markets on enquiry.' },
-  { q: 'What certifications do you have?', a: 'We hold an Import Export Code (IEC) and provide phytosanitary certification with every shipment; further certifications are confirmed per product and destination.' },
-  { q: 'What is your minimum order quantity?', a: 'MOQ depends on the product, pack format and destination - share your requirement and we will confirm what is possible.' },
-  { q: 'How do you ensure quality?', a: 'Every shipment is visually graded and quality-checked at origin before packing and dispatch.' },
-  { q: 'What is your typical shipping time?', a: 'Shipping time depends on the destination port and mode of transport - we will confirm an estimated timeline as part of your enquiry.' }
-]
-
 function Faq() {
   const [open, setOpen] = useState(0)
   return (
@@ -735,12 +706,6 @@ function Faq() {
     </section>
   )
 }
-
-// Lead capture. VITE_ vars are inlined into the client bundle and are therefore
-// public - only ever put a form-provider public form id / access key here.
-const FORM_ENDPOINT = import.meta.env.VITE_FORM_ENDPOINT
-const FORM_ACCESS_KEY = import.meta.env.VITE_FORM_ACCESS_KEY
-const ENQUIRY_EMAIL = 'hello@solsticetrading.com'
 
 // Failure fallback: never lose a lead to a dead endpoint - hand the buyer a
 // prefilled mail draft carrying everything they already typed.
@@ -907,13 +872,6 @@ function Footer() {
     </footer>
   )
 }
-
-const chatFaq = [
-  { q: 'What products do you export?', a: 'Fresh Indian fruits such as mangoes, pomegranates and table grapes, plus vegetables like onions and okra.', cta: ['Browse products', 'products'] },
-  { q: 'How do I start an enquiry?', a: 'Share your product, destination and preferred pack - we will get back to you with seasonal availability.', cta: ['Start an enquiry', 'contact'] },
-  { q: 'Is produce available year-round?', a: 'Availability is seasonal and varies by product. Each product page lists its current window.', cta: ['See seasonality', 'products'] },
-  { q: 'Where do you source from?', a: 'We source across growing regions in India and work with buyers, distributors and foodservice teams worldwide.', cta: ['Meet the team', 'team'] }
-]
 
 function ChatWidget() {
   const [open, setOpen] = useState(false)
