@@ -3,7 +3,7 @@ import { Eyebrow } from '../../components/ui/Eyebrow.jsx'
 import { Icon } from '../../components/ui/Icon.jsx'
 import { cardProps } from '../../components/ui/Card.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
-import { Globe } from '../../features/globe/index.js'
+import { Globe, useGlobeTheme } from '../../features/globe/index.js'
 import { products } from '../../data/products.js'
 import { globeMarkers, globeArcs } from '../../data/globe.js'
 import { useNavigate } from '../../app/navigation.js'
@@ -12,9 +12,7 @@ import { HeroMedia } from './sections/HeroMedia.jsx'
 export default function HomePage({ selectProduct, theme }) {
   const navigate = useNavigate()
   const homeProducts = [products[0], products[3], products[1]]
-  const globeTheme = theme === 'dark'
-    ? { dark: 1, baseColor: [0.07, 0.21, 0.15], markerColor: [0.86, 0.93, 0.42], arcColor: [0.86, 0.93, 0.42], glowColor: [0.04, 0.09, 0.07], mapBrightness: 6 }
-    : { dark: 0, baseColor: [1, 1, 1], markerColor: [0.04, 0.48, 0.29], arcColor: [0.04, 0.48, 0.29], glowColor: [0.94, 0.95, 0.91], mapBrightness: 10 }
+  const globeTheme = useGlobeTheme(theme)
   return <>
     <section className="home-hero">
       <HeroMedia/>
