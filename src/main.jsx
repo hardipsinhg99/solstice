@@ -812,7 +812,7 @@ function Footer() {
         </div>
       </div>
       <div className="container footer-bottom">
-        <span>© 2026 Solstice Trading International LLP</span>
+        <span>© {new Date().getFullYear()} Solstice Trading International LLP</span>
         <span>Fresh produce export, from India to your market.</span>
       </div>
     </footer>
