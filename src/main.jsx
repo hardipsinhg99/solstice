@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Globe } from './Globe.jsx'
+import { Globe } from './features/globe/index.js'
 import { globeMarkers, globeArcs } from './data/globe.js'
 import { products } from './data/products.js'
 import { navItems } from './data/navigation.js'
@@ -14,6 +14,9 @@ import { Header } from './components/layout/Header.jsx'
 import { Footer } from './components/layout/Footer.jsx'
 import { PageTitle } from './components/layout/PageTitle.jsx'
 import { NavigationProvider } from './app/navigation.js'
+import { ProductGrid, ProductFilter, RelatedProducts } from './features/products/index.js'
+import { EnquiryForm } from './features/enquiry/index.js'
+import { ChatWidget } from './features/chat/index.js'
 import { HERO_VIDEO_SRC, ENQUIRY_EMAIL, FORM_ENDPOINT, FORM_ACCESS_KEY } from './lib/constants.js'
 import './styles/index.css'
 
@@ -421,24 +424,8 @@ function Products({ selectProduct }) {
     <PageTitle mark="04" eyebrow="FRESH FROM INDIA" title="Our seasonal" accent="selection." copy="A concise collection of fresh fruits and vegetables. Availability depends on season and requirements."/>
     <section className="products-page section">
       <div className="container">
-        <div className="product-filters">
-          {['All', 'Fresh fruit', 'Fresh vegetable'].map(item => (
-            <button key={item} onClick={() => setFilter(item)} className={filter === item ? 'active' : ''}>{item}</button>
-          ))}
-        </div>
-        <div className="products-list">
-          {filtered.map((product, index) => (
-            <Reveal as="article" key={product.slug} delay={(index % 3) * 80} className="product-list-card" {...cardProps(() => selectProduct(product.slug), `View ${product.name}`)}>
-              <div className="product-list-image" style={{ backgroundImage: `url('${product.image}')` }}/>
-              <div className="product-list-info">
-                <span>{product.type}</span>
-                <h3>{product.name}</h3>
-                <p>{product.description}</p>
-                <span className="card-cue" aria-hidden="true">View product <Icon name="arrow" size={16}/></span>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        <ProductFilter options={['All', 'Fresh fruit', 'Fresh vegetable']} value={filter} onChange={setFilter}/>
+        <ProductGrid products={filtered} onSelect={selectProduct}/>
       </div>
     </section>
   </>
@@ -484,25 +471,7 @@ function ProductDetail({ product, selectProduct }) {
         </div>
       </div>
     </section>
-    {related.length > 0 && (
-      <section className="related-products section">
-        <div className="container">
-          <Reveal as="div" className="section-head">
-            <div><Eyebrow>KEEP EXPLORING</Eyebrow><h2>You may also<br/><em>be looking for.</em></h2></div>
-          </Reveal>
-          <div className="related-grid">
-            {related.map((p, i) => (
-              <Reveal as="article" key={p.slug} delay={i * 90} className="related-card" {...cardProps(() => selectProduct(p.slug), `View ${p.name}`)}>
-                <div className="related-image" style={{ backgroundImage: `url('${p.image}')` }}/>
-                <span>{p.type}</span>
-                <h3>{p.name}</h3>
-                <span className="card-cue" aria-hidden="true"><Icon name="arrow" size={15}/></span>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-    )}
+    <RelatedProducts products={related} onSelect={selectProduct}/>
     <section className="detail-note">
       <div className="container">
         <Icon name="leaf"/>
@@ -605,58 +574,7 @@ function Faq() {
   )
 }
 
-// Failure fallback: never lose a lead to a dead endpoint - hand the buyer a
-// prefilled mail draft carrying everything they already typed.
-function mailtoFallback(payload) {
-  const lines = [
-    ['Name', payload.name], ['Email', payload.email], ['Phone', payload.phone],
-    ['Company / market', payload.company], ['Product', payload.product],
-    ['Quantity', [payload.quantity, payload.quantity_unit].filter(Boolean).join(' ')],
-    ['Destination', payload.destination], ['Incoterm', payload.incoterm],
-    ['Frequency', payload.frequency], ['Message', payload.message]
-  ].filter(([, value]) => value).map(([label, value]) => `${label}: ${value}`)
-  const subject = `Enquiry - ${payload.product || 'general'}${payload.company ? ` - ${payload.company}` : ''}`
-  return `mailto:${ENQUIRY_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`
-}
-
 function Contact() {
-  const [status, setStatus] = useState('idle') // idle | submitting | success | error
-  const [errorDetail, setErrorDetail] = useState('')
-  const [fallbackHref, setFallbackHref] = useState(`mailto:${ENQUIRY_EMAIL}`)
-
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    const form = event.currentTarget
-    const payload = Object.fromEntries(new FormData(form))
-    if (payload.company_website) return // honeypot tripped - drop silently
-    delete payload.company_website
-    setFallbackHref(mailtoFallback(payload))
-
-    if (!FORM_ENDPOINT) {
-      setStatus('error')
-      setErrorDetail('The enquiry endpoint is not configured (VITE_FORM_ENDPOINT is unset).')
-      return
-    }
-
-    setStatus('submitting')
-    setErrorDetail('')
-    try {
-      if (FORM_ACCESS_KEY) payload.access_key = FORM_ACCESS_KEY
-      payload.subject = `New enquiry: ${payload.product || 'general'}${payload.company ? ` - ${payload.company}` : ''}`
-      const response = await fetch(FORM_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      if (!response.ok) throw new Error(`The enquiry service responded ${response.status}.`)
-      setStatus('success')
-      form.reset()
-    } catch (error) {
-      setStatus('error')
-      setErrorDetail(error.message === 'Failed to fetch' ? 'Could not reach the enquiry service.' : error.message)
-    }
-  }
-
   return <>
     <PageTitle mark="07" eyebrow="CONTACT SOLSTICE" title="Let’s talk" accent="produce." copy="Tell us what you are looking for and where you want it to go."/>
     <section className="contact-page section">
@@ -671,125 +589,10 @@ function Contact() {
             <span><Icon name="leaf" size={16}/> Fresh fruits &amp; vegetables</span>
           </div>
         </Reveal>
-        <Reveal as="form" delay={100} onSubmit={handleSubmit} aria-busy={status === 'submitting'}>
-          <label>Name<input name="name" required autoComplete="name" placeholder="Your name"/></label>
-          <label>Business email<input name="email" required type="email" autoComplete="email" placeholder="you@company.com"/></label>
-          <label>Phone / WhatsApp<input name="phone" type="tel" autoComplete="tel" placeholder="+1 234 567 8900"/></label>
-          <label>Company / market<input name="company" autoComplete="organization" placeholder="Company name and country"/></label>
-          <label>What are you looking for?
-            <select name="product" defaultValue="">
-              <option value="" disabled>Select a product category</option>
-              {products.map(p => <option key={p.slug}>{p.name}</option>)}
-              <option>Spices &amp; staples</option>
-              <option>Other product enquiry</option>
-            </select>
-          </label>
-          <label>Quantity
-            <span className="field-row">
-              <input name="quantity" type="number" min="1" inputMode="numeric" placeholder="e.g. 24"/>
-              <select name="quantity_unit" defaultValue="MT" aria-label="Quantity unit">
-                <option>MT</option><option>20ft reefer</option><option>40ft reefer</option><option>Cartons</option>
-              </select>
-            </span>
-          </label>
-          <label>Destination port or country<input name="destination" autoComplete="country-name" placeholder="e.g. Jebel Ali, UAE"/></label>
-          <label>Incoterm
-            <select name="incoterm" defaultValue="Not sure">
-              <option>FOB</option><option>CFR</option><option>CIF</option><option>DAP</option><option>Not sure</option>
-            </select>
-          </label>
-          <label>How often do you need this?
-            <select name="frequency" defaultValue="">
-              <option value="" disabled>Select frequency</option>
-              <option>One-time</option><option>Monthly</option><option>Seasonal programme</option><option>Annual contract</option>
-            </select>
-          </label>
-          <label>Message<textarea name="message" placeholder="Product, variety, pack, estimated quantity or any relevant detail"/></label>
-          <label className="consent-field">
-            <input name="consent" type="checkbox" required value="yes"/>
-            <span>I agree that Solstice Trading International LLP may use these details to respond to my enquiry.</span>
-          </label>
-          <label className="hp-field" aria-hidden="true">Company website
-            <input name="company_website" tabIndex={-1} autoComplete="off"/>
-          </label>
-          <button className={status === 'success' ? 'button primary sent' : 'button primary'} type="submit" disabled={status === 'submitting'}>
-            {status === 'success' ? <><Icon name="check" size={16}/> Enquiry received</>
-              : status === 'submitting' ? <>Sending<span className="dots" aria-hidden="true"/></>
-              : <>Send enquiry <Icon name="arrow" size={17}/></>}
-          </button>
-          <p className="form-status" role="status" aria-live="polite">
-            {status === 'success' && 'Thank you - your enquiry has reached our team. We reply within one business day (IST 09:00-18:00).'}
-          </p>
-          {status === 'error' && (
-            <p className="form-status form-error" role="alert">
-              We could not send your enquiry. {errorDetail}{' '}
-              <a href={fallbackHref}>Email it to us instead</a> - your answers are already in the draft.
-            </p>
-          )}
-        </Reveal>
+        <EnquiryForm/>
       </div>
     </section>
     <Faq/>
-  </>
-}
-
-function ChatWidget() {
-  const [open, setOpen] = useState(false)
-  const [messages, setMessages] = useState([{ from: 'bot', text: 'Hi! Ask about fresh fruits, vegetables, or how to start a buyer enquiry.' }])
-  const [typing, setTyping] = useState(false)
-  const [asked, setAsked] = useState([])
-  const listRef = useRef(null)
-
-  useEffect(() => {
-    if (!listRef.current) return
-    listRef.current.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
-  }, [messages, typing])
-
-  const ask = (item) => {
-    setMessages(m => [...m, { from: 'user', text: item.q }])
-    setAsked(a => [...a, item.q])
-    setTyping(true)
-    setTimeout(() => {
-      setTyping(false)
-      setMessages(m => [...m, { from: 'bot', text: item.a, cta: item.cta }])
-    }, 600)
-  }
-
-  const remaining = chatFaq.filter(f => !asked.includes(f.q))
-
-  return <>
-    <div className={open ? 'chat-panel visible' : 'chat-panel'}>
-      <div className="chat-head">
-        <span className="online-dot"/>
-        <div><b>Solstice team</b><small>Usually replies within a day</small></div>
-        <button onClick={() => setOpen(false)} aria-label="Close chat"><Icon name="close" size={16}/></button>
-      </div>
-      <div className="chat-messages" ref={listRef}>
-        {messages.map((message, index) => (
-          <div key={index} className={`chat-bubble ${message.from}`}>
-            <p>{message.text}</p>
-            {message.cta && (
-              <button className="chat-bubble-cta" onClick={() => { goTo(message.cta[1]); setOpen(false) }}>
-                {message.cta[0]} <Icon name="arrow" size={13}/>
-              </button>
-            )}
-          </div>
-        ))}
-        {typing && <div className="chat-bubble bot chat-typing"><i/><i/><i/></div>}
-      </div>
-      {remaining.length > 0 ? (
-        <div className="chat-quick">
-          {remaining.slice(0, 3).map(item => <button key={item.q} onClick={() => ask(item)}>{item.q}</button>)}
-        </div>
-      ) : (
-        <div className="chat-quick">
-          <button className="chat-enquire" onClick={() => { goTo('contact'); setOpen(false) }}>Start an enquiry <Icon name="arrow" size={14}/></button>
-        </div>
-      )}
-    </div>
-    <button className="chat-button" onClick={() => setOpen(!open)} aria-label="Open chat">
-      <Icon name={open ? 'close' : 'chat'} size={22}/>
-    </button>
   </>
 }
 
