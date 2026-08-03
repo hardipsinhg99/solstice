@@ -4,7 +4,43 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#008f4c" />
-    <title>Solstice | Global Import &amp; Export</title>
+
+    <!-- ==========================================================================
+         CONFIRM BEFORE DEPLOY: every absolute URL below assumes the production
+         origin is https://solsticetrading.com/ (inferred from the enquiry address
+         in src/main.jsx). If the live domain differs, update canonical, og:url
+         and og:image together - a wrong canonical is worse than none.
+
+         Phase 0 note: hash routing means all seven routes share this one <head>,
+         so these tags describe the site, not the page. Per-route metadata arrives
+         with the Astro rebuild; this ships now only because link previews are
+         currently blank wherever the URL is shared.
+         ========================================================================== -->
+
+    <title>Solstice Trading International LLP | Fresh Produce Exporter from India</title>
+    <meta name="description" content="Indian exporter of fresh fruit, vegetables, spices and food staples - mangoes, pomegranates, grapes, onions and okra. Export cartons, phytosanitary certification and enquiries welcome from international buyers." />
+    <link rel="canonical" href="https://solsticetrading.com/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Solstice Trading International LLP" />
+    <meta property="og:title" content="Solstice Trading International LLP | Fresh Produce Exporter from India" />
+    <meta property="og:description" content="Fresh fruit, vegetables, spices and essential foods sourced across India for international buyers. Send a product enquiry with your destination and pack requirement." />
+    <meta property="og:url" content="https://solsticetrading.com/" />
+    <meta property="og:image" content="https://solsticetrading.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Solstice Trading International LLP" />
+    <meta property="og:locale" content="en_IN" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Solstice Trading International LLP | Fresh Produce Exporter from India" />
+    <meta name="twitter:description" content="Fresh fruit, vegetables, spices and essential foods sourced across India for international buyers." />
+    <meta name="twitter:image" content="https://solsticetrading.com/og-image.png" />
+
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   </head>
   <body>
     <div id="root"></div>
