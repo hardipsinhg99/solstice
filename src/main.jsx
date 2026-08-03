@@ -109,6 +109,19 @@ function Header({ route, theme, setTheme }) {
 
 function Eyebrow({ children }) { return <p className="eyebrow">{children}</p> }
 
+// The whole card is the control, not the arrow drawn inside it. role + tabIndex +
+// Enter/Space makes it keyboard-operable (SC 2.1.1); the arrow is rendered as a
+// non-focusable cue so each card stays a single tab stop.
+const cardProps = (onActivate, label) => ({
+  role: 'button',
+  tabIndex: 0,
+  'aria-label': label,
+  onClick: onActivate,
+  onKeyDown: (event) => {
+    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onActivate() }
+  }
+})
+
 function Button({ children, onClick, variant = 'primary' }) {
   return <button onClick={onClick} className={`button ${variant}`}>{children}<Icon name="arrow" size={17}/></button>
 }
@@ -228,13 +241,13 @@ function Home({ selectProduct, theme }) {
         </Reveal>
         <div className="product-feature-grid">
           {homeProducts.map((product, index) => (
-            <Reveal as="article" key={product.slug} delay={index * 90} className={`product-feature product-feature-${index}`} onClick={() => selectProduct(product.slug)}>
+            <Reveal as="article" key={product.slug} delay={index * 90} className={`product-feature product-feature-${index}`} {...cardProps(() => selectProduct(product.slug), `View ${product.name}`)}>
               <div className="product-feature-image" style={{ backgroundImage: `url('${product.image}')` }}/>
               <div className="product-feature-overlay"/>
               <span>{product.type.toUpperCase()}</span>
               <h3>{product.name}</h3>
               <p className="product-feature-desc">{product.description}</p>
-              <button aria-label={`View ${product.name}`}><Icon name="arrow"/></button>
+              <span className="card-cue" aria-hidden="true"><Icon name="arrow"/></span>
             </Reveal>
           ))}
         </div>
@@ -448,13 +461,13 @@ function Products({ selectProduct }) {
         </div>
         <div className="products-list">
           {filtered.map((product, index) => (
-            <Reveal as="article" key={product.slug} delay={(index % 3) * 80} className="product-list-card" onClick={() => selectProduct(product.slug)}>
+            <Reveal as="article" key={product.slug} delay={(index % 3) * 80} className="product-list-card" {...cardProps(() => selectProduct(product.slug), `View ${product.name}`)}>
               <div className="product-list-image" style={{ backgroundImage: `url('${product.image}')` }}/>
               <div className="product-list-info">
                 <span>{product.type}</span>
                 <h3>{product.name}</h3>
                 <p>{product.description}</p>
-                <button>View product <Icon name="arrow" size={16}/></button>
+                <span className="card-cue" aria-hidden="true">View product <Icon name="arrow" size={16}/></span>
               </div>
             </Reveal>
           ))}
@@ -512,11 +525,11 @@ function ProductDetail({ product, selectProduct }) {
           </Reveal>
           <div className="related-grid">
             {related.map((p, i) => (
-              <Reveal as="article" key={p.slug} delay={i * 90} className="related-card" onClick={() => selectProduct(p.slug)}>
+              <Reveal as="article" key={p.slug} delay={i * 90} className="related-card" {...cardProps(() => selectProduct(p.slug), `View ${p.name}`)}>
                 <div className="related-image" style={{ backgroundImage: `url('${p.image}')` }}/>
                 <span>{p.type}</span>
                 <h3>{p.name}</h3>
-                <button aria-label={`View ${p.name}`}><Icon name="arrow" size={15}/></button>
+                <span className="card-cue" aria-hidden="true"><Icon name="arrow" size={15}/></span>
               </Reveal>
             ))}
           </div>
