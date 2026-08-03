@@ -418,6 +418,19 @@ h2{font-size:clamp(41px,4.6vw,65px)}
 .contact-page input:focus,.contact-page select:focus,.contact-page textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 20%,transparent)}
 .contact-page textarea{height:90px;resize:vertical}
 .contact-page form .button{justify-content:space-between;margin-top:4px}
+.contact-page form .button[disabled]{opacity:.7;cursor:progress}
+.field-row{display:grid;grid-template-columns:1fr minmax(96px,auto);gap:8px;align-items:start}
+.field-row select{width:auto}
+.consent-field{display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:start;line-height:1.5}
+.consent-field input{width:16px;height:16px;margin-top:1px;accent-color:var(--green)}
+.hp-field{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.form-status{margin:0;font-size:12px;line-height:1.6;color:var(--green)}
+.form-status:empty{display:none}
+.form-error{color:var(--ink);border-left:2px solid var(--gold);padding-left:12px}
+.form-error a{color:var(--green);font-weight:600;text-decoration:underline}
+.dots:after{content:'';animation:dots 1.2s steps(4,end) infinite}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+@media(prefers-reduced-motion:reduce){.dots:after{animation:none;content:'...'}}
 
 /* ============================================================
    FAQ accordion

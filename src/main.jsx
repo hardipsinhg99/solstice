@@ -634,8 +634,64 @@ function Faq() {
   )
 }
 
+// Lead capture. VITE_ vars are inlined into the client bundle and are therefore
+// public - only ever put a form-provider public form id / access key here.
+const FORM_ENDPOINT = import.meta.env.VITE_FORM_ENDPOINT
+const FORM_ACCESS_KEY = import.meta.env.VITE_FORM_ACCESS_KEY
+const ENQUIRY_EMAIL = 'hello@solsticetrading.com'
+
+// Failure fallback: never lose a lead to a dead endpoint - hand the buyer a
+// prefilled mail draft carrying everything they already typed.
+function mailtoFallback(payload) {
+  const lines = [
+    ['Name', payload.name], ['Email', payload.email], ['Phone', payload.phone],
+    ['Company / market', payload.company], ['Product', payload.product],
+    ['Quantity', [payload.quantity, payload.quantity_unit].filter(Boolean).join(' ')],
+    ['Destination', payload.destination], ['Incoterm', payload.incoterm],
+    ['Frequency', payload.frequency], ['Message', payload.message]
+  ].filter(([, value]) => value).map(([label, value]) => `${label}: ${value}`)
+  const subject = `Enquiry - ${payload.product || 'general'}${payload.company ? ` - ${payload.company}` : ''}`
+  return `mailto:${ENQUIRY_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`
+}
+
 function Contact() {
-  const [sent, setSent] = useState(false)
+  const [status, setStatus] = useState('idle') // idle | submitting | success | error
+  const [errorDetail, setErrorDetail] = useState('')
+  const [fallbackHref, setFallbackHref] = useState(`mailto:${ENQUIRY_EMAIL}`)
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    const form = event.currentTarget
+    const payload = Object.fromEntries(new FormData(form))
+    if (payload.company_website) return // honeypot tripped - drop silently
+    delete payload.company_website
+    setFallbackHref(mailtoFallback(payload))
+
+    if (!FORM_ENDPOINT) {
+      setStatus('error')
+      setErrorDetail('The enquiry endpoint is not configured (VITE_FORM_ENDPOINT is unset).')
+      return
+    }
+
+    setStatus('submitting')
+    setErrorDetail('')
+    try {
+      if (FORM_ACCESS_KEY) payload.access_key = FORM_ACCESS_KEY
+      payload.subject = `New enquiry: ${payload.product || 'general'}${payload.company ? ` - ${payload.company}` : ''}`
+      const response = await fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      if (!response.ok) throw new Error(`The enquiry service responded ${response.status}.`)
+      setStatus('success')
+      form.reset()
+    } catch (error) {
+      setStatus('error')
+      setErrorDetail(error.message === 'Failed to fetch' ? 'Could not reach the enquiry service.' : error.message)
+    }
+  }
+
   return <>
     <PageTitle mark="07" eyebrow="CONTACT SOLSTICE" title="Let’s talk" accent="produce." copy="Tell us what you are looking for and where you want it to go."/>
     <section className="contact-page section">
@@ -650,24 +706,61 @@ function Contact() {
             <span><Icon name="leaf" size={16}/> Fresh fruits &amp; vegetables</span>
           </div>
         </Reveal>
-        <Reveal as="form" delay={100} onSubmit={event => { event.preventDefault(); setSent(true) }}>
-          <label>Name<input required placeholder="Your name"/></label>
-          <label>Business email<input required type="email" placeholder="you@company.com"/></label>
-          <label>Phone<input type="tel" placeholder="+1 234 567 8900"/></label>
-          <label>Company / market<input placeholder="Company name and country"/></label>
+        <Reveal as="form" delay={100} onSubmit={handleSubmit} aria-busy={status === 'submitting'}>
+          <label>Name<input name="name" required autoComplete="name" placeholder="Your name"/></label>
+          <label>Business email<input name="email" required type="email" autoComplete="email" placeholder="you@company.com"/></label>
+          <label>Phone / WhatsApp<input name="phone" type="tel" autoComplete="tel" placeholder="+1 234 567 8900"/></label>
+          <label>Company / market<input name="company" autoComplete="organization" placeholder="Company name and country"/></label>
           <label>What are you looking for?
-            <select defaultValue="">
+            <select name="product" defaultValue="">
               <option value="" disabled>Select a product category</option>
-              <option>Fresh fruits</option>
-              <option>Fresh vegetables</option>
-              <option>Seasonal produce enquiry</option>
+              {products.map(p => <option key={p.slug}>{p.name}</option>)}
+              <option>Spices &amp; staples</option>
               <option>Other product enquiry</option>
             </select>
           </label>
-          <label>Message<textarea placeholder="Product, variety, pack, estimated quantity or any relevant detail"/></label>
-          <button className={sent ? 'button primary sent' : 'button primary'} type="submit">
-            {sent ? <><Icon name="check" size={16}/> Enquiry received</> : <>Send enquiry <Icon name="arrow" size={17}/></>}
+          <label>Quantity
+            <span className="field-row">
+              <input name="quantity" type="number" min="1" inputMode="numeric" placeholder="e.g. 24"/>
+              <select name="quantity_unit" defaultValue="MT" aria-label="Quantity unit">
+                <option>MT</option><option>20ft reefer</option><option>40ft reefer</option><option>Cartons</option>
+              </select>
+            </span>
+          </label>
+          <label>Destination port or country<input name="destination" autoComplete="country-name" placeholder="e.g. Jebel Ali, UAE"/></label>
+          <label>Incoterm
+            <select name="incoterm" defaultValue="Not sure">
+              <option>FOB</option><option>CFR</option><option>CIF</option><option>DAP</option><option>Not sure</option>
+            </select>
+          </label>
+          <label>How often do you need this?
+            <select name="frequency" defaultValue="">
+              <option value="" disabled>Select frequency</option>
+              <option>One-time</option><option>Monthly</option><option>Seasonal programme</option><option>Annual contract</option>
+            </select>
+          </label>
+          <label>Message<textarea name="message" placeholder="Product, variety, pack, estimated quantity or any relevant detail"/></label>
+          <label className="consent-field">
+            <input name="consent" type="checkbox" required value="yes"/>
+            <span>I agree that Solstice Trading International LLP may use these details to respond to my enquiry.</span>
+          </label>
+          <label className="hp-field" aria-hidden="true">Company website
+            <input name="company_website" tabIndex={-1} autoComplete="off"/>
+          </label>
+          <button className={status === 'success' ? 'button primary sent' : 'button primary'} type="submit" disabled={status === 'submitting'}>
+            {status === 'success' ? <><Icon name="check" size={16}/> Enquiry received</>
+              : status === 'submitting' ? <>Sending<span className="dots" aria-hidden="true"/></>
+              : <>Send enquiry <Icon name="arrow" size={17}/></>}
           </button>
+          <p className="form-status" role="status" aria-live="polite">
+            {status === 'success' && 'Thank you - your enquiry has reached our team. We reply within one business day (IST 09:00-18:00).'}
+          </p>
+          {status === 'error' && (
+            <p className="form-status form-error" role="alert">
+              We could not send your enquiry. {errorDetail}{' '}
+              <a href={fallbackHref}>Email it to us instead</a> - your answers are already in the draft.
+            </p>
+          )}
         </Reveal>
       </div>
     </section>
