@@ -154,6 +154,13 @@ h2{font-size:clamp(41px,4.6vw,65px)}
 .hero-scroll-cue i{width:1px;height:30px;background:linear-gradient(#d8ded0,transparent);position:relative;display:block}
 .hero-scroll-cue i:after{content:'';position:absolute;left:-2px;top:0;width:5px;height:5px;border-radius:50%;background:var(--lime);animation:scrollDot 2.2s ease-in-out infinite}
 @keyframes scrollDot{0%{top:0;opacity:1}75%{opacity:1}100%{top:28px;opacity:0}}
+/* The two continuous loops - heroZoom (30s) and scrollDot (2.2s). Continuous
+   motion is what SC 2.3.3 is actually about, so stopping only the entrance
+   animations above left the criterion unmet. Must sit after both base rules:
+   at equal specificity the later declaration wins. */
+@media(prefers-reduced-motion:reduce){
+  .hero-media:before,.hero-scroll-cue i:after{animation:none}
+}
 
 /* ============================================================
    Home - intro, feature grid, buyer path, manifesto, cta
