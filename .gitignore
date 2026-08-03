@@ -6,3 +6,6 @@ dist
 .env
 .env.local
 .env.*.local
+
+# Original video masters - re-encoded into public/hero/, not shipped
+media-source/

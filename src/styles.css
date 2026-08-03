@@ -17,15 +17,21 @@ html[data-theme='dark']{
   --green:#6cc793;--deep:#0a1510;--lime:#e2f27a;--gold:#d9bb74;--soft:#1b3226;
   --shadow:0 24px 60px rgba(0,0,0,.4);
 }
-/* Hero photography swaps with the theme toggle */
+/* Hero photography swaps with the theme toggle.
+   Scrim alphas are set by the brightest frame of the hero video, not by the
+   poster: the video carries blown warm highlights (raw rgb(255,245,208)) that
+   the Unsplash stills do not. Measured worst case across all 192 frames over
+   the copy block - light: body 5.97:1, dark: body 7.64:1. Weakening any stop
+   drops body copy below 4.5:1. */
 :root{
   --hero-image:url('https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&w=2000&q=80');
-  --hero-scrim:linear-gradient(100deg,rgba(9,26,18,.94) 0%,rgba(9,26,18,.84) 26%,rgba(9,26,18,.52) 52%,rgba(9,26,18,.2) 76%,rgba(9,26,18,.09) 100%);
+  --hero-scrim:linear-gradient(100deg,rgba(9,26,18,.96) 0%,rgba(9,26,18,.90) 26%,rgba(9,26,18,.72) 52%,rgba(9,26,18,.34) 76%,rgba(9,26,18,.12) 100%);
   --hero-filter:saturate(1.08) brightness(1.01);
+  --hero-video-fade:600ms;
 }
 html[data-theme='dark']{
   --hero-image:url('https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?auto=format&fit=crop&w=2000&q=80');
-  --hero-scrim:linear-gradient(100deg,rgba(4,12,8,.97) 0%,rgba(4,12,8,.88) 28%,rgba(4,12,8,.54) 54%,rgba(4,12,8,.22) 78%,rgba(4,12,8,.1) 100%);
+  --hero-scrim:linear-gradient(100deg,rgba(4,12,8,.98) 0%,rgba(4,12,8,.93) 28%,rgba(4,12,8,.75) 54%,rgba(4,12,8,.36) 78%,rgba(4,12,8,.13) 100%);
   --hero-filter:saturate(1.02) brightness(.9);
 }
 
@@ -121,6 +127,13 @@ h2{font-size:clamp(41px,4.6vw,65px)}
 .home-hero{height:730px;position:relative;overflow:hidden;background:#0c1b13;isolation:isolate}
 .hero-media{position:absolute;inset:0;z-index:0;overflow:hidden}
 .hero-media:before{content:'';position:absolute;inset:-4%;background:var(--hero-image) center/cover no-repeat;filter:var(--hero-filter);animation:heroZoom 30s ease-in-out infinite alternate}
+/* Video layer. Paint order inside .hero-media is ::before -> children -> ::after,
+   so the poster sits below and the scrim above without any z-index. Starts fully
+   transparent and is only revealed once canplay fires; if it never fires, this
+   element is invisible and the poster is what the user sees. */
+.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:var(--hero-filter);opacity:0;transition:opacity var(--hero-video-fade) var(--ease);pointer-events:none}
+.hero-video.ready{opacity:1}
+@media(prefers-reduced-motion:reduce){.hero-video{transition:none}}
 .hero-media:after{content:'';position:absolute;inset:0;background:var(--hero-scrim)}
 @keyframes heroZoom{from{transform:scale(1)}to{transform:scale(1.09)}}
 .home-hero-inner{height:620px;position:relative;z-index:2;display:flex;align-items:center}
