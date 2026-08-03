@@ -4,7 +4,7 @@ import { Globe } from './Globe.jsx'
 import './styles.css'
 
 const globeMarkers = [
-  { id: 'india', location: [19.0760, 72.8777], label: 'Mumbai, India — HQ' },
+  { id: 'india', location: [19.0760, 72.8777], label: 'Mumbai, India - HQ' },
   { id: 'uae', location: [25.2048, 55.2708], label: 'Dubai, UAE' },
   { id: 'vietnam', location: [10.8231, 106.6297], label: 'Ho Chi Minh City, Vietnam' },
   { id: 'china', location: [31.2304, 121.4737], label: 'Shanghai, China' }
@@ -139,7 +139,7 @@ function Home({ selectProduct, theme }) {
         <div className="hero-copy">
           <Eyebrow>GLOBAL SOURCING · IMPORT &amp; EXPORT</Eyebrow>
           <h1>From nature to<br/>your <em>table.</em></h1>
-          <p>Solstice Trading International LLP is a global import-export and sourcing company delivering premium fruits, vegetables, spices and essential food products — headquartered in India, with operational footprints across the UAE, Vietnam and China.</p>
+          <p>Solstice Trading International LLP is a global import-export and sourcing company delivering premium fruits, vegetables, spices and essential food products - headquartered in India, with operational footprints across the UAE, Vietnam and China.</p>
           <div className="hero-buttons">
             <Button onClick={() => goTo('products')}>Explore our produce</Button>
             <button className="quiet-link" onClick={() => goTo('contact')}>Request product details <Icon name="arrow" size={16}/></button>
@@ -147,7 +147,7 @@ function Home({ selectProduct, theme }) {
           <div className="hero-meta"><span>FRESH PRODUCE</span><i/><span>SPICES &amp; STAPLES</span><i/><span>GLOBAL TRADE</span></div>
         </div>
       </div>
-      <div className="hero-footer container"><span>GLOBAL IMPORT &amp; EXPORT · INDIA</span><div/><b>01 — 07</b></div>
+      <div className="hero-footer container"><span>GLOBAL IMPORT &amp; EXPORT · INDIA</span><div/><b>01 - 07</b></div>
     </section>
 
     <section className="intro-block section">
@@ -157,7 +157,7 @@ function Home({ selectProduct, theme }) {
           <h2>Your global<br/><em>growth partner.</em></h2>
         </Reveal>
         <Reveal as="div" delay={90}>
-          <p>Solstice Trading International LLP is committed to delivering premium quality food and agricultural products across international markets. Headquartered in India, with operational footprints in the UAE, Vietnam and China, we specialise in the trade of fresh fruits, vegetables, spices and essential food products — built on high-margin, sustainable business practices.</p>
+          <p>Solstice Trading International LLP is committed to delivering premium quality food and agricultural products across international markets. Headquartered in India, with operational footprints in the UAE, Vietnam and China, we specialise in the trade of fresh fruits, vegetables, spices and essential food products - built on high-margin, sustainable business practices.</p>
           <Button variant="outline" onClick={() => goTo('contact')}>Send your requirement</Button>
         </Reveal>
       </div>
@@ -209,7 +209,7 @@ function Home({ selectProduct, theme }) {
           </Reveal>
           <Reveal as="div" delay={160} className="globe-legend">
             <ul>
-              <li><i/> India — Headquarters</li>
+              <li><i/> India - Headquarters</li>
               <li><i/> United Arab Emirates</li>
               <li><i/> Vietnam</li>
               <li><i/> China</li>
@@ -320,7 +320,7 @@ function About() {
         <Reveal as="div">
           <Eyebrow>FROM THE FOUNDER</Eyebrow>
           <h2>A message from<br/>our <em>founder.</em></h2>
-          <p>Solstice Trading was built on a simple idea: fresh produce trade should be direct, transparent and easy to work with. Every enquiry we receive is handled with the same care we would want as a buyer ourselves — clear communication, honest availability and a genuine partnership mindset.</p>
+          <p>Solstice Trading was built on a simple idea: fresh produce trade should be direct, transparent and easy to work with. Every enquiry we receive is handled with the same care we would want as a buyer ourselves - clear communication, honest availability and a genuine partnership mindset.</p>
           <p>We are grateful to the buyers, growers and partners who have trusted us so far, and we look forward to growing with you.</p>
           <div className="founder-sign"><b>[Founder Name]</b><span>Founder &amp; Director, Solstice Trading International LLP</span></div>
         </Reveal>
@@ -526,7 +526,7 @@ function ProductDetail({ product, selectProduct }) {
     <section className="detail-note">
       <div className="container">
         <Icon name="leaf"/>
-        <p>Fresh produce is naturally seasonal. Final details—including variety, size, packing and availability—are confirmed with our team for each enquiry.</p>
+        <p>Fresh produce is naturally seasonal. Final details-including variety, size, packing and availability-are confirmed with our team for each enquiry.</p>
       </div>
     </section>
   </>
@@ -606,9 +606,9 @@ const contactFaq = [
   { q: 'What products do you export?', a: 'Fresh fruits and vegetables, spices and select essential food products, sourced from growing regions across India.' },
   { q: 'Which countries do you operate in?', a: 'We are headquartered in India with operational footprints across the UAE, Vietnam and China, and work with buyers in other markets on enquiry.' },
   { q: 'What certifications do you have?', a: 'We hold an Import Export Code (IEC) and provide phytosanitary certification with every shipment; further certifications are confirmed per product and destination.' },
-  { q: 'What is your minimum order quantity?', a: 'MOQ depends on the product, pack format and destination — share your requirement and we will confirm what is possible.' },
+  { q: 'What is your minimum order quantity?', a: 'MOQ depends on the product, pack format and destination - share your requirement and we will confirm what is possible.' },
   { q: 'How do you ensure quality?', a: 'Every shipment is visually graded and quality-checked at origin before packing and dispatch.' },
-  { q: 'What is your typical shipping time?', a: 'Shipping time depends on the destination port and mode of transport — we will confirm an estimated timeline as part of your enquiry.' }
+  { q: 'What is your typical shipping time?', a: 'Shipping time depends on the destination port and mode of transport - we will confirm an estimated timeline as part of your enquiry.' }
 ]
 
 function Faq() {
@@ -715,7 +715,7 @@ function Footer() {
 
 const chatFaq = [
   { q: 'What products do you export?', a: 'Fresh Indian fruits such as mangoes, pomegranates and table grapes, plus vegetables like onions and okra.', cta: ['Browse products', 'products'] },
-  { q: 'How do I start an enquiry?', a: 'Share your product, destination and preferred pack — we will get back to you with seasonal availability.', cta: ['Start an enquiry', 'contact'] },
+  { q: 'How do I start an enquiry?', a: 'Share your product, destination and preferred pack - we will get back to you with seasonal availability.', cta: ['Start an enquiry', 'contact'] },
   { q: 'Is produce available year-round?', a: 'Availability is seasonal and varies by product. Each product page lists its current window.', cta: ['See seasonality', 'products'] },
   { q: 'Where do you source from?', a: 'We source across growing regions in India and work with buyers, distributors and foodservice teams worldwide.', cta: ['Meet the team', 'team'] }
 ]
