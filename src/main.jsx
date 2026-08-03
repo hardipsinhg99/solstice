@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Globe } from './Globe.jsx'
-import './styles.css'
+import './styles/index.css'
 
 const globeMarkers = [
   { id: 'india', location: [19.0760, 72.8777], label: 'Mumbai, India - HQ' },
