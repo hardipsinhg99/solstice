@@ -15,6 +15,49 @@ worth sending an RFQ to. Every design and content decision serves that, not bran
   the product spec-sheet schema, the SEO roadmap, the RFQ design and 13 open questions.
   Do not re-derive those decisions.
 
+## Architecture
+
+`src/` is decomposed page-wise. This is the **target structure for the Astro rebuild**, not an
+intermediate — migrating should mean swapping the shell and router, not redesigning the tree.
+
+```
+src/
+├── app/          App.jsx · router.js (hash — the one file the migration deletes)
+│                 navigation.js (the seam) · ThemeProvider.jsx
+├── components/   ui/ (Icon, Button, Eyebrow, Card) · layout/ (Header, Nav, Footer, PageTitle)
+│                 motion/ (Reveal, useInView)
+├── features/     products/ · enquiry/ · globe/ · chat/     (one index.js barrel each)
+├── pages/        <page>/<Page>Page.jsx + optional sections/
+├── data/         products · navigation · faqs · globe      (the seam a CMS plugs into)
+├── lib/          constants.js
+├── styles/       tokens · base · layout · components · pages · footer · responsive
+└── main.jsx      mount only (10 lines)
+```
+
+**Import direction is one-way: `pages → features → components → lib`.** A `features/` module must
+never import from `pages/`. A `components/ui` primitive must never import domain data. If you need
+to break this, stop and raise it — it's a design smell, not something to route around.
+
+**Where new code goes.** Zero domain knowledge → `components/ui`. Site chrome → `components/layout`.
+Domain logic used by more than one page → `features/<domain>`. Used by exactly one page →
+`pages/<page>/sections/`. **Promote to `features/` only when a second page actually consumes it**,
+never speculatively.
+
+**No barrel files except one per `features/` folder.** Barrels at every level hurt HMR and
+tree-shaking for no ergonomic gain at this size.
+
+**Named exports everywhere except pages**, which are default exports. One component per file, named
+for the file.
+
+**Navigation never couples to the router.** Components call `useNavigate()` from `app/navigation.js`
+and receive a `(route) => void`. Only `app/router.js` knows routing is hash-based. Do not import
+`goTo` into a component.
+
+**CSS splits by cascade order, not by component.** Each file in `styles/` is a *contiguous* slice of
+the original single stylesheet, and `index.css` imports them in that exact order. Adding a rule means
+putting it in the file whose cascade position it belongs to — never reordering the imports, and never
+converting to CSS Modules (a rebuild-phase decision on a hand-written cascade).
+
 ## Design work: use the UI/UX Pro Max skills
 
 The `ui-ux-pro-max` skill set is installed in `.claude/skills/`. **Consult it before making
@@ -56,6 +99,5 @@ If a query returns no match, say so explicitly rather than quietly falling back 
 ## House rules
 
 - Don't add TypeScript, Tailwind, a router library, a test runner or a linter without asking.
-- Don't split `src/main.jsx` — it is replaced by the Astro rebuild.
 - Don't self-host or swap the Unsplash imagery; that is a rebuild decision pending real photography.
 - Never commit a form key or secret. `VITE_*` vars are inlined into the client bundle and are public.
