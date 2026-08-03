@@ -9,3 +9,7 @@ dist
 
 # Original video masters - re-encoded into public/hero/, not shipped
 media-source/
+
+# Python bytecode from skill scripts
+__pycache__/
+*.pyc
