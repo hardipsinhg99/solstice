@@ -10,6 +10,10 @@ import { Button } from './components/ui/Button.jsx'
 import { Eyebrow } from './components/ui/Eyebrow.jsx'
 import { cardProps } from './components/ui/Card.jsx'
 import { Reveal } from './components/motion/Reveal.jsx'
+import { Header } from './components/layout/Header.jsx'
+import { Footer } from './components/layout/Footer.jsx'
+import { PageTitle } from './components/layout/PageTitle.jsx'
+import { NavigationProvider } from './app/navigation.js'
 import { HERO_VIDEO_SRC, ENQUIRY_EMAIL, FORM_ENDPOINT, FORM_ACCESS_KEY } from './lib/constants.js'
 import './styles/index.css'
 
@@ -100,56 +104,6 @@ function HeroVideo() {
 function HeroMedia() {
   const allowed = useHeroVideoAllowed()
   return <div className="hero-media" aria-hidden="true">{allowed && <HeroVideo/>}</div>
-}
-
-function Header({ route, theme, setTheme }) {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-  useEffect(() => { document.body.style.overflow = menuOpen ? 'hidden' : '' }, [menuOpen])
-  const navigate = (target) => { goTo(target); setMenuOpen(false) }
-  return (
-    <header className={scrolled ? 'site-header scrolled' : 'site-header'}>
-      <div className="container nav">
-        <button className="brand brand-logo" onClick={() => navigate('home')} aria-label="Solstice home">
-          <img src="/solstice-logo.png" alt="Solstice Trading International LLP"/>
-        </button>
-        <nav className={menuOpen ? 'nav-links open' : 'nav-links'}>
-          {navItems.map(([target, label]) => (
-            <button className={route === target ? 'active' : ''} key={target} onClick={() => navigate(target)}>{label}</button>
-          ))}
-          <button className="nav-cta" onClick={() => navigate('contact')}>Send enquiry <Icon name="arrow" size={14}/></button>
-        </nav>
-        <div className="nav-tools">
-          <button className="theme-toggle" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label="Toggle theme">
-            <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={17}/>
-          </button>
-          <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
-            <Icon name={menuOpen ? 'close' : 'menu'}/>
-          </button>
-        </div>
-      </div>
-      {menuOpen && <div className="nav-backdrop" onClick={() => setMenuOpen(false)} aria-hidden="true"/>}
-    </header>
-  )
-}
-
-function PageTitle({ eyebrow, title, accent, copy, mark }) {
-  return (
-    <section className="page-title">
-      {mark && <span className="title-mark" aria-hidden="true">{mark}</span>}
-      <div className="container">
-        <Eyebrow>{eyebrow}</Eyebrow>
-        <h1>{title} <em>{accent}</em></h1>
-        {copy && <p>{copy}</p>}
-      </div>
-    </section>
-  )
 }
 
 function Home({ selectProduct, theme }) {
@@ -779,44 +733,6 @@ function Contact() {
   </>
 }
 
-function Footer() {
-  return (
-    <footer>
-      <div className="footer-cta">
-        <div className="container footer-cta-inner">
-          <div><Eyebrow>NEW ENQUIRY</Eyebrow><h3>Looking to source fresh produce, spices or staples from India?</h3></div>
-          <Button onClick={() => goTo('contact')} variant="lime">Start an enquiry</Button>
-        </div>
-      </div>
-      <div className="container footer-grid">
-        <div className="footer-brand">
-          <button className="brand brand-logo footer-logo" onClick={() => goTo('home')} aria-label="Solstice home">
-            <img src="/solstice-logo.png" alt="Solstice Trading International LLP"/>
-          </button>
-          <p>Fresh produce, spices &amp; essential foods<br/>from India, for international buyers.</p>
-        </div>
-        <div className="footer-col">
-          <span className="footer-heading">Explore</span>
-          {navItems.slice(1, 4).map(([route, label]) => <button key={route} onClick={() => goTo(route)}>{label}</button>)}
-        </div>
-        <div className="footer-col">
-          <span className="footer-heading">Company</span>
-          {navItems.slice(4).map(([route, label]) => <button key={route} onClick={() => goTo(route)}>{label}</button>)}
-        </div>
-        <div className="footer-col">
-          <span className="footer-heading">Get in touch</span>
-          <a href="mailto:hello@solsticetrading.com">hello@solsticetrading.com</a>
-          <span className="footer-note">International buyer enquiries welcome</span>
-        </div>
-      </div>
-      <div className="container footer-bottom">
-        <span>© {new Date().getFullYear()} Solstice Trading International LLP</span>
-        <span>Fresh produce export, from India to your market.</span>
-      </div>
-    </footer>
-  )
-}
-
 function ChatWidget() {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([{ from: 'bot', text: 'Hi! Ask about fresh fruits, vegetables, or how to start a buyer enquiry.' }])
@@ -906,12 +822,12 @@ function App() {
     contact: <Contact/>
   }
 
-  return <>
+  return <NavigationProvider value={goTo}>
     <Header route={route.startsWith('product/') ? 'products' : route} theme={theme} setTheme={setTheme}/>
     <main>{route.startsWith('product/') ? <ProductDetail product={product} selectProduct={selectProduct}/> : (pages[route] || pages.home)}</main>
     <Footer/>
     <ChatWidget/>
-  </>
+  </NavigationProvider>
 }
 
 createRoot(document.getElementById('root')).render(<App />)
