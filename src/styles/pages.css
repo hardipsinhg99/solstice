@@ -225,7 +225,9 @@
    the one later in the DOM paints on top. .products-page therefore needs an
    opaque --bg to actually hide what passes beneath it. */
 .explode-scroll{position:relative;height:200vh;margin-bottom:-1px}
-.explode-stage{position:sticky;top:0;height:100vh;overflow:hidden;display:block}
+.explode-stage{position:sticky;top:0;height:100vh;overflow:hidden;display:block;
+  background-image:var(--explode-poster);background-size:cover;background-position:center}
+.explode-stage.ready{background-image:none}
 .explode-canvas{
   display:block;width:100%;height:100%;
   opacity:0;transition:opacity .5s var(--ease);

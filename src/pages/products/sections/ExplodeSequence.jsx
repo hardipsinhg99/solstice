@@ -41,7 +41,14 @@ function ExplodeCanvas() {
 
   return (
     <div className="explode-scroll" ref={scrollRef} aria-hidden="true">
-      <div className="explode-stage">
+      {/* The poster is the stage's background until every frame has preloaded, so
+          the section is never an empty box - on a slow connection that wait is
+          measured in tens of seconds. Dropped once `ready` so it stops painting
+          underneath an opaque canvas. */}
+      <div
+        className={ready ? 'explode-stage ready' : 'explode-stage'}
+        style={{ '--explode-poster': `url(${POSTER_SRC})` }}
+      >
         <canvas
           ref={canvasRef}
           className={ready ? 'explode-canvas ready' : 'explode-canvas'}
