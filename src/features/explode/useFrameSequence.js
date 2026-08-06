@@ -4,8 +4,8 @@ import { FRAME_COUNT, framePath, MAX_DPR, DESCENT_VH, FADE_START, FADE_TO } from
 // Drives the scroll-linked frame sequence.
 //
 // Division of labour, which is the whole performance story:
-//   - the scroll listener RECORDS progress and does nothing else
-//   - a single rAF loop reads that progress and draws
+//   - there is no scroll listener at all; a single rAF loop measures and draws
+//   - the loop only runs while the section intersects the viewport
 //   - the draw is skipped entirely when the frame index has not moved
 //
 // Returns { ready, failed }. Until `ready` the caller shows the poster; on
@@ -30,6 +30,11 @@ export function useFrameSequence({ scrollRef, canvasRef }) {
     const load = (i) => new Promise((resolve, reject) => {
       const img = new Image()
       img.decoding = 'async'
+      // 60 frames fire as 60 concurrent requests, and on the Products page they
+      // race the catalogue photography the buyer actually came for. The sequence
+      // is not visible until the user scrolls into it, so it explicitly yields:
+      // the browser schedules these behind anything of default priority.
+      img.fetchPriority = 'low'
       img.onload = () => {
         images[i] = img
         // decode() moves the rasterisation cost off the first draw. A decode
@@ -74,15 +79,18 @@ export function useFrameSequence({ scrollRef, canvasRef }) {
     ro.observe(canvas)
     resize()
 
+    // getBoundingClientRect forces a synchronous layout. Called from the scroll
+    // listener - as it was - that happens at input frequency, ahead of style and
+    // layout for the frame, which is the classic layout-thrash shape even though
+    // the comment described the listener as doing "nothing else". Reading it
+    // inside the rAF tick instead means at most one forced layout per painted
+    // frame, and none at all while the loop is parked.
     const readProgress = () => {
       const r = scroller.getBoundingClientRect()
       const span = r.height - window.innerHeight
       progressRef.current = span <= 0 ? 0 : Math.min(1, Math.max(0, -r.top / span))
     }
     readProgress()
-
-    const onScroll = () => { readProgress() } // records only - never draws
-    window.addEventListener('scroll', onScroll, { passive: true })
 
     const draw = (index) => {
       const img = framesRef.current?.[index]
@@ -95,6 +103,7 @@ export function useFrameSequence({ scrollRef, canvasRef }) {
 
     const tick = () => {
       rafRef.current = activeRef.current ? requestAnimationFrame(tick) : 0
+      readProgress()
       const p = progressRef.current
 
       // Compositor-only properties. Only touched when they actually move, so a
@@ -130,7 +139,6 @@ export function useFrameSequence({ scrollRef, canvasRef }) {
       activeRef.current = false
       io.disconnect()
       ro.disconnect()
-      window.removeEventListener('scroll', onScroll)
     }
   }, [ready, failed, canvasRef, scrollRef])
 

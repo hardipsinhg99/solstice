@@ -4,9 +4,12 @@ import { products } from '../../data/products.js'
 import { useEnquirySubmit } from './useEnquirySubmit.js'
 
 export function EnquiryForm() {
-  const { status, errorDetail, fallbackHref, handleSubmit } = useEnquirySubmit()
+  const { status, errorDetail, fallbackHref, handleSubmit, resetStatus } = useEnquirySubmit()
   return (
-    <Reveal as="form" delay={100} onSubmit={handleSubmit} aria-busy={status === 'submitting'}>
+    // onInput rather than onChange so the reset fires on the first keystroke,
+    // not on blur - the stale "Enquiry received" label would otherwise sit there
+    // through the whole of the next enquiry being typed.
+    <Reveal as="form" delay={100} onSubmit={handleSubmit} onInput={resetStatus} aria-busy={status === 'submitting'}>
       <label>Name<input name="name" required autoComplete="name" placeholder="Your name"/></label>
       <label>Business email<input name="email" required type="email" autoComplete="email" placeholder="you@company.com"/></label>
       <label>Phone / WhatsApp<input name="phone" type="tel" autoComplete="tel" placeholder="+1 234 567 8900"/></label>

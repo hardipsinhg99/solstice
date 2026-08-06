@@ -20,6 +20,13 @@ export function useEnquirySubmit() {
   const [errorDetail, setErrorDetail] = useState('')
   const [fallbackHref, setFallbackHref] = useState(`mailto:${ENQUIRY_EMAIL}`)
 
+  // Both terminal states used to be permanent. After a success the button read
+  // "Enquiry received" forever, so a buyer sending a second enquiry for another
+  // product got no feedback that anything had happened; after a failure the
+  // error stayed on screen while they corrected the field it complained about.
+  // Any edit returns the form to idle.
+  const resetStatus = () => setStatus(s => (s === 'success' || s === 'error' ? 'idle' : s))
+
   const handleSubmit = async (event) => {
     event.preventDefault()
     const form = event.currentTarget
@@ -53,5 +60,5 @@ export function useEnquirySubmit() {
     }
   }
 
-  return { status, errorDetail, fallbackHref, handleSubmit }
+  return { status, errorDetail, fallbackHref, handleSubmit, resetStatus }
 }

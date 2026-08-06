@@ -3,7 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#008f4c" />
+    <meta name="theme-color" content="#f8f7f1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1c16" media="(prefers-color-scheme: dark)" />
+
+    <!-- Theme bootstrap. Must run before first paint: ThemeProvider applies the
+         theme in an effect, which lands *after* the first frame, so a returning
+         dark-theme buyer got a full flash of the light palette. Setting the
+         attribute here makes the first painted frame already correct, and
+         ThemeProvider reads its initial state back off this element.
+         localStorage throws in sandboxed/blocked-cookie contexts - hence try. -->
+    <script>
+      (function () {
+        var theme = 'light'
+        try {
+          theme = localStorage.getItem('solstice-theme') ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        } catch (e) { /* storage blocked - fall through to light */ }
+        document.documentElement.dataset.theme = theme
+      })()
+    </script>
+
+    <!-- Fonts are linked here, not @import-ed from index.css. An @import inside a
+         stylesheet cannot start until that stylesheet has downloaded AND parsed,
+         which serialises two round-trips onto the critical path before a single
+         glyph is requested. preconnect warms the TLS handshake in parallel. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap"
+    />
 
     <!-- ==========================================================================
          CONFIRM BEFORE DEPLOY: every absolute URL below assumes the production

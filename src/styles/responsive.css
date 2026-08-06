@@ -1,15 +1,72 @@
 /* ============================================================
    Responsive
+
+   Breakpoints, widest first:
+     781-1024px  tablet / small laptop
+     <=780px     phone (also the gate for the hero video and the explode
+                 sequence - see features/explode/config.js)
+     <=480px     small phone
+     <=390px     narrow phone
+
+   The tablet tier below did not exist. The site went straight from the full
+   desktop composition at 781px to a single column at 780px, so every four- and
+   three-column grid, and every percentage gutter tuned for a 1180px container,
+   was rendered into ~750px of usable width: four differentiator cards at 170px
+   each, catalogue cards narrower than their own headings, and a manifesto stat
+   block whose -8% offset hung off the left edge of the container.
    ============================================================ */
+@media(min-width:781px) and (max-width:1024px){
+  .section{padding:88px 0}
+
+  /* Percentage gutters were sized against a 1180px container; at ~750px they
+     were eating more width than the columns they separated. */
+  .intro-block-grid,.mission-stats-grid,.founder-grid,.detail-grid,.supply-cta-grid{gap:6%}
+  .globe-layout{gap:5%}
+  .manifesto-grid{gap:8%}
+  .contact-page-grid{gap:7%}
+
+  /* Column counts that only ever worked at desktop width. */
+  .differentiator-grid,.trust-grid,.value-grid,.products-list,.team-grid{grid-template-columns:1fr 1fr}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
+
+  /* The staggered feature row needs the full 1180px to read as deliberate
+     rather than as a broken baseline; at this width it flattens to one row. */
+  .product-feature-grid{grid-template-columns:repeat(3,1fr)}
+  .product-feature,.product-feature-1,.product-feature-2{height:330px;margin-top:0}
+
+  /* Escaped the container and pushed a horizontal scrollbar at this width. */
+  .manifesto-stats{left:0}
+  .manifesto-stat{min-width:0}
+
+  /* The ghost numeral is drawn behind the h1; at desktop the container is wide
+     enough that they never meet, here they collide. */
+  .title-mark{font-size:min(18vw,200px)}
+
+  .about-large-image{height:400px}
+  .detail-image{height:390px}
+  .team-image{height:280px}
+  .product-list-image{height:230px}
+  .gallery-grid{grid-auto-rows:190px}
+}
+
 @media(max-width:780px){
-  html,body,#root{max-width:100%;overflow-x:hidden}
   .container{width:min(100% - 40px,560px)}
   .site-header{height:70px}
   .nav{gap:10px}
   .nav-tools{margin-left:auto}
   .theme-toggle,.menu-toggle{width:33px;height:33px;flex:0 0 33px}
-  .nav-links{position:absolute;top:70px;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--line);padding:19px 20px;box-shadow:var(--shadow);flex-direction:column;align-items:stretch;gap:6px;opacity:0;transform:translateY(-10px);pointer-events:none;transition:opacity .25s var(--ease),transform .25s var(--ease)}
-  .nav-links.open{opacity:1;transform:none;pointer-events:auto}
+  /* visibility, not just opacity: the closed drawer was fully transparent but
+     still in the tab order, so a keyboard user leaving the logo tabbed through
+     seven invisible nav buttons before reaching the page. This is also why the
+     drawer cannot use `inert` in Nav.jsx - `open` is false on desktop too, where
+     these same buttons must stay reachable.
+     visibility is stepped with a delay rather than transitioned: `transition:
+     visibility .25s` relies on the discrete-interpolation special case for
+     visible/hidden, which is subtle enough to be worth designing around. Here
+     the intent is explicit - closing waits .25s so the fade is seen, opening
+     applies at 0s so the drawer is focusable the instant it is requested. */
+  .nav-links{position:absolute;top:70px;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--line);padding:19px 20px;box-shadow:var(--shadow);flex-direction:column;align-items:stretch;gap:6px;opacity:0;visibility:hidden;transform:translateY(-10px);pointer-events:none;transition:opacity .25s var(--ease),transform .25s var(--ease),visibility 0s linear .25s}
+  .nav-links.open{opacity:1;visibility:visible;transform:none;pointer-events:auto;transition:opacity .25s var(--ease),transform .25s var(--ease),visibility 0s linear 0s}
   .nav-links>button{text-align:left;margin:0;padding:12px 4px;border-radius:0;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
   .nav-links>button:hover{background:none;color:var(--green)}
   .nav-links>button:after{display:none}
@@ -27,8 +84,12 @@
   .hero-copy>p{font-size:13px;max-width:300px;margin-bottom:23px}
   .hero-buttons{flex-wrap:wrap;align-items:center;gap:16px}
   .hero-buttons .button{padding:13px 14px;font-size:11px}
-  .hero-meta{margin-top:25px;gap:7px;flex-wrap:wrap;font-size:7px;max-width:295px}
-  .hero-footer{height:72px;width:calc(100% - 40px)}
+  /* These chips were set at 7px here and 6.5px at the next breakpoint down.
+     Below roughly 9px this stops being small type and becomes unreadable, and
+     the chips are the hero's only statement of what the company actually sells.
+     Dropping the 295px cap lets them wrap instead of compressing. */
+  .hero-meta{margin-top:25px;gap:7px;flex-wrap:wrap;font-size:10px;max-width:100%}
+  .hero-footer{height:72px;width:calc(100% - 40px);font-size:9px}
   .hero-footer div{width:29%}
   .hero-footer span{max-width:120px;line-height:1.5}
   .hero-scroll-cue{display:none}
@@ -114,7 +175,14 @@
   .contact-page{padding-top:42px}
   .contact-page form{padding:20px}
   .contact-page-grid>*{min-width:0}
-  .contact-page input,.contact-page textarea,.contact-page select{max-width:100%}
+  /* 16px is a hard floor, not a style choice: iOS Safari auto-zooms the viewport
+     when a focused control's text is smaller, and it does not zoom back out on
+     blur. The buyer is left on a magnified page that now scrolls sideways -
+     which is how a 12px input became the site's main source of horizontal
+     scroll, on the one page that has to convert. */
+  .contact-page input,.contact-page textarea,.contact-page select{max-width:100%;font-size:16px}
+  .contact-page label{font-size:13px}
+  .contact-page form{gap:16px}
   .contact-page form .button{width:100%;justify-content:space-between}
 
   .footer-cta-inner{flex-direction:column;align-items:flex-start;padding:32px 0}
@@ -134,8 +202,8 @@
   .hero-copy h1{font-size:46px;letter-spacing:-2.8px;line-height:.94}
   .hero-copy>p{font-size:12px;line-height:1.62}
   .hero-buttons .button{padding:12px 13px;gap:9px}
-  .hero-meta{font-size:6.5px;margin-top:21px}
-  .hero-footer{width:calc(100% - 32px);font-size:7px}
+  .hero-meta{font-size:9.5px;margin-top:21px}
+  .hero-footer{width:calc(100% - 32px);font-size:8.5px}
   .hero-footer div{width:18%}
 
   .page-title{padding:56px 0 45px}
@@ -166,7 +234,7 @@
   .hero-copy>p{font-size:12px;max-width:277px}
   .quiet-link{font-size:11px}
   .hero-footer div{width:20%}
-  .hero-footer{font-size:7px}
+  .hero-footer{font-size:8.5px}
   .page-title h1{font-size:42px}
   .detail-copy h1{font-size:48px}
   .gallery-grid{grid-auto-rows:143px}

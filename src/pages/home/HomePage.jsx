@@ -7,6 +7,7 @@ import { Globe, useGlobeTheme } from '../../features/globe/index.js'
 import { products } from '../../data/products.js'
 import { globeMarkers, globeArcs } from '../../data/globe.js'
 import { useNavigate } from '../../app/navigation.js'
+import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
 import { HeroMedia } from './sections/HeroMedia.jsx'
 
 export default function HomePage({ selectProduct, theme }) {
@@ -111,7 +112,16 @@ export default function HomePage({ selectProduct, theme }) {
         <div className="product-feature-grid">
           {homeProducts.map((product, index) => (
             <Reveal as="article" key={product.slug} delay={index * 90} className={`product-feature product-feature-${index}`} {...cardProps(() => selectProduct(product.slug), `View ${product.name}`)}>
-              <div className="product-feature-image" style={{ backgroundImage: `url('${product.image}')` }}/>
+              <div className="product-feature-image">
+                <img
+                  src={unsplashAt(product.image, 800)}
+                  srcSet={unsplashSrcSet(product.image)}
+                  sizes="(max-width: 780px) 100vw, 33vw"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
               <div className="product-feature-overlay"/>
               <span>{product.type.toUpperCase()}</span>
               <h3>{product.name}</h3>

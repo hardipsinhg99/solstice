@@ -5,6 +5,7 @@ import { Reveal } from '../../components/motion/Reveal.jsx'
 import { products } from '../../data/products.js'
 import { RelatedProducts } from '../../features/products/index.js'
 import { useNavigate } from '../../app/navigation.js'
+import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
 import ProductsPage from './ProductsPage.jsx'
 
 export default function ProductDetailPage({ product, selectProduct }) {
@@ -32,7 +33,20 @@ export default function ProductDetailPage({ product, selectProduct }) {
           <div className="variety-pills">{product.varieties.map(v => <span key={v}>{v}</span>)}</div>
           <Button onClick={() => navigate('contact')}>Enquire about {product.name}</Button>
         </div>
-        <Reveal as="div" className="detail-image" style={{ backgroundImage: `url('${product.image}')` }}/>
+        {/* The one image on the site that must NOT be lazy: it is the largest
+            element in this page's first viewport, so it is the LCP candidate.
+            fetchPriority high pulls it ahead of the catalogue thumbnails that
+            the browser would otherwise schedule alongside it. */}
+        <Reveal as="div" className="detail-image">
+          <img
+            src={unsplashAt(product.image, 1000)}
+            srcSet={unsplashSrcSet(product.image, [600, 1000, 1400])}
+            sizes="(max-width: 780px) 89vw, 50vw"
+            alt={product.name}
+            fetchPriority="high"
+            decoding="async"
+          />
+        </Reveal>
       </div>
     </section>
     <section className="detail-info section">

@@ -78,12 +78,29 @@ export function Globe({
     if (!canvasRef.current) return
     const canvas = canvasRef.current
     let globe = null
-    let animationId
+    let animationId = 0
+    let revealTimer = 0
     let phi = 0
+
+    // Idle auto-rotation is a continuous, unstoppable animation - precisely what
+    // SC 2.3.3 covers. Drag still works under reduced motion; only the
+    // never-ending spin stops, so the component keeps its whole purpose.
+    const stillQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+    // The marker/arc payloads were rebuilt with two .map() calls on every one of
+    // the ~60 frames per second. They never change within an effect run, so they
+    // are built once here.
+    const frameMarkers = markers.map(m => ({ location: m.location, size: markerSize, id: m.id }))
+    const frameArcs = arcs.map(a => ({ from: a.from, to: a.to, id: a.id }))
+
+    // A globe scrolled out of view, or on a backgrounded tab, was still running
+    // a full WebGL draw every frame. Both conditions now hold the loop.
+    let onScreen = true
+    const shouldRun = () => onScreen && !document.hidden
 
     function animate() {
       if (!isPausedRef.current) {
-        phi += speed
+        if (!stillQuery.matches) phi += speed
         if (Math.abs(velocity.current.phi) > 0.0001 || Math.abs(velocity.current.theta) > 0.0001) {
           phiOffsetRef.current += velocity.current.phi
           thetaOffsetRef.current += velocity.current.theta
@@ -103,10 +120,16 @@ export function Globe({
         baseColor,
         arcColor,
         markerElevation,
-        markers: markers.map(m => ({ location: m.location, size: markerSize, id: m.id })),
-        arcs: arcs.map(a => ({ from: a.from, to: a.to, id: a.id }))
+        markers: frameMarkers,
+        arcs: frameArcs
       })
-      animationId = requestAnimationFrame(animate)
+      animationId = shouldRun() ? requestAnimationFrame(animate) : 0
+    }
+
+    // Single entry point for restarting the loop, so no path can ever leave two
+    // rAF chains running against the same canvas.
+    function resume() {
+      if (globe && !animationId && shouldRun()) animationId = requestAnimationFrame(animate)
     }
 
     function init() {
@@ -128,35 +151,48 @@ export function Globe({
         markerColor,
         glowColor,
         markerElevation,
-        markers: markers.map(m => ({ location: m.location, size: markerSize, id: m.id })),
-        arcs: arcs.map(a => ({ from: a.from, to: a.to, id: a.id })),
+        markers: frameMarkers,
+        arcs: frameArcs,
         arcColor,
         arcWidth,
         arcHeight,
         opacity: 0.7
       })
       animate()
-      setTimeout(() => canvas && (canvas.style.opacity = '1'))
+      revealTimer = setTimeout(() => { canvas.style.opacity = '1' })
     }
 
+    // Visibility gates. Both are attached up front so they apply whether init()
+    // runs immediately or waits on the ResizeObserver below.
+    const io = new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting
+      if (onScreen) resume()
+    }, { threshold: 0 })
+    io.observe(canvas)
+    const onVisibility = () => { if (!document.hidden) resume() }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    // A zero-width canvas cannot be initialised, so wait for it to be laid out.
+    // One observer either way - the previous version returned two different
+    // cleanups from two branches, which was easy to let drift apart.
+    let ro = null
     if (canvas.offsetWidth > 0) {
       init()
     } else {
-      const ro = new ResizeObserver((entries) => {
+      ro = new ResizeObserver((entries) => {
         if (entries[0]?.contentRect.width > 0) {
           ro.disconnect()
           init()
         }
       })
       ro.observe(canvas)
-      return () => {
-        ro.disconnect()
-        if (animationId) cancelAnimationFrame(animationId)
-        if (globe) globe.destroy()
-      }
     }
 
     return () => {
+      io.disconnect()
+      document.removeEventListener('visibilitychange', onVisibility)
+      ro?.disconnect()
+      if (revealTimer) clearTimeout(revealTimer)
       if (animationId) cancelAnimationFrame(animationId)
       if (globe) globe.destroy()
     }

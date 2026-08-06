@@ -12,7 +12,9 @@
 .outline:hover{background:var(--ink);color:var(--bg)}
 .lime{background:var(--lime);color:#153828}
 .lime:hover{box-shadow:0 14px 30px rgba(180,200,60,.35)}
-.quiet-link{border:0;background:transparent;padding:0;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:8px;transition:color .2s}
+/* These are standalone controls, not links inside a sentence, so SC 2.5.8's
+   24px minimum applies. At 12px with zero padding the hit area was ~16px. */
+.quiet-link{border:0;background:transparent;padding:4px 0;min-height:24px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:8px;transition:color .2s}
 .quiet-link svg{transition:transform .3s var(--ease)}
 .quiet-link:hover{color:var(--green)}
 .quiet-link:hover svg{transform:translateX(3px)}

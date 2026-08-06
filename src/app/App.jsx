@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Header } from '../components/layout/Header.jsx'
 import { Footer } from '../components/layout/Footer.jsx'
 import { ChatWidget } from '../features/chat/index.js'
@@ -18,8 +18,23 @@ import { goTo, useHashRoute, isProductRoute, productSlug } from './router.js'
 export function App() {
   const { theme, setTheme } = useTheme()
   const route = useHashRoute()
+  const mainRef = useRef(null)
+  const firstRender = useRef(true)
 
-  useEffect(() => { window.scrollTo(0, 0) }, [route])
+  useEffect(() => {
+    // `behavior: 'instant'` overrides html{scroll-behavior:smooth}. Without it,
+    // navigating from the foot of a long page animated a multi-second scroll
+    // through the whole document before the new page was readable.
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+
+    // Moving focus to the new <main> is what makes hash routing usable without a
+    // mouse: nothing else tells a screen reader the page changed, and keyboard
+    // focus would otherwise stay on the nav button that was just activated.
+    // Skipped on the very first render so a deep link does not steal focus from
+    // the document start.
+    if (firstRender.current) { firstRender.current = false; return }
+    mainRef.current?.focus()
+  }, [route])
 
   const selectProduct = (slug) => goTo(`product/${slug}`)
   const onProduct = isProductRoute(route)
@@ -35,8 +50,14 @@ export function App() {
   }
 
   return <NavigationProvider value={goTo}>
+    {/* A <button>, not an <a href="#main-content">: the router owns location.hash,
+        so an in-page anchor would be read as a navigation to a "main-content"
+        route and bounce the user to the home page. */}
+    <button className="skip-link" onClick={() => mainRef.current?.focus()}>Skip to content</button>
     <Header route={onProduct ? 'products' : route} theme={theme} setTheme={setTheme}/>
-    <main>{onProduct ? <ProductDetailPage product={product} selectProduct={selectProduct}/> : (pages[route] || pages.home)}</main>
+    <main id="main-content" ref={mainRef} tabIndex={-1}>
+      {onProduct ? <ProductDetailPage product={product} selectProduct={selectProduct}/> : (pages[route] || pages.home)}
+    </main>
     <Footer/>
     <ChatWidget/>
   </NavigationProvider>

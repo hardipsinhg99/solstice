@@ -5,7 +5,10 @@ export const Icon = ({ name, size = 20 }) => {
     sun: <><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></>,
     moon: <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z"/>,
     menu: <><path d="M4 7h16M4 12h16M4 17h16"/></>, close: <><path d="m6 6 12 12M18 6 6 18"/></>,
-    globe: <><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.6 3 14.4 0 18M12 3c-3 3.6-3 14.4 0-18"/></>,
+    // The left meridian's final pair read `0-18`, mirroring the curve upward out
+    // of the circle instead of down to the south pole - the globe rendered with
+    // one meridian and a stray arc above it.
+    globe: <><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.6 3 14.4 0 18M12 3c-3 3.6-3 14.4 0 18"/></>,
     leaf: <><path d="M20 4C10 4 4 9 4 18c8 0 15-5 16-14Z"/><path d="M4 18c3-4 7-7 12-9"/></>,
     box: <><path d="m3 7 9-4 9 4-9 4-9-4Z"/><path d="M3 7v10l9 4 9-4V7M12 11v10"/></>,
     check: <path d="m5 12 4.2 4L19 6.5"/>,

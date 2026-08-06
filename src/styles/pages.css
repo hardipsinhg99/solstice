@@ -72,8 +72,8 @@
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .stat-card{background:var(--surface);border:1px solid var(--line);padding:22px;text-align:center;transition:transform .25s,box-shadow .25s}
 .stat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
-.stat-card b{display:block;font-size:32px;font-family:'Playfair Display';color:var(--green);letter-spacing:-1px;margin-bottom:6px}
-.stat-card:nth-child(2) b,.stat-card:nth-child(4) b{color:var(--gold)}
+.stat-card b{display:block;font-size:32px;font-family:'Playfair Display',Georgia,serif;font-weight:500;color:var(--green);letter-spacing:-1px;margin-bottom:6px}
+.stat-card:nth-child(2) b,.stat-card:nth-child(4) b{color:var(--gold-text)}
 .stat-card span{font-size:11px;color:var(--muted)}
 
 .global-footprint{background:var(--bg)}
@@ -93,7 +93,8 @@
 .product-feature-1{margin-top:53px;height:332px}
 .product-feature-2{margin-top:20px;height:365px}
 .product-feature-image,.product-feature-overlay{position:absolute;inset:0}
-.product-feature-image{background:center/cover;transition:transform .6s var(--ease)}
+.product-feature-image{overflow:hidden;transition:transform .6s var(--ease)}
+.product-feature-image img{display:block;width:100%;height:100%;object-fit:cover}
 .product-feature:hover .product-feature-image{transform:scale(1.08)}
 .product-feature-overlay{background:linear-gradient(0deg,#10231ae6 0%,#10231a55 45%,transparent 70%)}
 .product-feature>span,.product-feature h3,.product-feature .card-cue,.product-feature-desc{position:absolute;z-index:1}
@@ -122,7 +123,7 @@
 .manifesto-image{height:440px;background:linear-gradient(#0c2d1e25,#0c2d1e6b),url('https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=1000&q=85') center/cover;border-radius:0 150px 0 0}
 .manifesto-stats{position:absolute;left:-8%;bottom:-28px;display:flex;flex-direction:column;gap:10px}
 .manifesto-stat{background:var(--surface);color:var(--ink);padding:16px 20px;box-shadow:var(--shadow);display:flex;align-items:baseline;gap:11px;min-width:230px}
-.manifesto-stat b{font-size:26px;font-family:'Playfair Display';color:var(--green);letter-spacing:-1px}
+.manifesto-stat b{font-size:26px;font-family:'Playfair Display',Georgia,serif;font-weight:500;color:var(--green);letter-spacing:-1px}
 .manifesto-stat span{font-size:11px;line-height:1.4;color:var(--muted)}
 .home-manifesto .eyebrow{color:#b7dcb5}
 .home-manifesto h2 em{color:var(--lime)}
@@ -139,7 +140,7 @@
    Page title - ghost numeral signature
    ============================================================ */
 .page-title{padding:105px 0 83px;border-bottom:1px solid var(--line);background:var(--surface);position:relative;overflow:hidden}
-.title-mark{position:absolute;right:2%;top:50%;transform:translateY(-52%);font:800 clamp(140px,20vw,320px)/1 'DM Sans';color:transparent;-webkit-text-stroke:1px color-mix(in srgb,var(--ink) 10%,transparent);letter-spacing:-6px;pointer-events:none;user-select:none;z-index:0}
+.title-mark{position:absolute;right:2%;top:50%;transform:translateY(-52%);font:700 clamp(140px,20vw,320px)/1 'DM Sans';color:transparent;-webkit-text-stroke:1px color-mix(in srgb,var(--ink) 10%,transparent);letter-spacing:-6px;pointer-events:none;user-select:none;z-index:0}
 .page-title>div{position:relative;z-index:1}
 .page-title h1{font-size:clamp(51px,6vw,82px);max-width:820px;margin:0}
 .page-title>div>p:last-child{font-size:15px;line-height:1.7;color:var(--muted);max-width:430px;margin:29px 0 0}
@@ -195,7 +196,7 @@
 .process-step{display:flex;gap:20px;align-items:flex-start;padding:22px 0;border-bottom:1px solid var(--line)}
 .process-icon{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex-shrink:0}
 .process-step:nth-child(3n+1) .process-icon{background:color-mix(in srgb,var(--green) 16%,transparent);color:var(--green)}
-.process-step:nth-child(3n+2) .process-icon{background:color-mix(in srgb,var(--gold) 20%,transparent);color:var(--gold)}
+.process-step:nth-child(3n+2) .process-icon{background:color-mix(in srgb,var(--gold) 20%,transparent);color:var(--gold-text)}
 .process-step:nth-child(3n+3) .process-icon{background:color-mix(in srgb,var(--lime) 30%,transparent);color:#5f6e22}
 .process-step h3{font-size:17px;margin:0 0 4px;letter-spacing:-.3px}
 .process-step p{font-size:12px;color:var(--muted);margin:0}
@@ -210,7 +211,7 @@
 .cert-strip{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:34px;padding-top:28px;border-top:1px solid var(--line)}
 .cert-label{font:500 10px 'DM Mono';letter-spacing:1.1px;color:var(--muted)}
 .cert-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink);border:1px solid var(--line);background:var(--surface);padding:7px 13px;border-radius:20px}
-.cert-item svg{color:var(--gold)}
+.cert-item svg{color:var(--gold-text)}
 
 .service-callout{background:var(--deep);color:#fff;padding:92px 0}
 .service-callout .eyebrow{color:#bfddbd}
@@ -265,7 +266,8 @@
 .products-list{display:grid;grid-template-columns:repeat(3,1fr);gap:17px}
 .product-list-card{background:var(--surface);border:1px solid var(--line);cursor:pointer;overflow:hidden;transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s}
 .product-list-card:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:transparent}
-.product-list-image{height:273px;background:center/cover;transition:transform .5s var(--ease)}
+.product-list-image{height:273px;overflow:hidden;transition:transform .5s var(--ease)}
+.product-list-image img{display:block;width:100%;height:100%;object-fit:cover}
 .product-list-card:hover .product-list-image{transform:scale(1.05)}
 .product-list-info{padding:20px}
 .product-list-info>span{color:var(--green);font:9px 'DM Mono';letter-spacing:.9px}
@@ -282,9 +284,10 @@
 .detail-copy p{font-size:15px;line-height:1.7;color:var(--muted);max-width:400px;margin-bottom:22px}
 .variety-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px}
 .variety-pills span{border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:11px;padding:6px 13px;border-radius:20px}
-.back-link{background:none;border:0;padding:0;margin:0;color:var(--muted);font-size:11px;transition:color .2s}
+.back-link{background:none;border:0;padding:4px 0;margin:0;min-height:24px;display:inline-flex;align-items:center;color:var(--muted);font-size:12px;transition:color .2s}
 .back-link:hover{color:var(--green)}
-.detail-image{height:455px;background:center/cover;border-radius:0 150px 0 0}
+.detail-image{height:455px;overflow:hidden;border-radius:0 150px 0 0}
+.detail-image img{display:block;width:100%;height:100%;object-fit:cover}
 
 .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .meta-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;align-items:flex-start;gap:16px;transition:border-color .25s,transform .25s,box-shadow .25s}
@@ -302,7 +305,8 @@
 .related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:17px}
 .related-card{background:var(--bg);border:1px solid var(--line);cursor:pointer;position:relative;overflow:hidden;transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s}
 .related-card:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:transparent}
-.related-image{height:190px;background:center/cover;transition:transform .5s var(--ease)}
+.related-image{height:190px;overflow:hidden;transition:transform .5s var(--ease)}
+.related-image img{display:block;width:100%;height:100%;object-fit:cover}
 .related-card:hover .related-image{transform:scale(1.05)}
 .related-card>span{display:block;margin:16px 16px 0;color:var(--green);font:9px 'DM Mono';letter-spacing:.9px;text-transform:uppercase}
 .related-card h3{margin:8px 16px 16px;font-size:19px;letter-spacing:-.5px}
@@ -314,7 +318,8 @@
    ============================================================ */
 .team{padding-top:64px}
 .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:17px}
-.team-image{height:333px;background:center/cover;filter:saturate(.7);transition:filter .4s}
+.team-image{height:333px;overflow:hidden;filter:saturate(.7);transition:filter .4s}
+.team-image img{display:block;width:100%;height:100%;object-fit:cover}
 .team-grid article:hover .team-image{filter:saturate(1.05)}
 .team-grid article>span{display:block;font:9px 'DM Mono';color:var(--green);margin-top:19px}
 .team-grid h3{font-size:22px;letter-spacing:-.7px;margin:16px 0 8px}
@@ -328,10 +333,11 @@
    ============================================================ */
 .gallery{padding-top:56px}
 .gallery-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;grid-auto-rows:216px;gap:13px}
-.gallery-tile{position:relative;background:center/cover;border:0;padding:0;margin:0;display:block;width:100%;font:inherit;text-align:left;overflow:hidden}
-.gallery-tile:before{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#0007,transparent 40%);opacity:0;transition:opacity .3s}
+.gallery-tile{position:relative;border:0;padding:0;margin:0;display:block;width:100%;font:inherit;text-align:left;overflow:hidden}
+.gallery-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.gallery-tile:before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(0deg,#0007,transparent 40%);opacity:0;transition:opacity .3s}
 .gallery-tile:hover:before{opacity:1}
-.gallery-tile span{position:absolute;top:13px;left:13px;color:#fff;font:9px 'DM Mono';letter-spacing:1px;text-shadow:0 1px 5px #000}
+.gallery-tile span{position:absolute;z-index:2;top:13px;left:13px;color:#fff;font:9px 'DM Mono';letter-spacing:1px;text-shadow:0 1px 5px #000}
 .tile-1{grid-row:span 2}
 .tile-4{grid-row:span 2}
 .lightbox{position:fixed;inset:0;z-index:200;background:rgba(6,14,10,.92);display:flex;align-items:center;justify-content:center;padding:40px;animation:fadeIn .25s var(--ease)}
@@ -357,7 +363,10 @@
 .contact-points span{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--muted)}
 .contact-points svg{color:var(--green)}
 .contact-page form{background:var(--surface);border:1px solid var(--line);padding:29px;display:grid;gap:14px}
-.contact-page label{font-size:10px;color:var(--muted)}
+/* 10px labels on the site's single conversion surface. Nudged to 12px: still
+   the quiet, monospaced-adjacent register the form was designed in, but
+   legible enough to scan a fourteen-field enquiry without leaning in. */
+.contact-page label{font-size:12px;color:var(--muted)}
 .contact-page input,.contact-page select,.contact-page textarea{width:100%;border:1px solid var(--line-strong);background:transparent;color:var(--ink);padding:12px;margin-top:6px;border-radius:0;outline:0;font-size:12px;transition:border-color .2s,box-shadow .2s}
 .contact-page input:focus,.contact-page select:focus,.contact-page textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 20%,transparent)}
 .contact-page textarea{height:90px;resize:vertical}
@@ -370,7 +379,7 @@
 .hp-field{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .form-status{margin:0;font-size:12px;line-height:1.6;color:var(--green)}
 .form-status:empty{display:none}
-.form-error{color:var(--ink);border-left:2px solid var(--gold);padding-left:12px}
+.form-error{color:var(--ink);border-left:2px solid var(--gold-text);padding-left:12px}
 .form-error a{color:var(--green);font-weight:600;text-decoration:underline}
 .dots:after{content:'';animation:dots 1.2s steps(4,end) infinite}
 @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}

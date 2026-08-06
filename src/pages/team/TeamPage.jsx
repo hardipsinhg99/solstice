@@ -2,6 +2,7 @@ import { Button } from '../../components/ui/Button.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
 import { PageTitle } from '../../components/layout/PageTitle.jsx'
 import { useNavigate } from '../../app/navigation.js'
+import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
 
 export default function TeamPage() {
   const navigate = useNavigate()
@@ -16,7 +17,16 @@ export default function TeamPage() {
       <div className="container team-grid">
         {team.map(([role, copy, image], index) => (
           <Reveal as="article" key={role} delay={index * 90}>
-            <div className="team-image" style={{ backgroundImage: `url('${image}')` }}/>
+            <div className="team-image">
+              <img
+                src={unsplashAt(image, 800)}
+                srcSet={unsplashSrcSet(image, [480, 800])}
+                sizes="(max-width: 780px) 100vw, 33vw"
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
             <span>0{index + 1}</span><h3>{role}</h3><p>{copy}</p>
           </Reveal>
         ))}
