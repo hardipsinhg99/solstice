@@ -6,11 +6,13 @@ worth sending an RFQ to. Every design and content decision serves that, not bran
 
 ## Current state
 
-- **Stack today:** Vite 8 + React 19 SPA, hash routing, all content hardcoded in `src/main.jsx`,
-  hand-written CSS in `src/styles.css`. No backend.
-- **Decided:** migrate the design system, rebuild the shell in Astro. `styles.css`, `Globe.jsx`,
-  the `Icon` sprite and the `Reveal` system port over. The hash router, single-file data model
-  and client-only rendering do not. **Not started** — blocked on content and photography.
+- **Stack today:** Vite 8 + React 19 SPA, hash routing, hand-written CSS split across
+  `src/styles/` in cascade order. Content lives in `src/data/` and per-page components under
+  `src/pages/` (the single-file `main.jsx` era is over — it is mount-only now). GSAP drives the
+  homepage journey sequence. No backend.
+- **Decided:** migrate the design system, rebuild the shell in Astro. The styles, `Globe.jsx`,
+  the `Icon` sprite and the `Reveal` system port over. The hash router and client-only rendering
+  do not. **Not started** — blocked on content and photography.
 - **Read `docs/website-strategy.md` before proposing structural work.** It holds the agreed IA,
   the product spec-sheet schema, the SEO roadmap, the RFQ design and 13 open questions.
   Do not re-derive those decisions.
