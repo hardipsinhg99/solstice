@@ -14,6 +14,12 @@
       ]
     },
     {
+      "source": "/journey/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=604800" }
+      ]
+    },
+    {
       "source": "/hero/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=604800" }
