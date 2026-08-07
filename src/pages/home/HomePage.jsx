@@ -9,6 +9,7 @@ import { globeMarkers, globeArcs } from '../../data/globe.js'
 import { useNavigate } from '../../app/navigation.js'
 import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
 import { HeroMedia } from './sections/HeroMedia.jsx'
+import { JourneyScroll } from './sections/JourneyScroll.jsx'
 
 export default function HomePage({ selectProduct, theme }) {
   const navigate = useNavigate()
@@ -132,6 +133,8 @@ export default function HomePage({ selectProduct, theme }) {
         </div>
       </div>
     </section>
+
+    <JourneyScroll/>
 
     <section className="buyer-path">
       <div className="container">

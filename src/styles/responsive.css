@@ -241,3 +241,36 @@
   .footer-grid{grid-template-columns:1fr;gap:18px}
   .contact-page form{padding:17px}
 }
+
+/* ============================================================
+   Journey - static fallback
+
+   One rule set, two triggers: below 781px and under reduced-motion. The
+   JavaScript gate in JourneyScroll.jsx uses exactly this condition
+   (gsap.matchMedia on "(min-width:781px) and (prefers-reduced-motion:
+   no-preference)"), so CSS and JS can never disagree about which state is on
+   screen. Written as a media query LIST rather than duplicated into the 780
+   block and a separate motion block - one copy, no drift.
+
+   Collapsing the runway to 0 is the important part: without it the page keeps
+   420vh of dead scroll that nothing is animating.
+   ============================================================ */
+@media(max-width:780px),(prefers-reduced-motion:reduce){
+  .journey-runway{height:0}
+  .journey-pin{position:relative;height:70svh}
+  .journey-crane,.journey-hook,.journey-container,.journey-truck,.journey-road,.journey-cloud,.journey-plane,.journey-sky{display:none}
+  /* The sequence's initial state is applied by GSAP, which never runs here, so
+     the sea is composed statically: full-bleed ocean, ship mid-frame, wake on. */
+  .journey-sea,.journey-sea-scale{position:absolute;inset:0;transform:none}
+  .journey-ship-group{left:14%;top:36%;width:64%}
+  .journey-wake{opacity:1}
+  /* Captions stack in flow along the bottom instead of cross-fading in place. */
+  .journey-captions{top:auto;right:0;left:0;bottom:0;width:100%;padding:18px 20px}
+  .journey-caption{position:relative;right:auto;top:auto;opacity:1!important;transform:none!important;max-width:min(100%,560px);padding:12px 16px}
+  .journey-caption+.journey-caption{margin-top:10px}
+  .journey-caption-text{font-size:15px}
+}
+@media(max-width:780px){
+  .journey-pin{height:auto;min-height:520px;padding-bottom:8px}
+  .journey-caption-text{font-size:14px}
+}
