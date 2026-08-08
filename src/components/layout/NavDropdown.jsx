@@ -67,7 +67,9 @@ export function NavDropdown({ item, route, onNavigate }) {
   }, [open])
 
   const go = (target) => { onNavigate(target); setOpen(false) }
-  const parentActive = route === item.route
+  // startsWith, not equality: the parent is active on '#products' and on both
+  // '#products/export' and '#products/import'.
+  const parentActive = route === item.route || route.startsWith(`${item.route}/`)
 
   return (
     <div className="nav-dropdown" ref={rootRef}>
