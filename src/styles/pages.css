@@ -341,7 +341,7 @@
    still carries its literal "[REWRITE - ...]" text, which is the safeguard that
    survives a production build; this is the loud version for the person working
    on the page. */
-.about-unresolved{outline:2px dashed var(--gold-text);outline-offset:8px}
+.about-unresolved{position:relative;outline:2px dashed var(--gold-text);outline-offset:8px}
 .about-unresolved:before{content:'NEEDS COPY';position:absolute;margin-top:-30px;font:500 9px 'DM Mono';letter-spacing:1.2px;color:var(--gold-text)}
 .about-unresolved[data-unresolved='scope']:before{content:'CONFIRM SCOPE'}
 .about-dev-flags [data-unresolved]{outline:2px dashed var(--gold-text);outline-offset:4px}
