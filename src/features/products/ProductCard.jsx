@@ -18,7 +18,37 @@ const SPECS = [
   { key: 'packaging', label: 'Pack', icon: 'box' }
 ]
 
+// A slot awaiting real data. Rendered deliberately unlike a product: no
+// photograph, a hatched plate, an "awaiting details" tag, and no interaction -
+// it is a plain <article>, so it takes no tab stop and cannot lead to a detail
+// page that has nothing to show. The point is that it can never be mistaken for
+// something Solstice actually trades.
+function PlaceholderCard({ product, delay }) {
+  return (
+    <Reveal as="article" delay={delay} className="product-list-card is-placeholder" data-unresolved="product">
+      <div className="product-list-image is-placeholder">
+        <Icon name="box" size={26}/>
+        <span className="product-list-tag">Awaiting details</span>
+      </div>
+      <div className="product-list-info">
+        <h3>{product.name}</h3>
+        <p>{product.description}</p>
+        <dl className="product-specs">
+          {SPECS.map(spec => (
+            <div key={spec.key}>
+              <dt><Icon name={spec.icon} size={13}/>{spec.label}</dt>
+              <dd>{product[spec.key]}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </Reveal>
+  )
+}
+
 export function ProductCard({ product, delay = 0, onSelect }) {
+  if (product.placeholder) return <PlaceholderCard product={product} delay={delay}/>
+
   return (
     <Reveal as="article" delay={delay} className="product-list-card" {...cardProps(() => onSelect(product.slug), `View ${product.name} specification`)}>
       <div className="product-list-image">
