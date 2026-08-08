@@ -42,20 +42,16 @@ html[data-theme='dark']{
   --elev-1:0 2px 6px rgba(0,0,0,.3),0 12px 28px rgba(0,0,0,.34);
   --elev-2:0 6px 14px rgba(0,0,0,.42),0 30px 60px rgba(0,0,0,.5);
 }
-/* Hero photography swaps with the theme toggle.
-   Scrim alphas are set by the brightest frame of the hero video, not by the
-   poster: the video carries blown warm highlights (raw rgb(255,245,208)) that
-   the Unsplash stills do not. Measured worst case across all 192 frames over
-   the copy block - light: body 5.97:1, dark: body 7.64:1. Weakening any stop
-   drops body copy below 4.5:1. */
+/* Hero treatment. The image itself no longer swaps with the theme - one
+   branded composite serves both, and inverting a photograph of the company's
+   own fleet would be wrong in either direction. What still swaps is the scrim
+   and the filter, which is what does the work of holding the copy legible.
+   Alphas re-measured against this composite - see the hero commit. */
 :root{
-  --hero-image:url('https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&w=2000&q=80');
   --hero-scrim:linear-gradient(100deg,rgba(9,26,18,.96) 0%,rgba(9,26,18,.90) 26%,rgba(9,26,18,.72) 52%,rgba(9,26,18,.34) 76%,rgba(9,26,18,.12) 100%);
   --hero-filter:saturate(1.08) brightness(1.01);
-  --hero-video-fade:600ms;
 }
 html[data-theme='dark']{
-  --hero-image:url('https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?auto=format&fit=crop&w=2000&q=80');
   --hero-scrim:linear-gradient(100deg,rgba(4,12,8,.98) 0%,rgba(4,12,8,.93) 28%,rgba(4,12,8,.75) 54%,rgba(4,12,8,.36) 78%,rgba(4,12,8,.13) 100%);
   --hero-filter:saturate(1.02) brightness(.9);
 }
