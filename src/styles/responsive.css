@@ -78,7 +78,7 @@
   .nav-cta:before{display:none}
   .menu-toggle{display:grid}
   .brand-logo img{width:125px}
-  .footer-logo img{width:160px}
+  .footer-logo img{width:180px}
   .nav-backdrop{display:block;position:fixed;inset:70px 0 0 0;background:rgba(6,14,10,.4);z-index:90}
 
   .home-hero{height:auto;min-height:790px}
@@ -226,7 +226,7 @@
   .gallery-grid{grid-auto-rows:140px}
   .contact-page form{padding:16px}
   .footer-grid{grid-template-columns:1fr;gap:18px}
-  .footer-logo img{width:154px}
+  .footer-logo img{width:180px}
   /* 47px, matching the launcher exactly rather than rounding the FAB up to 48:
      the two are a vertical stack of circles sharing a right edge, and a 1px
      difference in diameter is visible as a misaligned column. 47 clears both the

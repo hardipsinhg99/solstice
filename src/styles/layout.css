@@ -4,7 +4,12 @@
 .brand{border:0;background:transparent;color:var(--green-500);font:700 25px/15px 'DM Sans';letter-spacing:-1.8px;text-align:left;padding:0}
 .brand-logo{display:flex;align-items:center}
 .brand-logo img{display:block;width:145px;height:auto;transition:transform .3s var(--ease)}
-.footer-logo img{width:172px}
+/* MINIMUM LOCKUP WIDTH: 180px. Below it the subtitle rule and the wordmark's
+   counters stop resolving and the mark has to fall back to the disc alone.
+   The footer is the one placement with room to honour it, so it carries the
+   full lockup at every tier; the header sits at 145/125px and is the
+   symbol-only placement. */
+.footer-logo img{width:184px}
 .site-header{height:82px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(16px);border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent);position:sticky;top:0;z-index:100;transition:height .3s var(--ease),box-shadow .3s var(--ease);isolation:isolate}
 .site-header:before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green-500),var(--lime) 45%,var(--gold));opacity:.8}
 .site-header.scrolled{height:68px;box-shadow:0 10px 30px rgba(10,30,20,.08)}
