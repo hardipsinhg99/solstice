@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { HERO_VIDEO_SRC } from '../../../lib/constants.js'
+import { HERO_VIDEO_SRC, HERO_POSTER_SRC } from '../../../lib/constants.js'
 
 // Decides whether the hero video may exist at all. Gating happens here rather than
 // in CSS because display:none still downloads the file - a component that never
@@ -31,7 +31,7 @@ function useHeroVideoAllowed() {
 
 // Decorative only: aria-hidden and tabIndex -1 keep it out of the a11y tree and
 // off the tab order. Every failure path (404, bad codec, blocked autoplay) simply
-// leaves opacity at 0, which is the existing hero.
+// leaves opacity at 0, which is the poster still underneath.
 function HeroVideo() {
   const ref = useRef(null)
   const onScreen = useRef(false)
@@ -53,15 +53,27 @@ function HeroVideo() {
     io.observe(video)
 
     const onVisibility = () => { if (document.hidden) video.pause(); else resume() }
-    const onCanPlay = () => setReady(true)
+
+    // `playing`, not `canplay`. canplay only says the data arrived - it fires
+    // even when autoplay was refused, which would fade in a video frozen on
+    // frame 0. Latching on `playing` means the reveal happens if and only if
+    // the clip is actually running, so a refusal (iOS Low Power Mode, some
+    // privacy settings) simply leaves this element at opacity 0 and the poster
+    // still is the hero. No controls, nothing focusable, nothing to break.
+    const onPlaying = () => setReady(true)
     document.addEventListener('visibilitychange', onVisibility)
-    video.addEventListener('canplay', onCanPlay)
-    if (video.readyState >= 3) setReady(true) // already buffered before we attached
+    video.addEventListener('playing', onPlaying)
+
+    // The autoPlay attribute starts playback, but its promise is not ours to
+    // catch - an explicit attempt gives us the rejection so it never surfaces
+    // as an unhandled promise rejection in the console. One attempt only; a
+    // refusal is a user/OS decision, not a transient error to retry.
+    video.play().catch(() => {})
 
     return () => {
       io.disconnect()
       document.removeEventListener('visibilitychange', onVisibility)
-      video.removeEventListener('canplay', onCanPlay)
+      video.removeEventListener('playing', onPlaying)
       video.pause()
     }
   }, [])
@@ -71,6 +83,7 @@ function HeroVideo() {
       ref={ref}
       className={ready ? 'hero-video ready' : 'hero-video'}
       src={HERO_VIDEO_SRC}
+      poster={HERO_POSTER_SRC}
       muted loop playsInline autoPlay
       preload="metadata"
       aria-hidden="true"
@@ -85,5 +98,25 @@ function HeroVideo() {
 // of script evaluation). Isolating the state keeps Home's render count at one.
 export function HeroMedia() {
   const allowed = useHeroVideoAllowed()
-  return <div className="hero-media" aria-hidden="true">{allowed && <HeroVideo/>}</div>
+  return (
+    <div className="hero-media" aria-hidden="true">
+      {/* A real <img>, not the CSS background-image this replaced. The preload
+          scanner cannot see a background-image behind a custom property, so the
+          LCP element was undiscoverable until the stylesheet had parsed;
+          fetchPriority pulls it further forward still. Intrinsic dimensions are
+          declared, and the element is absolutely positioned inside an
+          already-sized box, so it reserves its space and shifts nothing.
+          alt="" because the parent is aria-hidden and this is decoration. */}
+      <img
+        className="hero-poster"
+        src={HERO_POSTER_SRC}
+        alt=""
+        width="1920"
+        height="1080"
+        fetchPriority="high"
+        decoding="async"
+      />
+      {allowed && <HeroVideo/>}
+    </div>
+  )
 }

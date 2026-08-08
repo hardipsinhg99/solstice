@@ -3,16 +3,19 @@
    ============================================================ */
 .home-hero{height:730px;position:relative;overflow:hidden;background:#0c1b13;isolation:isolate}
 .hero-media{position:absolute;inset:0;z-index:0;overflow:hidden}
-.hero-media:before{content:'';position:absolute;inset:-4%;background:var(--hero-image) center/cover no-repeat;filter:var(--hero-filter);animation:heroZoom 30s ease-in-out infinite alternate}
-/* Video layer. Paint order inside .hero-media is ::before -> children -> ::after,
-   so the poster sits below and the scrim above without any z-index. Starts fully
-   transparent and is only revealed once canplay fires; if it never fires, this
-   element is invisible and the poster is what the user sees. */
+/* Poster still. Paint order inside .hero-media is children-in-DOM-order ->
+   ::after, so the poster paints under the video and the scrim over both, with
+   no z-index needed anywhere. object-fit:cover crops rather than letterboxes at
+   every aspect ratio. The 30s heroZoom that used to live on this layer is gone:
+   the clip is the motion now, and two slow moves on one element read as drift. */
+.hero-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:var(--hero-filter)}
+/* Video layer. Transparent until the clip is genuinely playing - see the
+   `playing` listener in HeroMedia.jsx. If autoplay is refused this stays at
+   opacity 0 and the poster above is what the user sees. */
 .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:var(--hero-filter);opacity:0;transition:opacity var(--hero-video-fade) var(--ease);pointer-events:none}
 .hero-video.ready{opacity:1}
 @media(prefers-reduced-motion:reduce){.hero-video{transition:none}}
 .hero-media:after{content:'';position:absolute;inset:0;background:var(--hero-scrim)}
-@keyframes heroZoom{from{transform:scale(1)}to{transform:scale(1.09)}}
 .home-hero-inner{height:620px;position:relative;z-index:2;display:flex;align-items:center}
 .hero-copy{position:relative;z-index:5;max-width:600px}
 .hero-copy .eyebrow{color:var(--lime)}
@@ -44,12 +47,13 @@
 .hero-scroll-cue i{width:1px;height:30px;background:linear-gradient(#d8ded0,transparent);position:relative;display:block}
 .hero-scroll-cue i:after{content:'';position:absolute;left:-2px;top:0;width:5px;height:5px;border-radius:50%;background:var(--lime);animation:scrollDot 2.2s ease-in-out infinite}
 @keyframes scrollDot{0%{top:0;opacity:1}75%{opacity:1}100%{top:28px;opacity:0}}
-/* The two continuous loops - heroZoom (30s) and scrollDot (2.2s). Continuous
-   motion is what SC 2.3.3 is actually about, so stopping only the entrance
-   animations above left the criterion unmet. Must sit after both base rules:
-   at equal specificity the later declaration wins. */
+/* scrollDot is the only continuous loop left on this page - heroZoom was
+   retired with the background plate, and the video never mounts under reduced
+   motion. Continuous motion is what SC 2.3.3 is actually about, so stopping
+   only the entrance animations above left the criterion unmet. Must sit after
+   the base rule: at equal specificity the later declaration wins. */
 @media(prefers-reduced-motion:reduce){
-  .hero-media:before,.hero-scroll-cue i:after{animation:none}
+  .hero-scroll-cue i:after{animation:none}
 }
 
 /* ============================================================
