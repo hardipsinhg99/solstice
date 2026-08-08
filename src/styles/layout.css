@@ -16,7 +16,15 @@
 .site-header.scrolled .brand-logo img{transform:scale(.92)}
 .nav{height:100%;display:flex;align-items:center;justify-content:space-between}
 .nav-links{display:flex;align-items:center;gap:22px}
-.nav-links>button{border:0;background:transparent;font-size:12px;color:var(--muted);padding:8px 12px;margin:0 -12px;border-radius:20px;position:relative;transition:color .2s,background .25s}
+/* Nav type. Fluid rather than a flat bump: the bar carries seven items plus the
+   CTA, the logo and the theme toggle, and at the narrow end of desktop (781px,
+   where the container is only ~733px) that row is already close to full. A flat
+   15px would overflow there. clamp holds 13px until ~1130px and only reaches 15px
+   once there is width to spend, so the row can never outgrow its container.
+   The lower bound is also the 14px-ish floor website-strategy.md 2.6 asks for on
+   body-adjacent text - 12px was under it.
+   .nav-cta is a direct child of .nav-links, so it scales with the rest. */
+.nav-links>button{border:0;background:transparent;font-size:clamp(13px,1.15vw,15px);color:var(--muted);padding:8px 12px;margin:0 -12px;border-radius:20px;position:relative;transition:color .2s,background .25s}
 .nav-links>button:hover{background:color-mix(in srgb,var(--green-500) 10%,transparent);color:var(--ink)}
 .nav-links>button.active{color:var(--ink);font-weight:600}
 .nav-links>button:after{content:'';position:absolute;bottom:1px;left:12px;right:12px;height:1px;background:var(--green-500);transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
