@@ -17,6 +17,19 @@
   --bg:#f8f7f1;--surface:#fffefa;--ink:#182922;--muted:#586359;--line:#dde3d6;--line-strong:#78877a;
   --green:#0b7a49;--deep:#123526;--lime:#dcec6c;--gold:#c9a24d;--gold-text:#8f6b1e;--soft:#eef1e8;
   --shadow:0 24px 60px rgba(18,45,33,.1);--ease:cubic-bezier(.16,1,.3,1);
+  /* Elevation scale for the About page's tilt cards. --elev-1 is the resting
+     card, --elev-2 the lifted state under a pointer. Tokenised rather than
+     inlined so the two themes can carry different shadow densities - a shadow
+     tuned for a cream surface is invisible on a dark one. */
+  --elev-1:0 2px 6px rgba(18,45,33,.05),0 12px 28px rgba(18,45,33,.07);
+  --elev-2:0 6px 14px rgba(18,45,33,.09),0 30px 60px rgba(18,45,33,.14);
+  /* The founder monogram plate stands in for a photograph, and a photograph
+     does not invert with the theme - so this is deliberately declared once and
+     NOT overridden in the dark block. Built from --green/--deep it measured
+     1.87:1 in dark, where --green flips to a light mint; fixed at the light
+     theme's values the worst point of the gradient holds 4.92:1 against the
+     monogram's #f2f6ec in both themes. */
+  --monogram-plate:linear-gradient(150deg,#123526,#0b7a49);
 }
 /* color-scheme is what makes the native layer follow the theme: without it the
    <select> dropdown list, the date/number spinners and the default scrollbars
@@ -26,6 +39,8 @@ html[data-theme='dark']{
   --bg:#0e1c16;--surface:#152a21;--ink:#f2f2ea;--muted:#aebbb2;--line:#31473c;--line-strong:#688674;
   --green:#6cc793;--deep:#0a1510;--lime:#e2f27a;--gold:#d9bb74;--gold-text:#d9bb74;--soft:#1b3226;
   --shadow:0 24px 60px rgba(0,0,0,.4);
+  --elev-1:0 2px 6px rgba(0,0,0,.3),0 12px 28px rgba(0,0,0,.34);
+  --elev-2:0 6px 14px rgba(0,0,0,.42),0 30px 60px rgba(0,0,0,.5);
 }
 /* Hero photography swaps with the theme toggle.
    Scrim alphas are set by the brightest frame of the hero video, not by the

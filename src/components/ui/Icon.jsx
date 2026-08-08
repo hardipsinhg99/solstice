@@ -17,7 +17,12 @@ export const Icon = ({ name, size = 20 }) => {
     instagram: <><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></>,
     calendar: <><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></>,
     award: <><circle cx="12" cy="8" r="5"/><path d="m8.5 12.5-1.5 7 5-2.5 5 2.5-1.5-7"/></>,
-    user: <><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></>
+    user: <><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></>,
+    // Added for the About page's industry set. Same 24x24 grid, same stroke
+    // weight and cap style as the rest of the sprite - no second icon system.
+    ceramic: <><path d="M9.5 3h5l-.8 3.2c1.9 1 3.3 3 3.3 5.6V18a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3v-6.2c0-2.6 1.4-4.6 3.3-5.6L9.5 3Z"/><path d="M8 13h8"/></>,
+    layers: <><path d="m12 3 8.5 4.7L12 12.4 3.5 7.7 12 3Z"/><path d="m3.5 12.3 8.5 4.7 8.5-4.7"/></>,
+    factory: <><path d="M3 21V10.5l6 3.6V10.5l6 3.6V7l6 3.6V21Z"/><path d="M7.5 21v-3.4M13 21v-3.4M18 21v-2.6"/></>
   }
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>
 }
