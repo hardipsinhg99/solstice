@@ -347,6 +347,13 @@
 .about-dev-flags [data-unresolved]{outline:2px dashed var(--gold-text);outline-offset:4px}
 .about-dev-flags [data-unresolved]:after{content:'CONFIRM SCOPE';position:absolute;left:22px;bottom:8px;font:500 8px 'DM Mono';letter-spacing:1.1px;color:var(--gold-text)}
 
+/* -- 9. mission / vision ---------------------------------------------------- */
+.about-mv{background:var(--surface);padding-bottom:112px}
+.about-mv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.about-mv-panel .about-tilt-inner{padding:36px 32px;background:var(--deep);border-color:transparent;color:#e7efe8;height:100%}
+.about-mv-panel h2{margin:0 0 16px;font-size:clamp(26px,2.8vw,36px);letter-spacing:-1.2px;color:#f5f4ea}
+.about-mv-panel p{margin:0;font-size:15px;line-height:1.75;color:#c7d3c9}
+
 /* ============================================================
    Services
    ============================================================ */

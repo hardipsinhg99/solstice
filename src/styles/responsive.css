@@ -278,33 +278,45 @@
    About - responsive
 
    The tilt is already pointer-gated in pages.css via (hover:hover) and
-   (pointer:fine), so nothing here needs to undo it; these rules only
-   reflow the layout.
+   (pointer:fine), so nothing here needs to undo it; these rules only reflow
+   the layout. The one behavioural change is the founder grid, which stops
+   being a card-quote-card triptych once there is no room for three columns.
    ============================================================ */
 @media(max-width:780px){
-  .about-section-head{margin-bottom:32px}
-  .about-lede{font-size:14px}
   .about-hero{padding:72px 0 60px}
   .about-hero-quote{max-width:100%}
   .about-hero-layer{font-size:clamp(32px,8.4vw,44px);letter-spacing:-1.6px}
+  .about-section-head{margin-bottom:32px}
+  .about-lede{font-size:14px}
+
   .about-timeline-node{padding-left:32px;padding-bottom:28px}
   .about-timeline-body p{font-size:14px}
+
+  /* Quote moves below the two founders rather than dividing them. */
   .about-founder-grid{grid-template-columns:1fr;gap:18px}
   .about-principle{order:3;padding:8px 0}
   .about-founder-mission{margin-top:30px;text-align:left}
+
   .about-industry-grid{grid-template-columns:1fr 1fr;gap:10px}
   .about-industry-card .about-tilt-inner{min-height:0;padding:20px 16px}
+
   .about-presence-layout{grid-template-columns:1fr;gap:30px}
   .about-globe-stage{max-width:280px}
+
   .about-stat-grid{grid-template-columns:1fr 1fr;gap:10px}
   .about-stat{min-height:128px;padding:20px 16px}
+
   .about-check-list,.about-recognition-list{grid-template-columns:1fr;gap:12px}
   .about-check-list li{font-size:14px}
+
+  .about-mv-grid{grid-template-columns:1fr;gap:12px}
+  .about-mv-panel .about-tilt-inner{padding:26px 22px}
+  .about-mv{padding-bottom:73px}
 }
 
 @media(max-width:480px){
   .about-hero-layer{font-size:33px;letter-spacing:-1.3px}
-  .about-industry-grid{grid-template-columns:1fr}
   .about-stat-grid{grid-template-columns:1fr}
   .about-stat{min-height:0}
+  .about-industry-grid{grid-template-columns:1fr}
 }
