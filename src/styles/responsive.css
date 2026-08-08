@@ -48,6 +48,7 @@
   .gallery-grid{grid-auto-rows:190px}
 
   /* About: five industries and three stat columns both over-compress here. */
+  .about-founder-grid{gap:18px}
 }
 
 @media(max-width:780px){
@@ -286,6 +287,9 @@
   .about-hero-layer{font-size:clamp(32px,8.4vw,44px);letter-spacing:-1.6px}
   .about-timeline-node{padding-left:32px;padding-bottom:28px}
   .about-timeline-body p{font-size:14px}
+  .about-founder-grid{grid-template-columns:1fr;gap:18px}
+  .about-principle{order:3;padding:8px 0}
+  .about-founder-mission{margin-top:30px;text-align:left}
 }
 
 @media(max-width:480px){
