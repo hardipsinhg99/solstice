@@ -203,6 +203,7 @@
      bottom from changes with it - the gap between the two is never restated. */
   :root{--chat-launcher-inset:15px}
   .whatsapp-fab{right:15px}
+  .back-to-top{right:15px}
 }
 
 @media(max-width:480px){

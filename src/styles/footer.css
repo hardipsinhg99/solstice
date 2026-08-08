@@ -98,3 +98,55 @@ footer{background:var(--deep);color:#d8e2da}
 body:has(.chat-panel.visible) .whatsapp-fab,
 body:has(.nav-links.open) .whatsapp-fab,
 body:has(.lightbox) .whatsapp-fab{opacity:0;visibility:hidden;transform:scale(.9);pointer-events:none;transition:opacity .25s var(--ease),transform .25s var(--ease),visibility 0s linear .25s}
+
+/* Back to top.
+
+   Slot 2 of the corner column (tokens.css): base + 2*step puts it a consistent
+   --fab-gap above the WhatsApp FAB, which sits the same distance above the chat
+   launcher. Three circles, one pitch, derived from the launcher's own geometry
+   rather than three hand-tuned numbers.
+
+   z-index matches the FAB at 310, between the film grain (300) and the skip link
+   (400). Below the grain its mix-blend-mode:overlay would treat the button as
+   backdrop and wash the green; above 400 it would cover the skip link. The two
+   never overlap each other, so they share a layer. Being above the grain also
+   puts it above every dialog on this site - all of which sit below 300 - which
+   is what the :has() block below withdraws it for.
+
+   The sentinel is exactly --back-to-top-threshold tall and pinned to the
+   document origin. visibility:hidden keeps it unpainted while still generating
+   the box IntersectionObserver needs; display:none would report nothing. */
+.back-to-top-sentinel{position:absolute;top:0;left:0;width:1px;height:var(--back-to-top-threshold);visibility:hidden;pointer-events:none}
+.back-to-top{position:fixed;right:21px;bottom:calc(var(--corner-stack-base) + 2 * var(--corner-stack-step));z-index:310;width:var(--chat-launcher-size);height:var(--chat-launcher-size);border:0;border-radius:50%;background:var(--green-600);color:var(--on-green);display:grid;place-items:center;box-shadow:0 10px 25px rgba(13,43,27,.3);transition:opacity .25s var(--ease),transform .25s var(--ease),background-color .25s var(--ease),box-shadow .25s var(--ease)}
+/* display:grid on the class outranks the UA's [hidden]{display:none} - author
+   styles beat the UA sheet at equal specificity - so without this the button
+   stayed painted and focusable in the corner at scroll 0, which is the exact
+   failure the hidden attribute is here to prevent. */
+.back-to-top[hidden]{display:none}
+/* An animation, not a transition, for the entrance: the button arrives from
+   hidden (display:none), and a transition has no start value to move from
+   there, whereas an animation replays whenever the box is displayed again. */
+.back-to-top:not([hidden]){animation:back-to-top-in .25s var(--ease)}
+@keyframes back-to-top-in{from{opacity:0;transform:translateY(8px)}}
+.back-to-top.is-out{opacity:0;transform:translateY(8px);pointer-events:none}
+.back-to-top:hover{background:var(--green-700);transform:scale(1.08);box-shadow:0 14px 32px rgba(13,43,27,.38)}
+.back-to-top:active{transform:scale(1)}
+/* Same reason as the FAB: the resting box-shadow outranks the global
+   :focus-visible halo in base.css, so the halo is restated with the drop shadow
+   kept underneath. --on-green is the correct halo in both themes. */
+.back-to-top:focus-visible{box-shadow:0 0 0 2px var(--on-green),0 10px 25px rgba(13,43,27,.3)}
+/* No entrance motion and no rise under reduced motion. The opacity transition is
+   left in place so transitionend still fires and the hidden attribute is still
+   restored; the backstop in base.css collapses it to .01ms. */
+@media(prefers-reduced-motion:reduce){
+  .back-to-top:not([hidden]){animation:none}
+  .back-to-top:hover{transform:none}
+  .back-to-top.is-out{transform:none}
+}
+/* Withdrawn while any dialog owns the screen - the chat panel opens into this
+   exact column, and the drawer and lightbox both sit below the grain and so
+   below this button. Declared separately from the FAB's identical block rather
+   than by extending its selector list, to keep that rule untouched. */
+body:has(.chat-panel.visible) .back-to-top,
+body:has(.nav-links.open) .back-to-top,
+body:has(.lightbox) .back-to-top{opacity:0;visibility:hidden;transform:scale(.9);pointer-events:none;transition:opacity .25s var(--ease),transform .25s var(--ease),visibility 0s linear .25s}

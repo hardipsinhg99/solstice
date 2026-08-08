@@ -104,6 +104,23 @@
   --chat-launcher-size:51px;
   --chat-launcher-inset:20px;
   --fab-gap:14px;
+  /* The bottom-right column, as one arithmetic series. --corner-stack-base is
+     slot 0 (the chat launcher's own inset, plus the iOS home indicator);
+     --corner-stack-step is the pitch from one slot to the next. Slot n therefore
+     sits at base + n*step, so retuning the whole column is a one-line change
+     here rather than an edit per element.
+       slot 0  chat launcher   base
+       slot 1  WhatsApp FAB    base + 1*step   (still computes this inline in
+                                                footer.css - identical value,
+                                                not yet migrated onto these)
+       slot 2  back to top     base + 2*step
+     Resolves to 20/85/150px at desktop and 15/76/137px at <=480px, because both
+     inputs already flex at those breakpoints. */
+  --corner-stack-base:calc(var(--chat-launcher-inset) + env(safe-area-inset-bottom,0px));
+  --corner-stack-step:calc(var(--chat-launcher-size) + var(--fab-gap));
+  /* How far the page must scroll before the back-to-top button appears. This is
+     the sentinel's height, not a scroll comparison - see BackToTop.jsx. */
+  --back-to-top-threshold:300px;
 }
 /* color-scheme is what makes the native layer follow the theme: without it the
    <select> dropdown list, the date/number spinners and the default scrollbars

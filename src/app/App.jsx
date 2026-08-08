@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Header } from '../components/layout/Header.jsx'
 import { Footer } from '../components/layout/Footer.jsx'
 import { WhatsAppFab } from '../components/layout/WhatsAppFab.jsx'
+import { BackToTop } from '../components/layout/BackToTop.jsx'
 import { ChatWidget } from '../features/chat/index.js'
 import { products } from '../data/products.js'
 import HomePage from '../pages/home/HomePage.jsx'
@@ -62,5 +63,7 @@ export function App() {
     <Footer/>
     <ChatWidget/>
     <WhatsAppFab/>
+    {/* Shares the skip link's target so 'top of the page' means one place. */}
+    <BackToTop targetRef={mainRef}/>
   </NavigationProvider>
 }
