@@ -20,13 +20,13 @@
 
   /* Percentage gutters were sized against a 1180px container; at ~750px they
      were eating more width than the columns they separated. */
-  .intro-block-grid,.mission-stats-grid,.founder-grid,.detail-grid,.supply-cta-grid{gap:6%}
+  .intro-block-grid,.mission-stats-grid,.detail-grid,.supply-cta-grid{gap:6%}
   .globe-layout{gap:5%}
   .manifesto-grid{gap:8%}
   .contact-page-grid{gap:7%}
 
   /* Column counts that only ever worked at desktop width. */
-  .differentiator-grid,.trust-grid,.value-grid,.products-list,.team-grid{grid-template-columns:1fr 1fr}
+  .differentiator-grid,.trust-grid,.products-list,.team-grid{grid-template-columns:1fr 1fr}
   .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
 
   /* The staggered feature row needs the full 1180px to read as deliberate
@@ -42,11 +42,12 @@
      enough that they never meet, here they collide. */
   .title-mark{font-size:min(18vw,200px)}
 
-  .about-large-image{height:400px}
   .detail-image{height:390px}
   .team-image{height:280px}
   .product-list-image{height:230px}
   .gallery-grid{grid-auto-rows:190px}
+
+  /* About: five industries and three stat columns both over-compress here. */
 }
 
 @media(max-width:780px){
@@ -95,8 +96,7 @@
   .hero-scroll-cue{display:none}
 
   .section{padding:73px 0}
-  .intro-block-grid,.about-story-grid,.detail-grid,.contact-page-grid,.manifesto-grid,.mission-stats-grid,.founder-grid{grid-template-columns:1fr;gap:29px}
-  .founder-photo{height:280px;order:-1}
+  .intro-block-grid,.detail-grid,.contact-page-grid,.manifesto-grid,.mission-stats-grid{grid-template-columns:1fr;gap:29px}
   .meta-grid{grid-template-columns:1fr;gap:12px}
   .differentiator-grid{grid-template-columns:1fr 1fr;gap:10px}
   .stats-grid{gap:10px}
@@ -135,10 +135,6 @@
   .page-title>div>p:last-child{font-size:13px;margin-top:22px}
   .title-mark{font-size:min(46vw,220px);right:-2%}
 
-  .about-large-image{height:340px;border-radius:100px 0 0 0;max-width:100%}
-  .value-grid{grid-template-columns:1fr}
-  .value-grid article{min-height:164px}
-  .value-grid h3{margin-top:26px}
 
   .service-list article{grid-template-columns:42px 35px 1fr;gap:8px;padding:21px 0}
   .service-list article>button{display:none}
@@ -273,4 +269,23 @@
 @media(max-width:780px){
   .journey-pin{height:auto;min-height:520px;padding-bottom:8px}
   .journey-caption-text{font-size:14px}
+}
+
+/* ============================================================
+   About - responsive
+
+   The tilt is already pointer-gated in pages.css via (hover:hover) and
+   (pointer:fine), so nothing here needs to undo it; these rules only
+   reflow the layout.
+   ============================================================ */
+@media(max-width:780px){
+  .about-section-head{margin-bottom:32px}
+  .about-lede{font-size:14px}
+  .about-hero{padding:72px 0 60px}
+  .about-hero-quote{max-width:100%}
+  .about-hero-layer{font-size:clamp(32px,8.4vw,44px);letter-spacing:-1.6px}
+}
+
+@media(max-width:480px){
+  .about-hero-layer{font-size:33px;letter-spacing:-1.3px}
 }
