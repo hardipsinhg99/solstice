@@ -312,6 +312,18 @@
 .about-presence-markets{margin:0;font-size:14px;line-height:1.7;color:var(--muted)}
 .about-presence-markets strong{color:var(--ink)}
 
+/* -- 6. journey stats ------------------------------------------------------- */
+.about-stats{background:var(--surface)}
+/* Fixed grid tracks + a reserved min-height: the counter changes glyphs inside
+   a box whose dimensions were settled at first paint, so counting 0 -> 350
+   cannot move anything on the page. */
+.about-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.about-stat{background:var(--bg);border:1px solid var(--line);padding:26px 22px;min-height:150px;display:flex;flex-direction:column;justify-content:center;position:relative}
+.about-stat b{display:block;font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:clamp(34px,3.6vw,46px);line-height:1;letter-spacing:-1.5px;color:var(--green);font-variant-numeric:tabular-nums;margin-bottom:10px}
+.about-stat-static b{font-size:clamp(19px,2vw,24px);letter-spacing:-.6px;line-height:1.25;color:var(--gold-text)}
+.about-stat-label{font-size:12px;color:var(--muted)}
+.about-stat-unit{font:500 10px 'DM Mono';letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:5px}
+
 /* ============================================================
    Services
    ============================================================ */
