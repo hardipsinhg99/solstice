@@ -1,15 +1,14 @@
 import { useState } from 'react'
 import { PageTitle } from '../../components/layout/PageTitle.jsx'
 import { products } from '../../data/products.js'
-import { ProductFilter, ProductGrid, TradeSwitch } from '../../features/products/index.js'
-import { useNavigate } from '../../app/navigation.js'
+import { ProductFilter, ProductGrid } from '../../features/products/index.js'
 import { ExplodeSequence } from './sections/ExplodeSequence.jsx'
 import { CatalogueEmpty } from './sections/CatalogueEmpty.jsx'
 
-// Direction is a prop off the route, never local state. The header dropdown and
-// the switch below both simply navigate, so there is one source of truth and no
-// way for the two to show different things - and '#products/import' becomes a
-// real URL that survives a reload and can be sent to someone.
+// Direction is a prop off the route, never local state. It is chosen from the
+// header's Products menu, which navigates to '#products/export' or
+// '#products/import' - a real URL that survives a reload and can be sent to
+// someone. The page just renders whichever direction the route names.
 const HEADINGS = {
   export: {
     eyebrow: 'FRESH FROM INDIA',
@@ -26,7 +25,6 @@ const HEADINGS = {
 }
 
 export default function ProductsPage({ trade, selectProduct }) {
-  const navigate = useNavigate()
   const [category, setCategory] = useState('All')
 
   const inTrade = products.filter(product => product.trade === trade)
@@ -47,7 +45,6 @@ export default function ProductsPage({ trade, selectProduct }) {
     <ExplodeSequence/>
     <section className="products-page section">
       <div className="container">
-        <TradeSwitch value={trade} onChange={(next) => navigate(`products/${next}`)}/>
         {categories.length > 1 && <ProductFilter options={categories} value={category} onChange={setCategory}/>}
 
         {/* The category chips swap the grid without navigating, so the result

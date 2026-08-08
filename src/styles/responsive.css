@@ -160,11 +160,6 @@
   .product-list-image{height:255px}
   .product-list-info p{min-height:0}
   .product-filters{overflow-x:auto;padding-bottom:3px;white-space:nowrap}
-  /* The switch becomes two full-width halves rather than shrinking its labels. */
-  .trade-switch{display:grid;grid-template-columns:1fr 1fr;width:100%;gap:4px}
-  .trade-option{padding:11px 12px}
-  .trade-option-label{font-size:14px}
-  .trade-option-hint{font-size:9px;letter-spacing:.6px}
   .product-specs div{grid-template-columns:76px 1fr;gap:10px}
   .product-filters button{flex:0 0 auto}
 

@@ -446,20 +446,6 @@
 
 .products-page{padding-top:59px;position:relative;background:var(--bg)}
 
-/* -- trade direction switch -------------------------------------------------
-   The primary control on the page: which side of the business you are looking
-   at. Deliberately heavier than the category chips below it so the hierarchy
-   reads direction-first, category-second. */
-.trade-switch{display:inline-flex;gap:6px;padding:6px;margin-bottom:22px;background:var(--soft);border:1px solid var(--line);border-radius:2px}
-.trade-option{display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:1px solid transparent;background:transparent;color:var(--muted);padding:12px 20px;text-align:left;transition:background .25s,color .25s,border-color .25s}
-.trade-option svg{color:var(--muted);transition:color .25s}
-.trade-option-label{font-size:15px;font-weight:600;letter-spacing:-.2px}
-.trade-option-hint{font:500 10px 'DM Mono';letter-spacing:.9px;text-transform:uppercase;opacity:.85}
-.trade-option:hover{color:var(--ink);border-color:var(--line-strong)}
-.trade-option:hover svg{color:var(--green)}
-.trade-option.active{background:var(--deep);color:#f5f4ea;border-color:var(--deep)}
-.trade-option.active svg{color:var(--lime)}
-
 .products-count{margin:0 0 18px;font:500 10px 'DM Mono';letter-spacing:1.1px;text-transform:uppercase;color:var(--muted)}
 
 /* -- empty catalogue state -------------------------------------------------- */
