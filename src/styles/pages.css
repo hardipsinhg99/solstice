@@ -289,6 +289,14 @@
 .about-principle blockquote{margin:0;font-family:'Playfair Display',Georgia,serif;font-style:italic;font-weight:500;font-size:clamp(24px,2.6vw,34px);line-height:1.2;letter-spacing:-1px;color:var(--green)}
 .about-founder-mission{margin:44px auto 0;max-width:620px;text-align:center;font-size:15px;line-height:1.75;color:var(--muted)}
 
+/* -- 4. what we do ---------------------------------------------------------- */
+.about-industries{background:var(--soft)}
+.about-industry-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.about-industry-card .about-tilt-inner{padding:24px 20px;display:flex;flex-direction:column;gap:16px;min-height:172px}
+.about-industry-icon{color:var(--green)}
+.about-industry-card h3{margin:0;font-size:15px;line-height:1.35;letter-spacing:-.3px}
+.about-industry-footnote{margin:32px 0 0;max-width:620px;font-size:14px;line-height:1.7;color:var(--muted)}
+
 /* ============================================================
    Services
    ============================================================ */
