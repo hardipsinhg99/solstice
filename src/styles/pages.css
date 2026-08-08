@@ -255,6 +255,22 @@
 .about-hero-layer-face{position:relative;color:#f5f4ea;transform:translateZ(38px)}
 .about-hero-layer-back{position:absolute;inset:0;color:#04140d;opacity:.55;filter:blur(3px);transform:translateZ(-46px)}
 
+/* -- 2. story timeline ------------------------------------------------------ */
+.about-story-timeline{background:var(--surface)}
+.about-timeline{list-style:none;margin:0;padding:0;position:relative;max-width:720px}
+.about-timeline:before,.about-timeline:after{content:'';position:absolute;left:6px;top:10px;width:2px}
+.about-timeline:before{bottom:10px;background:var(--line)}
+/* The fill. scaleY is a compositor-only property and the track above already
+   reserves the space, so the draw-in cannot shift a single pixel of layout. */
+.about-timeline:after{height:calc(100% - 20px);background:var(--green);transform-origin:top;transform:scaleY(0);transition:transform 1.2s var(--ease)}
+.about-timeline.drawn:after{transform:scaleY(1)}
+@media(prefers-reduced-motion:reduce){.about-timeline:after{transform:scaleY(1);transition:none}}
+.about-timeline-node{position:relative;padding:0 0 34px 38px}
+.about-timeline-node:last-child{padding-bottom:0}
+.about-timeline-dot{position:absolute;left:0;top:8px;width:14px;height:14px;border-radius:50%;background:var(--surface);border:2px solid var(--green);z-index:1}
+.about-timeline-label{display:block;font:500 10px 'DM Mono';letter-spacing:1.15px;text-transform:uppercase;color:var(--green);margin-bottom:10px}
+.about-timeline-body p{margin:0;font-size:15px;line-height:1.75;color:var(--muted)}
+
 /* ============================================================
    Services
    ============================================================ */

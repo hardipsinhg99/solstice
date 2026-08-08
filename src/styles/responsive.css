@@ -284,6 +284,8 @@
   .about-hero{padding:72px 0 60px}
   .about-hero-quote{max-width:100%}
   .about-hero-layer{font-size:clamp(32px,8.4vw,44px);letter-spacing:-1.6px}
+  .about-timeline-node{padding-left:32px;padding-bottom:28px}
+  .about-timeline-body p{font-size:14px}
 }
 
 @media(max-width:480px){
