@@ -47,6 +47,13 @@
   .product-list-image{height:230px}
   .gallery-grid{grid-auto-rows:190px}
 
+  /* Insurance for the larger nav type. This is the tightest desktop range - the
+     container is ~733-976px and has to hold the logo, seven links, the CTA and
+     the theme toggle on one row. Tightening the gutter buys back the width the
+     bigger text costs, so the bar cannot wrap or overflow here. */
+  .nav-links{gap:14px}
+  .nav-cta{margin-left:14px}
+
   /* About: five industries and three stat columns both over-compress here. */
   .about-industry-grid{grid-template-columns:repeat(3,1fr)}
   .about-presence-layout{gap:5%}
