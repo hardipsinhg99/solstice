@@ -330,6 +330,23 @@
 .about-check-list li{display:flex;align-items:flex-start;gap:13px;font-size:15px;line-height:1.55;color:var(--ink);padding-bottom:14px;border-bottom:1px solid var(--line)}
 .about-check{flex-shrink:0;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--green) 16%,transparent);color:var(--green);margin-top:-2px}
 
+/* -- 8. industry recognition ------------------------------------------------ */
+.about-recognition{background:var(--bg)}
+.about-recognition-intro{max-width:620px;font-size:15px;line-height:1.75;color:var(--muted);margin:0 0 34px}
+.about-recognition-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.about-recognition-point{display:flex;align-items:flex-start;gap:13px;font-size:14px;line-height:1.55;color:var(--ink);background:var(--surface);border:1px solid var(--line);padding:16px 18px}
+.about-recognition-mark{color:var(--gold-text);flex-shrink:0;margin-top:1px}
+
+/* Development-only marker for unresolved content. The rendered copy itself
+   still carries its literal "[REWRITE - ...]" text, which is the safeguard that
+   survives a production build; this is the loud version for the person working
+   on the page. */
+.about-unresolved{outline:2px dashed var(--gold-text);outline-offset:8px}
+.about-unresolved:before{content:'NEEDS COPY';position:absolute;margin-top:-30px;font:500 9px 'DM Mono';letter-spacing:1.2px;color:var(--gold-text)}
+.about-unresolved[data-unresolved='scope']:before{content:'CONFIRM SCOPE'}
+.about-dev-flags [data-unresolved]{outline:2px dashed var(--gold-text);outline-offset:4px}
+.about-dev-flags [data-unresolved]:after{content:'CONFIRM SCOPE';position:absolute;left:22px;bottom:8px;font:500 8px 'DM Mono';letter-spacing:1.1px;color:var(--gold-text)}
+
 /* ============================================================
    Services
    ============================================================ */
