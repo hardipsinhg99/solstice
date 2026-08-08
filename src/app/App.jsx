@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Header } from '../components/layout/Header.jsx'
 import { Footer } from '../components/layout/Footer.jsx'
+import { WhatsAppFab } from '../components/layout/WhatsAppFab.jsx'
 import { ChatWidget } from '../features/chat/index.js'
 import { products } from '../data/products.js'
 import HomePage from '../pages/home/HomePage.jsx'
@@ -60,5 +61,6 @@ export function App() {
     </main>
     <Footer/>
     <ChatWidget/>
+    <WhatsAppFab/>
   </NavigationProvider>
 }
