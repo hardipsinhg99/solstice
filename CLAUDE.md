@@ -101,5 +101,14 @@ If a query returns no match, say so explicitly rather than quietly falling back 
 ## House rules
 
 - Don't add TypeScript, Tailwind, a router library, a test runner or a linter without asking.
-- Don't self-host or swap the Unsplash imagery; that is a rebuild decision pending real photography.
+- Don't self-host or swap the remaining Unsplash imagery — product, team, gallery and the
+  manifesto plate — that is still a rebuild decision pending real photography.
+  **The hero is the exception, and the condition was met:** real footage was supplied
+  (a locked-camera ship-at-sea clip), so `--hero-image` and its two Unsplash plates are gone.
+  The hero still is now `public/hero/hero-poster.jpg`, frame 0 of the encoded clip, rendered
+  as a real `<img fetchPriority="high">` rather than a CSS `background-image` — the old
+  construction was invisible to the preload scanner, which is what `docs/website-strategy.md`
+  §3.7 flags as the LCP problem. One still serves both themes; `--hero-scrim` and
+  `--hero-filter` still swap. Retiring the plates also removed 769KB of cross-origin image
+  from the hero path.
 - Never commit a form key or secret. `VITE_*` vars are inlined into the client bundle and are public.
