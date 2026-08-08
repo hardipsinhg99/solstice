@@ -2,6 +2,7 @@ import { HeroQuote } from './sections/HeroQuote.jsx'
 import { StoryTimeline } from './sections/StoryTimeline.jsx'
 import { Founders } from './sections/Founders.jsx'
 import { WhatWeDo } from './sections/WhatWeDo.jsx'
+import { GlobalPresence } from './sections/GlobalPresence.jsx'
 
 // The About composition. Ordered so the page answers a buyer's questions in the
 // order they are actually asked - who are you, how did you get here, who runs
@@ -16,5 +17,6 @@ export default function AboutPage() {
     <StoryTimeline/>
     <Founders/>
     <WhatWeDo/>
+    <GlobalPresence/>
   </>
 }

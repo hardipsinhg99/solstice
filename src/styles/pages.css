@@ -297,6 +297,21 @@
 .about-industry-card h3{margin:0;font-size:15px;line-height:1.35;letter-spacing:-.3px}
 .about-industry-footnote{margin:32px 0 0;max-width:620px;font-size:14px;line-height:1.7;color:var(--muted)}
 
+/* -- 5. global presence ----------------------------------------------------- */
+.about-presence{background:var(--bg)}
+.about-presence-layout{display:grid;grid-template-columns:1fr 1fr;gap:8%;align-items:center}
+.about-globe-stage{max-width:420px;width:100%;margin:0 auto}
+.about-presence-list-title{margin:0 0 18px;font:500 10px 'DM Mono';letter-spacing:1.15px;text-transform:uppercase;color:var(--green)}
+.about-presence-list ul{list-style:none;margin:0 0 22px;padding:0;display:grid;gap:14px}
+.about-presence-list li{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.about-presence-list li:last-child{border-bottom:0;padding-bottom:0}
+.about-presence-list li i{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;align-self:center}
+.about-office-country{font-size:15px;color:var(--ink);font-weight:600}
+.about-office-city,.about-office-note{font:500 10px 'DM Mono';letter-spacing:.9px;text-transform:uppercase;color:var(--muted)}
+.about-office-note{color:var(--green)}
+.about-presence-markets{margin:0;font-size:14px;line-height:1.7;color:var(--muted)}
+.about-presence-markets strong{color:var(--ink)}
+
 /* ============================================================
    Services
    ============================================================ */
