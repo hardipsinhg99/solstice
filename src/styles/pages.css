@@ -558,8 +558,6 @@
 .contact-page textarea{height:90px;resize:vertical}
 .contact-page form .button{justify-content:space-between;margin-top:4px}
 .contact-page form .button[disabled]{opacity:.7;cursor:progress}
-.field-row{display:grid;grid-template-columns:1fr minmax(96px,auto);gap:8px;align-items:start}
-.field-row select{width:auto}
 .consent-field{display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:start;line-height:1.5}
 .consent-field input{width:16px;height:16px;margin-top:1px;accent-color:var(--green)}
 .hp-field{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}

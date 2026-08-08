@@ -5,13 +5,10 @@ import { ENQUIRY_EMAIL, FORM_ENDPOINT, FORM_ACCESS_KEY } from '../../lib/constan
 // prefilled mail draft carrying everything they already typed.
 function mailtoFallback(payload) {
   const lines = [
-    ['Name', payload.name], ['Email', payload.email], ['Phone', payload.phone],
-    ['Company / market', payload.company], ['Product', payload.product],
-    ['Quantity', [payload.quantity, payload.quantity_unit].filter(Boolean).join(' ')],
-    ['Destination', payload.destination], ['Incoterm', payload.incoterm],
-    ['Frequency', payload.frequency], ['Message', payload.message]
+    ['Name', payload.name], ['Email', payload.email],
+    ['Phone', payload.phone], ['Message', payload.message]
   ].filter(([, value]) => value).map(([label, value]) => `${label}: ${value}`)
-  const subject = `Enquiry - ${payload.product || 'general'}${payload.company ? ` - ${payload.company}` : ''}`
+  const subject = `Enquiry from ${payload.name || 'the website'}`
   return `mailto:${ENQUIRY_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`
 }
 
@@ -45,7 +42,7 @@ export function useEnquirySubmit() {
     setErrorDetail('')
     try {
       if (FORM_ACCESS_KEY) payload.access_key = FORM_ACCESS_KEY
-      payload.subject = `New enquiry: ${payload.product || 'general'}${payload.company ? ` - ${payload.company}` : ''}`
+      payload.subject = `New enquiry from ${payload.name || 'the website'}`
       const response = await fetch(FORM_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
