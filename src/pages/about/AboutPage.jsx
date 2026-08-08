@@ -4,6 +4,7 @@ import { Founders } from './sections/Founders.jsx'
 import { WhatWeDo } from './sections/WhatWeDo.jsx'
 import { GlobalPresence } from './sections/GlobalPresence.jsx'
 import { JourneyStats } from './sections/JourneyStats.jsx'
+import { WhyChooseUs } from './sections/WhyChooseUs.jsx'
 
 // The About composition. Ordered so the page answers a buyer's questions in the
 // order they are actually asked - who are you, how did you get here, who runs
@@ -20,5 +21,6 @@ export default function AboutPage() {
     <WhatWeDo/>
     <GlobalPresence/>
     <JourneyStats/>
+    <WhyChooseUs/>
   </>
 }

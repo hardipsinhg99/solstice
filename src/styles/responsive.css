@@ -298,6 +298,8 @@
   .about-globe-stage{max-width:280px}
   .about-stat-grid{grid-template-columns:1fr 1fr;gap:10px}
   .about-stat{min-height:128px;padding:20px 16px}
+  .about-check-list,.about-recognition-list{grid-template-columns:1fr;gap:12px}
+  .about-check-list li{font-size:14px}
 }
 
 @media(max-width:480px){
