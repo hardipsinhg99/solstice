@@ -48,10 +48,6 @@
      colour and gets a legible one in both themes. */
   --on-green:#ffffff;
   --blue-600:#0A46A8;
-  /* Deprecated alias, live only so this commit does not break the 57 rules that
-     still say var(--green). The next commit reassigns each of them to -500 or
-     -600 by role and deletes this line. */
-  --green:var(--green-600);
   --bg:#f8f7f1;--surface:#fffefa;--ink:#12211B;--body:#3F4A44;--muted:#546258;
   /* --border is the canonical hairline; --line is kept pointing at it so the 40
      existing consumers keep working rather than two near-identical greys living
@@ -71,11 +67,27 @@
   --elev-2:0 6px 14px rgba(18,45,33,.09),0 30px 60px rgba(18,45,33,.14);
   /* The founder monogram plate stands in for a photograph, and a photograph
      does not invert with the theme - so this is deliberately declared once and
-     NOT overridden in the dark block. Built from --green/--deep it measured
-     1.87:1 in dark, where --green flips to a light mint; fixed at the light
-     theme's values the worst point of the gradient holds 4.92:1 against the
+     NOT overridden in the dark block. Built from theme-flipping tokens it
+     measured 1.87:1 in dark, where the green becomes a light mint; pinned to
+     literal values the worst point of the gradient holds 4.92:1 against the
      monogram's #f2f6ec in both themes. */
   --monogram-plate:linear-gradient(150deg,#123526,#058A4B);
+  /* Green text on a section that is dark in BOTH themes - the hero, the
+     manifesto, the about hero, the journey captions, the footer CTA. These
+     surfaces do not invert, so the ramp cannot serve them: --green-600 measured
+     2.65:1 on the hero. This absorbs the two near-identical literals that were
+     already doing this job by hand (#b7dcb5 in four rules, #bfddbd in two).
+     Measured 8.90:1 on the lightest of those surfaces (--deep) and 11.78:1 on
+     the hero. */
+  --green-on-dark:#b7dcb5;
+  /* The journey's "sky" caption sits on a scrim that is deliberately LIGHT in
+     both themes (pages.css explains why: no single ink passes on both the yard
+     and the sky act). A theme-flipping green therefore cannot be used on it -
+     --green-600 resolves to a mint in dark mode and measured 1.30:1 there.
+     Frozen at the light ramp's -700, same precedent as --monogram-plate above.
+     On the composited scrim it measures 5.87:1 light / 5.58:1 dark; -600 would
+     have been 4.46:1 / 4.24:1, i.e. under AA in both. */
+  --green-on-scrim:#03562F;
   /* WhatsApp's own green, darkened. Declared once and deliberately NOT
      overridden in the dark block - it identifies a third-party service, and a
      brand mark that flips with the theme stops being a brand mark (same

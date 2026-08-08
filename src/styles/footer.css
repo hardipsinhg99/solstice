@@ -4,7 +4,7 @@
 footer{background:var(--deep);color:#d8e2da}
 .footer-cta{border-bottom:1px solid rgba(255,255,255,.12)}
 .footer-cta-inner{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:44px 0}
-.footer-cta-inner .eyebrow{color:#bfddbd}
+.footer-cta-inner .eyebrow{color:var(--green-on-dark)}
 .footer-cta-inner h3{font-size:clamp(21px,2.6vw,29px);letter-spacing:-.7px;margin:0;max-width:480px;font-weight:600}
 .footer-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1.1fr;gap:30px;align-items:start;padding:48px 0}
 /* 10px was below comfortable reading size for the only place the contact
@@ -18,10 +18,12 @@ footer{background:var(--deep);color:#d8e2da}
 .footer-grid button,.footer-grid a{display:inline-flex;align-items:center;min-height:24px}
 .footer-grid button{background:none;border:0;padding:0;text-align:left;transition:color .2s}
 .footer-grid button:hover{color:#fff}
-.footer-grid a{color:var(--lime);transition:opacity .2s}
+/* Same SC 1.4.1 fix as the contact address: --lime against the footer's body
+   grey was a colour-only distinction. */
+.footer-grid a{color:var(--lime);transition:opacity .2s;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
 .footer-grid a:hover{opacity:.8}
 .footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:22px 0;border-top:1px solid rgba(255,255,255,.12);font-size:10px;color:#8ba296}
-.chat-button{position:fixed;right:21px;bottom:20px;z-index:120;width:51px;height:51px;border:0;border-radius:50%;background:var(--green);color:#fff;box-shadow:0 10px 25px rgba(13,43,27,.3);display:grid;place-items:center;transition:transform .25s var(--ease)}
+.chat-button{position:fixed;right:21px;bottom:20px;z-index:120;width:51px;height:51px;border:0;border-radius:50%;background:var(--green-600);color:var(--on-green);box-shadow:0 10px 25px rgba(13,43,27,.3);display:grid;place-items:center;transition:transform .25s var(--ease)}
 .chat-button:hover{transform:scale(1.08)}
 /* visibility - not just opacity - is what removes the closed panel from the
    tab order and the a11y tree. It is stepped with a delay rather than
@@ -40,7 +42,7 @@ footer{background:var(--deep);color:#d8e2da}
 .chat-bubble p{margin:0}
 .chat-bubble.bot{background:var(--soft);color:var(--ink);align-self:flex-start;border-bottom-left-radius:3px}
 .chat-bubble.user{background:var(--deep);color:#fff;align-self:flex-end;border-bottom-right-radius:3px}
-.chat-bubble-cta{margin-top:9px;border:0;background:none;padding:0;color:var(--green);font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px}
+.chat-bubble-cta{margin-top:9px;border:0;background:none;padding:0;color:var(--green-600);font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px}
 .chat-typing{display:flex;gap:4px;padding:14px;align-items:center}
 .chat-typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);opacity:.5;animation:chatTyping 1.1s ease-in-out infinite}
 .chat-typing i:nth-child(2){animation-delay:.15s}
@@ -48,5 +50,51 @@ footer{background:var(--deep);color:#d8e2da}
 @keyframes chatTyping{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
 .chat-quick{flex:0 0 auto;padding:14px 18px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
 .chat-quick>button{border:1px solid var(--line);background:var(--bg);color:var(--ink);text-align:left;padding:9px 12px;border-radius:10px;font-size:11px;transition:border-color .2s,background .2s}
-.chat-quick>button:hover{border-color:var(--green);background:var(--soft)}
-.chat-enquire{border:0;background:none;padding:0;color:var(--green);font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;justify-content:center;padding:6px 0}
+.chat-quick>button:hover{border-color:var(--green-600);background:var(--soft)}
+.chat-enquire{border:0;background:none;padding:0;color:var(--green-600);font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;justify-content:center;padding:6px 0}
+
+/* WhatsApp FAB.
+
+   Stacked directly above .chat-button rather than resolved by z-index: two
+   controls fighting over the same corner and settling it by paint order means
+   one of them is permanently untappable. bottom is computed from the launcher's
+   own size and inset (tokens.css) plus the gap, so the pair cannot drift apart
+   when either breakpoint changes.
+
+   z-index:310 sits between the film grain (300, base.css) and the skip link
+   (400). Below 300 the grain's mix-blend-mode:overlay treats the button as part
+   of its backdrop and washes the brand green; there is no value that clears the
+   grain and still sits under the dialogs, because every dialog on this site is
+   itself below 300. That is what the :has() block underneath resolves.
+
+   env() is written with a 0px fallback and currently resolves to 0 everywhere:
+   index.html has no viewport-fit=cover, so iOS never reports an inset. It is
+   here so the button lifts clear of the home indicator the moment that changes. */
+.whatsapp-fab{position:fixed;right:21px;bottom:calc(var(--chat-launcher-inset) + var(--chat-launcher-size) + var(--fab-gap) + env(safe-area-inset-bottom,0px));z-index:310;width:var(--chat-launcher-size);height:var(--chat-launcher-size);border-radius:50%;background:var(--whatsapp);color:#fff;display:grid;place-items:center;box-shadow:0 10px 25px rgba(13,43,27,.3);transition:transform .25s var(--ease),box-shadow .25s var(--ease),opacity .25s var(--ease),visibility 0s linear 0s}
+.whatsapp-fab:hover{transform:scale(1.08);box-shadow:0 14px 32px rgba(13,43,27,.38)}
+/* The resting box-shadow above outranks the global :focus-visible halo in
+   base.css - equal specificity, later file - which would have left this the one
+   control on the site with a single-tone focus ring. The halo is restated here
+   with the drop shadow kept underneath, now naming --on-green rather than the
+   two hexes it used to hardcode, so it tracks the ring in base.css. */
+.whatsapp-fab:focus-visible{box-shadow:0 0 0 2px var(--on-green),0 10px 25px rgba(13,43,27,.3)}
+/* The label is absolutely positioned rather than laid out inside the anchor so
+   the hit area stays exactly the circle, and pointer-events:none keeps it from
+   shadowing anything to its left while it is fading. */
+.whatsapp-fab-label{position:absolute;right:calc(100% + 10px);white-space:nowrap;background:var(--surface);color:var(--ink);border:1px solid var(--line-strong);border-radius:999px;padding:7px 13px;font-size:11px;font-weight:600;box-shadow:var(--elev-1);opacity:0;transform:translateX(6px);pointer-events:none;transition:opacity .2s var(--ease),transform .2s var(--ease)}
+/* Pointer-only: on touch there is no hover state to reveal it, and it would
+   otherwise flash on every tap. */
+@media(hover:hover) and (pointer:fine){
+  .whatsapp-fab:hover .whatsapp-fab-label,.whatsapp-fab:focus-visible .whatsapp-fab-label{opacity:1;transform:none}
+}
+/* The FAB is the only fixed control that paints above the grain, which also puts
+   it above every dialog on the site. Rather than lower it back under the grain,
+   it is withdrawn while any of them is open - which is the wanted behaviour
+   regardless: the chat panel opens into exactly this strip, and a WhatsApp
+   bubble floating over the lightbox or the mobile drawer is noise.
+   visibility, not opacity alone, so it leaves the tab order too - the same
+   stepped-with-a-delay pattern as .chat-panel and .nav-links. Read off the state
+   the other components already put in the DOM, so none of their CSS is touched. */
+body:has(.chat-panel.visible) .whatsapp-fab,
+body:has(.nav-links.open) .whatsapp-fab,
+body:has(.lightbox) .whatsapp-fab{opacity:0;visibility:hidden;transform:scale(.9);pointer-events:none;transition:opacity .25s var(--ease),transform .25s var(--ease),visibility 0s linear .25s}

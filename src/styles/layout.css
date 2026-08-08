@@ -1,26 +1,27 @@
 /* ============================================================
    Brand & header
    ============================================================ */
-.brand{border:0;background:transparent;color:var(--green);font:700 25px/15px 'DM Sans';letter-spacing:-1.8px;text-align:left;padding:0}
+.brand{border:0;background:transparent;color:var(--green-500);font:700 25px/15px 'DM Sans';letter-spacing:-1.8px;text-align:left;padding:0}
 .brand-logo{display:flex;align-items:center}
 .brand-logo img{display:block;width:145px;height:auto;transition:transform .3s var(--ease)}
 .footer-logo img{width:172px}
 .site-header{height:82px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(16px);border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent);position:sticky;top:0;z-index:100;transition:height .3s var(--ease),box-shadow .3s var(--ease);isolation:isolate}
-.site-header:before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),var(--lime) 45%,var(--gold));opacity:.8}
+.site-header:before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green-500),var(--lime) 45%,var(--gold));opacity:.8}
 .site-header.scrolled{height:68px;box-shadow:0 10px 30px rgba(10,30,20,.08)}
 .site-header.scrolled .brand-logo img{transform:scale(.92)}
 .nav{height:100%;display:flex;align-items:center;justify-content:space-between}
 .nav-links{display:flex;align-items:center;gap:22px}
 .nav-links>button{border:0;background:transparent;font-size:12px;color:var(--muted);padding:8px 12px;margin:0 -12px;border-radius:20px;position:relative;transition:color .2s,background .25s}
-.nav-links>button:hover{background:color-mix(in srgb,var(--green) 10%,transparent);color:var(--ink)}
+.nav-links>button:hover{background:color-mix(in srgb,var(--green-500) 10%,transparent);color:var(--ink)}
 .nav-links>button.active{color:var(--ink);font-weight:600}
-.nav-links>button:after{content:'';position:absolute;bottom:1px;left:12px;right:12px;height:1px;background:var(--green);transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
+.nav-links>button:after{content:'';position:absolute;bottom:1px;left:12px;right:12px;height:1px;background:var(--green-500);transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
 .nav-links>button.active:after,.nav-links>button:hover:after{transform:scaleX(1)}
 .nav-cta{background:var(--deep)!important;color:#fff!important;padding:11px 14px!important;display:flex;align-items:center;gap:7px;margin-left:19px;position:relative;transition:background .25s}
 .nav-cta:before{content:'';position:absolute;left:-16px;top:50%;transform:translateY(-50%);width:1px;height:18px;background:var(--line)}
-.nav-cta:hover{background:var(--green)!important}
+.nav-cta:hover{background:var(--green-600)!important;color:var(--on-green)!important}
+.nav-cta:active{background:var(--green-700)!important;color:var(--on-green)!important}
 .nav-tools{display:flex;align-items:center;gap:10px}
 .theme-toggle,.menu-toggle{border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;width:34px;height:34px;border-radius:50%;transition:border-color .2s,transform .3s var(--ease)}
-.theme-toggle:hover{border-color:var(--green);transform:rotate(14deg)}
+.theme-toggle:hover{border-color:var(--green-600);transform:rotate(14deg)}
 .menu-toggle{display:none}
 .nav-backdrop{display:none}

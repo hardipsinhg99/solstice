@@ -6,8 +6,9 @@
 .button:hover svg{transform:translateX(4px)}
 .button:active{transform:scale(.97)}
 .primary{background:var(--deep);color:#fff}
-.primary:hover{background:var(--green);box-shadow:0 14px 30px rgba(11,60,40,.28)}
-.primary.sent{background:var(--green)}
+.primary:hover{background:var(--green-600);color:var(--on-green);box-shadow:0 14px 30px rgba(11,60,40,.28)}
+.primary:active{background:var(--green-700);color:var(--on-green)}
+.primary.sent{background:var(--green-600);color:var(--on-green)}
 .outline{background:transparent;border:1px solid var(--ink);color:var(--ink)}
 .outline:hover{background:var(--ink);color:var(--bg)}
 .lime{background:var(--lime);color:#153828}
@@ -16,5 +17,5 @@
    24px minimum applies. At 12px with zero padding the hit area was ~16px. */
 .quiet-link{border:0;background:transparent;padding:4px 0;min-height:24px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:8px;transition:color .2s}
 .quiet-link svg{transition:transform .3s var(--ease)}
-.quiet-link:hover{color:var(--green)}
+.quiet-link:hover{color:var(--green-600)}
 .quiet-link:hover svg{transform:translateX(3px)}

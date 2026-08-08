@@ -12,7 +12,7 @@ html{scrollbar-color:var(--line) var(--bg)}
    (not hidden) keeps position:sticky working on the header and explode stage;
    overflow-x:hidden on an ancestor silently turns sticky into static. */
 html,body{max-width:100%;overflow-x:clip}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Sans',Arial,sans-serif;transition:background .3s,color .3s}
+body{margin:0;background:var(--bg);color:var(--body);font-family:'DM Sans',Arial,sans-serif;transition:background .3s,color .3s}
 button,input,textarea,select{font:inherit}
 button{color:inherit}
 button,a{cursor:pointer}
@@ -29,25 +29,31 @@ img{max-width:100%}
    tabindex="-1" makes that possible; the outline would otherwise be noise. */
 main:focus{outline:none}
 ::selection{background:var(--lime);color:#153828}
-/* Dual-tone focus ring: a dark inner ring against light backgrounds and a light
-   outer ring against dark ones, so at least one edge clears 3:1 on any backdrop
-   - including the photographic hero and the deep-green footer, where a single
-   green ring was unreliable. SC 2.4.11 / 2.4.13. */
-:focus-visible{outline:2px solid #0a1f16;outline-offset:2px;box-shadow:0 0 0 5px #f2f6dc;border-radius:2px}
-html[data-theme='dark'] :focus-visible{outline-color:#f2f6dc;box-shadow:0 0 0 5px #0a1f16}
+/* Dual-tone focus ring, so at least one edge clears 3:1 on any backdrop -
+   including the photographic hero and the deep-green footer. SC 2.4.11 / 2.4.13.
+   The ring is --green-700 and the halo --on-green, which is exactly the pair the
+   ring needs: white behind the deep ring on the light theme, ink behind the mint
+   ring on the dark one. The 2px halo fills the outline-offset gap, and that is
+   what lets the ring survive on a green-filled control - --green-700 on a
+   --green-600 fill is nearly invisible alone, and the halo is the edge that
+   separates them. */
+:focus-visible{outline:2px solid var(--green-700);outline-offset:2px;box-shadow:0 0 0 2px var(--on-green);border-radius:2px}
 ::-webkit-scrollbar{width:10px;height:10px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
-::-webkit-scrollbar-thumb:hover{background:var(--green)}
+::-webkit-scrollbar-thumb:hover{background:var(--green-500)}
 /* Faint film grain for depth - decorative only */
 body:before{content:'';position:fixed;inset:0;z-index:300;pointer-events:none;opacity:.035;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")}
 
 .container{width:min(1180px,calc(100% - 48px));margin:0 auto}
 .section{padding:112px 0}
-.eyebrow{margin:0 0 18px;font:500 10px 'DM Mono';letter-spacing:1.15px;color:var(--green)}
+.eyebrow{margin:0 0 18px;font:500 10px 'DM Mono';letter-spacing:1.15px;color:var(--green-600)}
 h1,h2,h3,p{margin-top:0}
+/* Headings take --ink, body copy --body: the two were a single token, so every
+   heading and every paragraph carried identical weight on the page. */
+h1,h2,h3,h4,h5,h6{color:var(--ink)}
 h1,h2{letter-spacing:-2.6px;line-height:.98}
-h1 em,h2 em{font-family:'Playfair Display';font-weight:500;font-style:italic;color:var(--green)}
+h1 em,h2 em{font-family:'Playfair Display';font-weight:500;font-style:italic;color:var(--green-500)}
 h2{font-size:clamp(41px,4.6vw,65px)}
 
 /* ============================================================

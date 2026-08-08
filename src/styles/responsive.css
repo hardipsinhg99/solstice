@@ -72,7 +72,7 @@
   .nav-links{position:absolute;top:70px;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--line);padding:19px 20px;box-shadow:var(--shadow);flex-direction:column;align-items:stretch;gap:6px;opacity:0;visibility:hidden;transform:translateY(-10px);pointer-events:none;transition:opacity .25s var(--ease),transform .25s var(--ease),visibility 0s linear .25s}
   .nav-links.open{opacity:1;visibility:visible;transform:none;pointer-events:auto;transition:opacity .25s var(--ease),transform .25s var(--ease),visibility 0s linear 0s}
   .nav-links>button{text-align:left;margin:0;padding:12px 4px;border-radius:0;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
-  .nav-links>button:hover{background:none;color:var(--green)}
+  .nav-links>button:hover{background:none;color:var(--green-600)}
   .nav-links>button:after{display:none}
   .nav-links .nav-cta{justify-content:center;margin:12px 0 0;border-bottom:0}
   .nav-cta:before{display:none}
@@ -192,6 +192,10 @@
   .footer-bottom{flex-direction:column;align-items:flex-start;gap:6px}
   .chat-button{right:15px;bottom:15px}
   .chat-panel{right:15px;bottom:77px;width:calc(100% - 30px);max-width:calc(100vw - 30px)}
+  /* The launcher's inset changes here, so the value the FAB derives its own
+     bottom from changes with it - the gap between the two is never restated. */
+  :root{--chat-launcher-inset:15px}
+  .whatsapp-fab{right:15px}
 }
 
 @media(max-width:480px){
@@ -223,7 +227,12 @@
   .contact-page form{padding:16px}
   .footer-grid{grid-template-columns:1fr;gap:18px}
   .footer-logo img{width:154px}
+  /* 47px, matching the launcher exactly rather than rounding the FAB up to 48:
+     the two are a vertical stack of circles sharing a right edge, and a 1px
+     difference in diameter is visible as a misaligned column. 47 clears both the
+     44px floor of SC 2.5.5 and the 24px floor of SC 2.5.8. */
   .chat-button{width:47px;height:47px}
+  :root{--chat-launcher-size:47px}
 }
 
 @media(max-width:390px){
