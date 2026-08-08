@@ -1,4 +1,12 @@
-export const HERO_VIDEO_SRC = '/hero/hero.mp4'
+// The hero composite. Three widths; the largest is the source's native 1672px -
+// anything above that would be upscaling, which invents detail and costs bytes
+// for nothing, so wide viewports scale the native file instead.
+export const HERO_IMAGE_SRC = '/hero/hero-1280.webp'
+export const HERO_IMAGE_SRCSET = [
+  '/hero/hero-960.webp 960w',
+  '/hero/hero-1280.webp 1280w',
+  '/hero/hero-1672.webp 1672w'
+].join(', ')
 
 export const ENQUIRY_EMAIL = 'hello@solsticetrading.com'
 
