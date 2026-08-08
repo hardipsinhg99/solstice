@@ -12,10 +12,56 @@
    companion for any gold that is text or a meaningful glyph.
    Measured light: 4.85:1 on --surface, 4.56:1 on --bg, 4.29:1 on --soft.
    Dark stays #d9bb74, which already measures 8.17:1 on --surface. */
+/* GREEN RAMP.
+   The brand green is #058A4B, sampled from the master artwork. It measures
+   4.43:1 on white - which clears SC 1.4.11's 3:1 for graphics and AA for large
+   text, but misses the 4.5:1 that normal-size text needs, and white on it is the
+   same 4.43:1, so it cannot carry a small white button label either. It is
+   therefore an IDENTITY colour, not a working one, and is never darkened: it is
+   the value on the logo, the container livery and the composite key visual.
+   -600 is the interactive default and -700 the pressed/hover/focus step. Every
+   value measured on the light surfaces this site actually paints on:
+
+                    white   --bg    --surface  --soft   --green-050
+     --green-500    4.43    4.12     4.39      3.88      4.02
+     --green-600    6.71    6.26     6.65      5.88      6.10
+     --green-700    8.84    8.23     8.76      7.74      8.03
+
+   The ramp inverts in the dark theme - see the dark block. It cannot be reused
+   there: --green-600 measures 2.04-2.77 on the dark surfaces, i.e. it would take
+   dark mode from passing everywhere to failing everywhere.
+
+   The retired --green was #0b7a49. It was neither the brand green nor a step on
+   any ramp - it entered in the initial commit, survived two contrast passes
+   untouched, and passed only because its accidental darkness put it at 5.39:1.
+   Its consumers are split across -500 and -600 by role, not by appearance. */
 :root{
   color-scheme:light;
-  --bg:#f8f7f1;--surface:#fffefa;--ink:#182922;--muted:#586359;--line:#dde3d6;--line-strong:#78877a;
-  --green:#0b7a49;--deep:#123526;--lime:#dcec6c;--gold:#c9a24d;--gold-text:#8f6b1e;--soft:#eef1e8;
+  --green-500:#058A4B;
+  --green-600:#046A3A;
+  --green-700:#03562F;
+  --green-050:#F1F5F2;
+  /* The label that sits ON a green fill. White is correct on the light theme's
+     -600/-700 (6.71:1 / 8.84:1) but wrong on the dark theme's mint, where white
+     measures 2.05:1 - which is exactly what .primary:hover and .nav-cta:hover
+     were shipping in dark mode. Tokenised so a green-filled control names one
+     colour and gets a legible one in both themes. */
+  --on-green:#ffffff;
+  --blue-600:#0A46A8;
+  /* Deprecated alias, live only so this commit does not break the 57 rules that
+     still say var(--green). The next commit reassigns each of them to -500 or
+     -600 by role and deletes this line. */
+  --green:var(--green-600);
+  --bg:#f8f7f1;--surface:#fffefa;--ink:#12211B;--body:#3F4A44;--muted:#546258;
+  /* --border is the canonical hairline; --line is kept pointing at it so the 40
+     existing consumers keep working rather than two near-identical greys living
+     side by side. Both are decorative and exempt from SC 1.4.11; --line-strong
+     remains the one that must reach 3:1 on interactive boundaries. */
+  --border:#D8E3DC;--line:var(--border);--line-strong:#78877a;
+  /* Same treatment: --green-050 is the canonical tinted section surface and
+     --soft aliases onto it. */
+  --soft:var(--green-050);
+  --deep:#123526;--lime:#dcec6c;--gold:#c9a24d;--gold-text:#8f6b1e;
   --shadow:0 24px 60px rgba(18,45,33,.1);--ease:cubic-bezier(.16,1,.3,1);
   /* Elevation scale for the About page's tilt cards. --elev-1 is the resting
      card, --elev-2 the lifted state under a pointer. Tokenised rather than
@@ -29,15 +75,52 @@
      1.87:1 in dark, where --green flips to a light mint; fixed at the light
      theme's values the worst point of the gradient holds 4.92:1 against the
      monogram's #f2f6ec in both themes. */
-  --monogram-plate:linear-gradient(150deg,#123526,#0b7a49);
+  --monogram-plate:linear-gradient(150deg,#123526,#058A4B);
+  /* WhatsApp's own green, darkened. Declared once and deliberately NOT
+     overridden in the dark block - it identifies a third-party service, and a
+     brand mark that flips with the theme stops being a brand mark (same
+     reasoning as --monogram-plate above).
+     The raw brand #25D366 is unusable here: the white glyph measures 1.98:1 on
+     it and the circle's edge 1.85:1 against the light --bg, failing SC 1.4.11
+     twice. #199B4C holds the hue and measures white glyph 3.60:1, circle edge
+     3.35:1 on light --bg and 4.88:1 on dark --bg. */
+  --whatsapp:#199B4C;
+  /* The FAB stacks directly above the chat launcher, so its inset is derived
+     from that launcher's geometry rather than guessed. These mirror .chat-button
+     in footer.css and are restated at the same breakpoints in responsive.css -
+     move the launcher and the FAB follows it. */
+  --chat-launcher-size:51px;
+  --chat-launcher-inset:20px;
+  --fab-gap:14px;
 }
 /* color-scheme is what makes the native layer follow the theme: without it the
    <select> dropdown list, the date/number spinners and the default scrollbars
    stay light-on-light while the page is dark. */
+/* The green ramp INVERTS here: on a dark surface a higher step must be lighter,
+   not darker, so -700 (the hover/focus step) is the lightest value rather than
+   the deepest. The light ramp is not reusable - #046A3A measures 2.04:1 on
+   --soft. Measured on the dark surfaces:
+
+                    --bg    --surface  --soft   --deep
+     --green-500    8.55     7.38      6.68     6.54
+     --green-600   10.27     8.87      8.03     7.86
+     --green-700   12.32    10.64      9.63     9.43
+
+   --on-green flips to the ink colour: these mints are light fills, and white on
+   --green-500 is 2.05:1. Dark ink on them measures 8.12:1 to 11.70:1. */
 html[data-theme='dark']{
   color-scheme:dark;
-  --bg:#0e1c16;--surface:#152a21;--ink:#f2f2ea;--muted:#aebbb2;--line:#31473c;--line-strong:#688674;
-  --green:#6cc793;--deep:#0a1510;--lime:#e2f27a;--gold:#d9bb74;--gold-text:#d9bb74;--soft:#1b3226;
+  --green-500:#6CC793;
+  --green-600:#8AD6AB;
+  --green-700:#ABE5C4;
+  /* Keeps the dark theme's existing tinted-surface value rather than inventing a
+     second one next to it; --soft still aliases onto it, as in the light block. */
+  --green-050:#1b3226;
+  --on-green:#12211B;
+  --blue-600:#7FA8F0;
+  --bg:#0e1c16;--surface:#152a21;--ink:#f2f2ea;--body:#d5ddd7;--muted:#aebbb2;
+  --border:#31473c;--line-strong:#688674;
+  --deep:#0a1510;--lime:#e2f27a;--gold:#d9bb74;--gold-text:#d9bb74;
   --shadow:0 24px 60px rgba(0,0,0,.4);
   --elev-1:0 2px 6px rgba(0,0,0,.3),0 12px 28px rgba(0,0,0,.34);
   --elev-2:0 6px 14px rgba(0,0,0,.42),0 30px 60px rgba(0,0,0,.5);
