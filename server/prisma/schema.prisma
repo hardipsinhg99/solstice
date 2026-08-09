@@ -1,0 +1,179 @@
+// Solstice admin CMS - Phase 1a schema (Products only).
+// Pages, PageSection and Enquiry are designed in docs/admin-cms-blueprint.md but
+// deliberately not created here: both are blocked on open questions the client
+// has not answered, and an unused table is a migration to undo later.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TradeDirection {
+  EXPORT
+  IMPORT
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+}
+
+// Incoterms are aspirational - no product carries one today. Modelled as an enum
+// rather than free text so the value set cannot drift once data does arrive.
+enum Incoterm {
+  EXW
+  FOB
+  CFR
+  CIF
+  DAP
+  DDP
+}
+
+/// Single admin. No role column by design (docs/admin-cms-blueprint.md §2):
+/// Solstice is ~10 people with one operator. The updatedById back-references
+/// below are captured from day one so roles can be introduced later without a
+/// data migration - backfilling who-did-what is the expensive part of RBAC.
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  lastLoginAt  DateTime?
+  createdAt    DateTime @default(now())
+
+  products       Product[]
+  varieties      ProductVariety[]
+  packOptions    ProductPackOption[]
+  certifications ProductCertification[]
+  auditEntries   AuditLog[]
+
+  @@map("admins")
+}
+
+model Product {
+  id     String         @id @default(cuid())
+  slug   String         @unique
+  name   String
+  trade  TradeDirection @default(EXPORT)
+  status ProductStatus  @default(DRAFT)
+
+  // The fields that carry real data today. `image` is nullable on purpose: the
+  // two import placeholder records have image: null, so a NOT NULL here would
+  // block seeding the very data this table exists to hold.
+  type        String
+  image       String?
+  description String  @db.Text
+  season      String
+  origin      String
+  packaging   String
+
+  /// Marks the "awaiting details" import slots. Kept because ProductCard renders
+  /// a distinct placeholder card off it; dropping the flag would silently turn
+  /// two stubs into apparently-real products.
+  placeholder Boolean @default(false)
+
+  // ── Aspirational commercial spec ────────────────────────────────────────────
+  // Every one of these is nullable / empty-by-default. No product has any of
+  // them yet, and requiring data nobody has would block product creation.
+  hsCode         String?
+  incoterms      Incoterm[]
+  moqValue       Decimal?   @db.Decimal(10, 2)
+  moqUnit        String?
+  shelfLifeDays  Int?
+  storageTempC   String?
+  storageHumidity String?
+  portsOfLoading String[]
+
+  seoTitle       String?
+  seoDescription String?
+
+  varieties      ProductVariety[]
+  packOptions    ProductPackOption[]
+  certifications ProductCertification[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+  updatedBy   Admin?   @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([trade, status])
+  @@map("products")
+}
+
+/// Child table, not a JSON array on Product - per the blueprint: varieties must
+/// be filterable independently ("everything FOB Mundra in 4kg cartons"), which a
+/// JSON blob does not support cleanly.
+model ProductVariety {
+  id         String  @id @default(cuid())
+  product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  String
+  name       String
+  grade      String?
+  calibreMin Int?
+  calibreMax Int?
+  order      Int     @default(0)
+
+  updatedById String?
+  updatedBy   Admin?  @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([productId, order])
+  @@map("product_varieties")
+}
+
+model ProductPackOption {
+  id               String  @id @default(cuid())
+  product          Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId        String
+  cartonWeightKg   Decimal @db.Decimal(6, 2)
+  cartonsPerPallet Int?
+  palletsPerReefer Int?
+  cartonsPerReefer Int?
+  notes            String?
+  order            Int     @default(0)
+
+  updatedById String?
+  updatedBy   Admin?  @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([productId, order])
+  @@map("product_pack_options")
+}
+
+/// `verifiable` is not cosmetic. docs/website-strategy.md records that claiming a
+/// certification without a producible certificate reference is a legal exposure
+/// in several destination markets. The admin UI puts an explicit confirmation in
+/// front of setting it true, and renders unverified claims in a warning state.
+model ProductCertification {
+  id         String  @id @default(cuid())
+  product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  String
+  name       String
+  verifiable Boolean @default(false)
+  reference  String?
+  order      Int     @default(0)
+
+  updatedById String?
+  updatedBy   Admin?  @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([productId, order])
+  @@map("product_certifications")
+}
+
+/// Lightweight audit trail - answers "who changed the Alphonso MOQ last Tuesday".
+/// Deliberately not an enterprise audit system: no tamper-proofing, no retention.
+model AuditLog {
+  id         String   @id @default(cuid())
+  entityType String
+  entityId   String
+  action     String
+  actorId    String?
+  actor      Admin?   @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  summary    String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId, createdAt])
+  @@map("audit_log")
+}
