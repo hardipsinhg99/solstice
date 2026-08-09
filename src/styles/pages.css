@@ -621,3 +621,13 @@
 .faq-answer>p{overflow:hidden;margin:0;padding:0 4px;font-size:13px;line-height:1.7;color:var(--muted)}
 .faq-item.open .faq-answer{grid-template-rows:1fr}
 .faq-item.open .faq-answer>p{padding-bottom:22px}
+
+/* Catalogue fetch states. The grid now comes from the API, so "empty" and
+   "unreachable" have to look different: CatalogueEmpty means the shelf is bare,
+   this means the shop could not be opened. No new animation - the ellipsis is
+   the same .dots pattern already in the stylesheet, which the reduced-motion
+   backstop in base.css already covers. */
+.products-loading{color:var(--muted);font:500 13px 'DM Sans';padding:28px 0}
+.products-error{border:1px solid var(--danger);background:var(--danger-bg);border-radius:12px;padding:24px;display:grid;gap:10px;max-width:560px}
+.products-error p{margin:0;font-size:13px;line-height:1.6;color:var(--body)}
+.products-error .button{justify-self:start;margin-top:4px}

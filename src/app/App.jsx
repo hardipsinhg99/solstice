@@ -4,7 +4,7 @@ import { Footer } from '../components/layout/Footer.jsx'
 import { WhatsAppFab } from '../components/layout/WhatsAppFab.jsx'
 import { BackToTop } from '../components/layout/BackToTop.jsx'
 import { ChatWidget } from '../features/chat/index.js'
-import { products } from '../data/products.js'
+import { useProductCatalogue } from '../features/products/index.js'
 import HomePage from '../pages/home/HomePage.jsx'
 import AboutPage from '../pages/about/AboutPage.jsx'
 import ServicesPage from '../pages/services/ServicesPage.jsx'
@@ -21,6 +21,7 @@ import AdminApp from '../pages/admin/AdminApp.jsx'
 export function App() {
   const { theme, setTheme } = useTheme()
   const route = useHashRoute()
+  const [products] = useProductCatalogue()
   const mainRef = useRef(null)
   const firstRender = useRef(true)
 

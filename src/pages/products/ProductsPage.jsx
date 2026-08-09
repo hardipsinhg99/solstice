@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { PageTitle } from '../../components/layout/PageTitle.jsx'
-import { products } from '../../data/products.js'
-import { ProductFilter, ProductGrid } from '../../features/products/index.js'
+import { ProductFilter, ProductGrid, useProductCatalogue } from '../../features/products/index.js'
 import { ExplodeSequence } from './sections/ExplodeSequence.jsx'
 import { CatalogueEmpty } from './sections/CatalogueEmpty.jsx'
 
@@ -26,6 +25,7 @@ const HEADINGS = {
 
 export default function ProductsPage({ trade, selectProduct }) {
   const [category, setCategory] = useState('All')
+  const [products, status, retry] = useProductCatalogue()
 
   const inTrade = products.filter(product => product.trade === trade)
   // Categories are derived from what this direction actually contains, never
@@ -51,10 +51,28 @@ export default function ProductsPage({ trade, selectProduct }) {
             count is announced - otherwise a screen-reader user presses a chip
             and is told nothing changed. */}
         <div aria-live="polite">
-          <p className="products-count">{countLabel}</p>
-          {filtered.length > 0
-            ? <ProductGrid products={filtered} onSelect={selectProduct}/>
-            : <CatalogueEmpty direction={trade}/>}
+          {/* Three distinct states, because "no products" and "we could not
+              reach the catalogue" mean opposite things to a buyer: one is an
+              empty shelf, the other is a broken shop. Rendering CatalogueEmpty
+              for a failed fetch would tell them Solstice sells nothing. */}
+          {status === 'loading' && (
+            <p className="products-loading" role="status">Loading the catalogue…</p>
+          )}
+
+          {status === 'error' && (
+            <div className="products-error" role="alert">
+              <p><strong>The catalogue is temporarily unavailable.</strong></p>
+              <p>This is a problem on our side, not with your connection. Please try again, or send an enquiry and we will reply with current availability.</p>
+              <button className="button outline" onClick={retry}>Try again</button>
+            </div>
+          )}
+
+          {status === 'ready' && <>
+            <p className="products-count">{countLabel}</p>
+            {filtered.length > 0
+              ? <ProductGrid products={filtered} onSelect={selectProduct}/>
+              : <CatalogueEmpty direction={trade}/>}
+          </>}
         </div>
       </div>
     </section>

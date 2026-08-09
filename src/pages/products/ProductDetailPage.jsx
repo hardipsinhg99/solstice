@@ -2,14 +2,14 @@ import { Button } from '../../components/ui/Button.jsx'
 import { Eyebrow } from '../../components/ui/Eyebrow.jsx'
 import { Icon } from '../../components/ui/Icon.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
-import { products } from '../../data/products.js'
-import { RelatedProducts } from '../../features/products/index.js'
+import { RelatedProducts, useProductCatalogue } from '../../features/products/index.js'
 import { useNavigate } from '../../app/navigation.js'
 import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
 import ProductsPage from './ProductsPage.jsx'
 
 export default function ProductDetailPage({ product, selectProduct }) {
   const navigate = useNavigate()
+  const [products] = useProductCatalogue()
   if (!product) return <ProductsPage selectProduct={selectProduct}/>
   const index = products.findIndex(p => p.slug === product.slug)
   const related = [...products.filter(p => p.slug !== product.slug && p.type === product.type), ...products.filter(p => p.slug !== product.slug && p.type !== product.type)].slice(0, 3)

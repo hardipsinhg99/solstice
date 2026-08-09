@@ -4,7 +4,7 @@ import { Icon } from '../../components/ui/Icon.jsx'
 import { cardProps } from '../../components/ui/Card.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
 import { Globe, useGlobeTheme } from '../../features/globe/index.js'
-import { products } from '../../data/products.js'
+import { useProductCatalogue } from '../../features/products/index.js'
 import { globeMarkers, globeArcs } from '../../data/globe.js'
 import { useNavigate } from '../../app/navigation.js'
 import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
@@ -12,8 +12,13 @@ import { HeroMedia } from './sections/HeroMedia.jsx'
 import { JourneyScroll } from './sections/JourneyScroll.jsx'
 
 export default function HomePage({ selectProduct, theme }) {
+  const [products] = useProductCatalogue()
   const navigate = useNavigate()
-  const homeProducts = [products[0], products[3], products[1]]
+  // The three featured slots are positional. While the catalogue is still in
+  // flight the array is empty, so filter the holes out rather than render
+  // undefined into ProductCard - the section simply has nothing in it for a
+  // moment, which is the honest state.
+  const homeProducts = [products[0], products[3], products[1]].filter(Boolean)
   const globeTheme = useGlobeTheme(theme)
   return <>
     <section className="home-hero">
