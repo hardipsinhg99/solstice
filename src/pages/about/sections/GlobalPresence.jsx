@@ -51,8 +51,8 @@ export function GlobalPresence() {
               {globalPresence.offices.map(office => (
                 <li key={office.id}>
                   <i aria-hidden="true"/>
-                  <span className="about-office-country">{office.country}</span>
-                  {office.city && <span className="about-office-city">{office.city}</span>}
+                  <span className="about-office-country notranslate" translate="no">{office.country}</span>
+                  {office.city && <span className="about-office-city notranslate" translate="no">{office.city}</span>}
                   {office.note && <span className="about-office-note">{office.note}</span>}
                 </li>
               ))}

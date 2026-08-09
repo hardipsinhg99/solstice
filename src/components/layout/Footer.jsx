@@ -16,7 +16,7 @@ export function Footer() {
       </div>
       <div className="container footer-grid">
         <div className="footer-brand">
-          <button className="brand brand-logo footer-logo" onClick={() => navigate('home')} aria-label="Solstice home">
+          <button className="brand brand-logo footer-logo notranslate" translate="no" onClick={() => navigate('home')} aria-label="Solstice home">
             <img src="/solstice-logo.png" alt="Solstice Trading International LLP"/>
           </button>
           <p>Fresh produce, spices &amp; essential foods<br/>from India, for international buyers.</p>

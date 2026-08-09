@@ -40,7 +40,7 @@ function ExplodeCanvas() {
   if (failed) return <ExplodePoster/>
 
   return (
-    <div className="explode-scroll" ref={scrollRef} aria-hidden="true">
+    <div className="explode-scroll notranslate" translate="no" ref={scrollRef} aria-hidden="true">
       {/* The poster is the stage's background until every frame has preloaded, so
           the section is never an empty box - on a slow connection that wait is
           measured in tens of seconds. Dropped once `ready` so it stops painting
@@ -62,7 +62,7 @@ function ExplodeCanvas() {
 
 function ExplodePoster() {
   return (
-    <div className="explode-fallback" aria-hidden="true">
+    <div className="explode-fallback notranslate" translate="no" aria-hidden="true">
       <img src={POSTER_SRC} alt="" decoding="async" fetchPriority="low"/>
     </div>
   )

@@ -25,12 +25,13 @@ export default function ProductDetailPage({ product, selectProduct }) {
         <div className="detail-copy">
           <div className="detail-top">
             <button className="back-link" onClick={() => navigate('products')}>← All products</button>
-            <span className="detail-index">0{index + 1} / 0{products.length}</span>
+            <span className="detail-index notranslate" translate="no">0{index + 1} / 0{products.length}</span>
           </div>
-          <span className="detail-type">{product.type.toUpperCase()}</span>
+          <span className="detail-type notranslate" translate="no">{product.type.toUpperCase()}</span>
           <h1>{product.name}</h1>
           <p>{product.description}</p>
-          <div className="variety-pills">{product.varieties.map(v => <span key={v}>{v}</span>)}</div>
+          {/* Cultivar names are proper nouns - "Alphonso" must not become a literal. */}
+          <div className="variety-pills notranslate" translate="no">{product.varieties.map(v => <span key={v}>{v}</span>)}</div>
           <Button onClick={() => navigate('contact')}>Enquire about {product.name}</Button>
         </div>
         {/* The one image on the site that must NOT be lazy: it is the largest
@@ -56,7 +57,7 @@ export default function ProductDetailPage({ product, selectProduct }) {
           {meta.map(([icon, title, value], i) => (
             <Reveal as="div" key={title} delay={i * 80} className="meta-card">
               <div className="meta-icon"><Icon name={icon} size={19}/></div>
-              <div><b>{title}</b><span>{value}</span></div>
+              <div><b>{title}</b><span className="notranslate" translate="no">{value}</span></div>
             </Reveal>
           ))}
         </div>

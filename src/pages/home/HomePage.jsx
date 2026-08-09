@@ -28,7 +28,7 @@ export default function HomePage({ selectProduct, theme }) {
             <Button onClick={() => navigate('products')}>Explore our produce</Button>
             <button className="quiet-link" onClick={() => navigate('contact')}>Request product details <Icon name="arrow" size={16}/></button>
           </div>
-          <div className="hero-meta"><span>FRESH PRODUCE</span><i/><span>SPICES &amp; STAPLES</span><i/><span>GLOBAL TRADE</span></div>
+          <div className="hero-meta notranslate" translate="no"><span>FRESH PRODUCE</span><i/><span>SPICES &amp; STAPLES</span><i/><span>GLOBAL TRADE</span></div>
         </div>
       </div>
       <div className="hero-footer container"><span>GLOBAL IMPORT &amp; EXPORT · INDIA</span><div/><b>01 - 07</b></div>

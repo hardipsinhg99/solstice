@@ -51,6 +51,44 @@
 #google_translate_element{position:fixed;z-index:101;display:none}
 #google_translate_element[data-ready='true']{display:block}
 
+/* Google's own chrome. These need !important because its stylesheet is injected
+   into <head> at runtime, after our bundle, so it would otherwise always win.
+   body{top:0} undoes the ~40px it shoves the whole page down by.
+
+   The banner is matched STRUCTURALLY, not by class name. The documented
+   .goog-te-banner-frame no longer exists in the shipping widget - it now renders
+   as iframe.VIpgJd-ZVi9od-ORHb-OEVmcd, an obfuscated name that will churn. What
+   is stable is where it lives: a direct child of <body> carrying .skiptranslate.
+   Measured before this rule: 1280x39 at top:0, overlapping the header, and the
+   first tab stop on the page.
+   #google_translate_element is also a direct child of body but does NOT carry
+   .skiptranslate itself - only its inner gadget div does - so our own widget is
+   not caught by this. */
+body > .skiptranslate{display:none!important}
+iframe.skiptranslate{display:none!important}
+.goog-te-banner-frame,.goog-te-balloon-frame{display:none!important}
+body{top:0!important;position:static!important}
+#goog-gt-tt,.goog-te-gadget-icon{display:none!important}
+/* Google paints a yellow wash behind every string it has rewritten. */
+.goog-text-highlight{background:none!important;box-shadow:none!important}
+
+/* Restyling a UA-rendered <select>: border, type and colours are ours, the
+   dropdown list itself belongs to the OS and is deliberately left alone.
+   The id+class selector is what outranks Google's own .goog-te-combo rules. */
+/* overflow:hidden is a structural clamp, not decoration. After a translation
+   Google re-renders the gadget and appends a "Powered by" anchor plus a 37px
+   branding <img>, and it re-asserts font-size:12px on that anchor, so collapsing
+   the gadget's font size alone does not contain it. Measured before this rule:
+   the gadget's right edge reached 378px against a 118px box ending at 288px,
+   overlapping the theme toggle at 298px. The two rules below remove the
+   attribution; overflow:hidden guarantees nothing Google injects can ever escape
+   the reserved slot, whatever its obfuscated class names change to next. */
+#google_translate_element{overflow:hidden}
+#google_translate_element .goog-te-gadget{font-size:0!important;line-height:0}
+#google_translate_element .goog-te-gadget > span,
+#google_translate_element .goog-te-gadget img{display:none!important}
+#google_translate_element .goog-te-combo{width:100%;height:34px;margin:0!important;padding:0 10px;border:1px solid var(--line-strong);border-radius:20px;background:var(--surface);color:var(--ink);font:500 12px 'DM Sans',Arial,sans-serif;cursor:pointer;transition:border-color .2s}
+#google_translate_element .goog-te-combo:hover{border-color:var(--green-600)}
 .theme-toggle,.menu-toggle{border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;width:34px;height:34px;border-radius:50%;transition:border-color .2s,transform .3s var(--ease)}
 .theme-toggle:hover{border-color:var(--green-600);transform:rotate(14deg)}
 .menu-toggle{display:none}

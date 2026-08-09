@@ -17,7 +17,10 @@ function CounterTile({ stat, delay }) {
   const [ref, value] = useCountUp(stat.value)
   return (
     <Reveal as="div" delay={delay} className="about-stat" data-unresolved={stat.unresolvedScope || undefined}>
-      <b ref={ref}>
+      {/* useCountUp rewrites this text on every animation frame while the
+          tile is in view. A <font> wrapper around a node React is re-rendering
+          that fast is the highest-risk removeChild site on the site. */}
+      <b ref={ref} className="notranslate" translate="no">
         {value}{stat.suffix || ''}
       </b>
       <span className="about-stat-label">{stat.label}</span>
@@ -29,7 +32,7 @@ function CounterTile({ stat, delay }) {
 function StaticTile({ stat, delay }) {
   return (
     <Reveal as="div" delay={delay} className="about-stat about-stat-static" data-unresolved={stat.unresolvedScope || undefined}>
-      <b>{stat.text}</b>
+      <b className="notranslate" translate="no">{stat.text}</b>
       <span className="about-stat-label">{stat.label}</span>
     </Reveal>
   )

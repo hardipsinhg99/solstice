@@ -43,7 +43,7 @@ export function Header({ route, theme, setTheme }) {
   return (
     <header className={scrolled ? 'site-header scrolled' : 'site-header'}>
       <div className="container nav">
-        <button className="brand brand-logo" onClick={() => onNavigate('home')} aria-label="Solstice home">
+        <button className="brand brand-logo notranslate" translate="no" onClick={() => onNavigate('home')} aria-label="Solstice home">
           {/* Intrinsic dimensions, not the rendered 145px: they give the browser
               the aspect ratio it needs to reserve the box before the PNG lands,
               which is what stops the header from reflowing on first paint. */}
