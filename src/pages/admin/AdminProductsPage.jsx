@@ -17,9 +17,12 @@ function DeleteConfirm({ product, busy, error, onCancel, onConfirm }) {
         its {product.certifications.length} certification records. It cannot be undone.
       </p>
       {error && <p className="admin-error" role="alert">{error}</p>}
+      {/* Focus lands on Cancel, not on the destructive button. The panel appears
+          under the operator's hand; a stray Enter should dismiss it, never
+          delete a product. */}
       <div className="admin-danger-actions">
-        <button className="admin-btn" onClick={onCancel} disabled={busy}>Cancel</button>
-        <button className="admin-btn admin-btn-danger" onClick={onConfirm} disabled={busy} autoFocus>
+        <button className="admin-btn" onClick={onCancel} disabled={busy} autoFocus>Cancel</button>
+        <button className="admin-btn admin-btn-danger" onClick={onConfirm} disabled={busy}>
           {busy ? 'Deleting…' : 'Delete permanently'}
         </button>
       </div>

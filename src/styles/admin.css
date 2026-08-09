@@ -44,7 +44,12 @@
 .admin-field{display:grid;gap:6px;margin-bottom:14px}
 .admin-field>span{font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:.2px}
 .admin-field input,.admin-field select,.admin-field textarea{background:var(--bg);border:1px solid var(--line-strong);color:var(--ink);border-radius:8px;padding:9px 11px;font-size:13px;width:100%}
-.admin-field input:focus,.admin-field select:focus,.admin-field textarea:focus{border-color:var(--green-600);outline:none}
+/* border-color only - deliberately NOT outline:none. admin.css is imported last,
+   so an outline reset here would beat the global :focus-visible ring in base.css
+   and leave the form controls, the ones a keyboard user needs it on most, with
+   no visible focus at all. The tinted border is an addition to that ring, not a
+   replacement for it. */
+.admin-field input:focus,.admin-field select:focus,.admin-field textarea:focus{border-color:var(--green-600)}
 .admin-hint{color:var(--muted);font-size:11px}
 .admin-error{color:var(--danger);font-size:12px;font-weight:600;margin:0}
 .admin-saved{color:var(--green-600);font-size:12px;font-weight:600}
