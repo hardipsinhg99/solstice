@@ -15,7 +15,7 @@ import GalleryPage from '../pages/gallery/GalleryPage.jsx'
 import ContactPage from '../pages/contact/ContactPage.jsx'
 import { NavigationProvider } from './navigation.js'
 import { useTheme } from './ThemeProvider.jsx'
-import { goTo, useHashRoute, isProductRoute, productSlug } from './router.js'
+import { goTo, useHashRoute, isProductRoute, productSlug, isProductsRoute, productsTrade } from './router.js'
 
 export function App() {
   const { theme, setTheme } = useTheme()
@@ -41,11 +41,15 @@ export function App() {
   const selectProduct = (slug) => goTo(`product/${slug}`)
   const onProduct = isProductRoute(route)
   const product = onProduct ? products.find(p => p.slug === productSlug(route)) : null
+  // The catalogue's direction lives in the route, so the header dropdown and the
+  // on-page switch read from one source and cannot disagree, and a filtered view
+  // is a shareable URL.
+  const onProducts = isProductsRoute(route)
+  const trade = productsTrade(route)
   const pages = {
     home: <HomePage selectProduct={selectProduct} theme={theme}/>,
     about: <AboutPage/>,
     services: <ServicesPage/>,
-    products: <ProductsPage selectProduct={selectProduct}/>,
     team: <TeamPage/>,
     gallery: <GalleryPage/>,
     contact: <ContactPage/>
@@ -58,7 +62,14 @@ export function App() {
     <button className="skip-link" onClick={() => mainRef.current?.focus()}>Skip to content</button>
     <Header route={onProduct ? 'products' : route} theme={theme} setTheme={setTheme}/>
     <main id="main-content" ref={mainRef} tabIndex={-1}>
-      {onProduct ? <ProductDetailPage product={product} selectProduct={selectProduct}/> : (pages[route] || pages.home)}
+      {onProduct
+        ? <ProductDetailPage product={product} selectProduct={selectProduct}/>
+        : onProducts
+          // key remounts on a direction change, which resets the category chips.
+          // Carrying "Fresh fruit" from one direction into another that has no
+          // fruit would strand the grid empty for a reason nobody chose.
+          ? <ProductsPage key={trade} trade={trade} selectProduct={selectProduct}/>
+          : (pages[route] || pages.home)}
     </main>
     <Footer/>
     <ChatWidget/>

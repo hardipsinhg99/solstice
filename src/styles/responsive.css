@@ -81,6 +81,16 @@
   .nav-links>button{text-align:left;margin:0;padding:12px 4px;border-radius:0;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
   .nav-links>button:hover{background:none;color:var(--green-600)}
   .nav-links>button:after{display:none}
+  /* In the drawer the panel expands inline instead of floating - a positioned
+     overlay inside a vertical menu would cover the items beneath it. */
+  .nav-dropdown{display:block;position:static}
+  .nav-dropdown-trigger{width:100%;justify-content:space-between;text-align:left;margin:0;padding:12px 4px;border-radius:0;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+  .nav-dropdown-trigger:hover{background:none;color:var(--green-600)}
+  .nav-dropdown-trigger:after{display:none}
+  .nav-dropdown-panel{position:static;min-width:0;border:0;box-shadow:none;background:transparent;animation:none;margin:2px 0 8px}
+  .nav-dropdown-panel ul{padding:0}
+  .nav-dropdown-item{padding:10px 4px 10px 16px;font-size:13px;border-left:2px solid var(--line)}
+  .nav-dropdown-item.active{border-left-color:var(--green-600)}
   .nav-links .nav-cta{justify-content:center;margin:12px 0 0;border-bottom:0}
   .nav-cta:before{display:none}
   .menu-toggle{display:grid}
@@ -157,6 +167,7 @@
   .product-list-image{height:255px}
   .product-list-info p{min-height:0}
   .product-filters{overflow-x:auto;padding-bottom:3px;white-space:nowrap}
+  .product-specs div{grid-template-columns:76px 1fr;gap:10px}
   .product-filters button{flex:0 0 auto}
 
   .detail-hero{padding:50px 0 0}

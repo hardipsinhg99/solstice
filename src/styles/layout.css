@@ -24,15 +24,39 @@
    The lower bound is also the 14px-ish floor website-strategy.md 2.6 asks for on
    body-adjacent text - 12px was under it.
    .nav-cta is a direct child of .nav-links, so it scales with the rest. */
-.nav-links>button{border:0;background:transparent;font-size:clamp(13px,1.15vw,15px);color:var(--muted);padding:8px 12px;margin:0 -12px;border-radius:20px;position:relative;transition:color .2s,background .25s}
-.nav-links>button:hover{background:color-mix(in srgb,var(--green-500) 10%,transparent);color:var(--ink)}
-.nav-links>button.active{color:var(--ink);font-weight:600}
-.nav-links>button:after{content:'';position:absolute;bottom:1px;left:12px;right:12px;height:1px;background:var(--green-500);transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
-.nav-links>button.active:after,.nav-links>button:hover:after{transform:scaleX(1)}
+.nav-links>button,.nav-dropdown-trigger{border:0;background:transparent;font-size:clamp(13px,1.15vw,15px);color:var(--muted);padding:8px 12px;margin:0 -12px;border-radius:20px;position:relative;transition:color .2s,background .25s}
+.nav-links>button:hover,.nav-dropdown-trigger:hover{background:color-mix(in srgb,var(--green-500) 10%,transparent);color:var(--ink)}
+.nav-links>button.active,.nav-dropdown-trigger.active{color:var(--ink);font-weight:600}
+.nav-links>button:after,.nav-dropdown-trigger:after{content:'';position:absolute;bottom:1px;left:12px;right:12px;height:1px;background:var(--green-500);transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
+.nav-links>button.active:after,.nav-links>button:hover:after,.nav-dropdown-trigger.active:after,.nav-dropdown-trigger:hover:after{transform:scaleX(1)}
 .nav-cta{background:var(--deep)!important;color:#fff!important;padding:11px 14px!important;display:flex;align-items:center;gap:7px;margin-left:19px;position:relative;transition:background .25s}
 .nav-cta:before{content:'';position:absolute;left:-16px;top:50%;transform:translateY(-50%);width:1px;height:18px;background:var(--line)}
 .nav-cta:hover{background:var(--green-600)!important;color:var(--on-green)!important}
 .nav-cta:active{background:var(--green-700)!important;color:var(--on-green)!important}
+/* -- nav dropdown ------------------------------------------------------------
+   Click-triggered disclosure. The panel is only in the DOM while open (see
+   NavDropdown.jsx), so there is no hidden-but-focusable state to defend against
+   and the entrance can be a plain animation with nothing to reverse. */
+.nav-dropdown{position:relative;display:flex;align-items:center}
+.nav-dropdown-trigger{display:inline-flex;align-items:center;gap:6px}
+.nav-dropdown-trigger svg{transition:transform .25s var(--ease)}
+.nav-dropdown-trigger[aria-expanded='true'] svg{transform:rotate(180deg)}
+.nav-dropdown-trigger[aria-expanded='true']{color:var(--ink)}
+
+.nav-dropdown-panel{position:absolute;top:calc(100% + 14px);left:-14px;z-index:110;min-width:290px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);animation:navMenuIn .18s var(--ease) both}
+@keyframes navMenuIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.nav-dropdown-panel ul{list-style:none;margin:0;padding:6px}
+.nav-dropdown-item{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;padding:13px 15px;text-align:left;color:var(--ink);font-size:14px;transition:background .2s,color .2s}
+.nav-dropdown-item-label{flex:1 1 auto}
+.nav-dropdown-item-meta{font:500 9px 'DM Mono';letter-spacing:.9px;text-transform:uppercase;color:var(--muted)}
+/* The cue is hidden until the row is hover/focus/current, so the panel reads as
+   a clean list rather than a column of arrows. */
+.nav-dropdown-item svg{flex-shrink:0;color:var(--green-600);opacity:0;transform:translateX(-4px);transition:opacity .2s,transform .2s}
+.nav-dropdown-item:hover,.nav-dropdown-item:focus-visible{background:var(--soft);color:var(--green-600)}
+.nav-dropdown-item:hover svg,.nav-dropdown-item:focus-visible svg{opacity:1;transform:none}
+.nav-dropdown-item.active{color:var(--green-600);font-weight:600}
+.nav-dropdown-item.active svg{opacity:1;transform:none}
+
 .nav-tools{display:flex;align-items:center;gap:10px}
 
 /* Language switcher.

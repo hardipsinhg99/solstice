@@ -23,11 +23,11 @@ export function Footer() {
         </div>
         <div className="footer-col">
           <span className="footer-heading">Explore</span>
-          {navItems.slice(1, 4).map(([route, label]) => <button key={route} onClick={() => navigate(route)}>{label}</button>)}
+          {navItems.slice(1, 4).map(item => <button key={item.route} onClick={() => navigate(item.route)}>{item.label}</button>)}
         </div>
         <div className="footer-col">
           <span className="footer-heading">Company</span>
-          {navItems.slice(4).map(([route, label]) => <button key={route} onClick={() => navigate(route)}>{label}</button>)}
+          {navItems.slice(4).map(item => <button key={item.route} onClick={() => navigate(item.route)}>{item.label}</button>)}
         </div>
         <div className="footer-col">
           <span className="footer-heading">Get in touch</span>
