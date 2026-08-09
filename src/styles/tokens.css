@@ -48,6 +48,17 @@
      colour and gets a legible one in both themes. */
   --on-green:#ffffff;
   --blue-600:#0A46A8;
+  /* Danger. The dashboard needs destructive-action and validation-error colour
+     that the site has never had - the palette was built for a marketing page
+     with nothing to destroy. Added semantically alongside the green ramp, not
+     as a competing second palette: --danger is the ink/border, --danger-bg the
+     tinted surface it sits on. Measured: --danger 7.40:1 on --surface, 6.95:1 on
+     --bg, 6.55:1 on --danger-bg, and white on --danger 7.46:1.
+     --danger-bg is only 1.13:1 against --surface, so a danger panel must always
+     carry a --danger border - the tint alone is not a visible boundary. */
+  --danger:#A3231B;
+  --danger-bg:#FBEDEC;
+  --on-danger:#ffffff;
   --bg:#f8f7f1;--surface:#fffefa;--ink:#12211B;--body:#3F4A44;--muted:#546258;
   /* --border is the canonical hairline; --line is kept pointing at it so the 40
      existing consumers keep working rather than two near-identical greys living
@@ -147,6 +158,13 @@ html[data-theme='dark']{
   --green-050:#1b3226;
   --on-green:#12211B;
   --blue-600:#7FA8F0;
+  /* Inverts like the green ramp: on a dark surface the readable danger colour is
+     a light red and the tinted surface a deep one. Measured: --danger 7.64:1 on
+     --surface, 8.85:1 on --bg, 8.06:1 on --danger-bg, and --on-danger on
+     --danger 8.41:1. Same border caveat as the light block (1.06:1 tint edge). */
+  --danger:#FF9E96;
+  --danger-bg:#3A1714;
+  --on-danger:#12211B;
   --bg:#0e1c16;--surface:#152a21;--ink:#f2f2ea;--body:#d5ddd7;--muted:#aebbb2;
   --border:#31473c;--line-strong:#688674;
   --deep:#0a1510;--lime:#e2f27a;--gold:#d9bb74;--gold-text:#d9bb74;

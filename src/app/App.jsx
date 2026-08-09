@@ -15,7 +15,8 @@ import GalleryPage from '../pages/gallery/GalleryPage.jsx'
 import ContactPage from '../pages/contact/ContactPage.jsx'
 import { NavigationProvider } from './navigation.js'
 import { useTheme } from './ThemeProvider.jsx'
-import { goTo, useHashRoute, isProductRoute, productSlug, isProductsRoute, productsTrade } from './router.js'
+import { goTo, useHashRoute, isProductRoute, productSlug, isProductsRoute, productsTrade, isAdminRoute } from './router.js'
+import AdminApp from '../pages/admin/AdminApp.jsx'
 
 export function App() {
   const { theme, setTheme } = useTheme()
@@ -54,6 +55,11 @@ export function App() {
     gallery: <GalleryPage/>,
     contact: <ContactPage/>
   }
+
+  // The admin renders instead of the marketing shell, not inside it: it has its
+  // own chrome and must not inherit the site header, footer, chat widget or the
+  // floating corner column.
+  if (isAdminRoute(route)) return <AdminApp route={route}/>
 
   return <NavigationProvider value={goTo}>
     {/* A <button>, not an <a href="#main-content">: the router owns location.hash,

@@ -22,3 +22,10 @@ export const isProductsRoute = (route) => route === 'products' || route.startsWi
 // land somewhere real rather than on an empty page.
 export const productsTrade = (route) => (route.split('/')[1] === 'import' ? 'import' : 'export')
 export const productSlug = (route) => route.split('/')[1]
+
+// Admin lives under the same hash router rather than a second deployable, which
+// is how the PRIM AI panel is actually built. 'admin' and 'admin/...' cannot
+// collide with the product routes above: neither starts with 'product'.
+export const isAdminRoute = (route) => route === 'admin' || route.startsWith('admin/')
+export const adminSection = (route) => route.split('/')[1] || 'products'
+export const adminParam = (route) => route.split('/')[2] || null

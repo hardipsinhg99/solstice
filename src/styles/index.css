@@ -8,3 +8,6 @@
 @import './pages.css';
 @import './footer.css';
 @import './responsive.css';
+/* Admin last: a separate surface, not a page of the site - nothing in the
+   marketing cascade should reach it, and it should not reach them. */
+@import './admin.css';
