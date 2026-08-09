@@ -73,7 +73,68 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   </head>
   <body>
+    <!-- Google's widget container is a SIBLING of #root, never a descendant, and
+         that placement is the whole point rather than a detail.
+
+         Google Translate rewrites live text nodes, wrapping them in <font> tags
+         that React knows nothing about. React's virtual DOM still believes the
+         original text node is a child of its parent, so the next reconciliation
+         that touches the subtree calls parent.removeChild(originalNode) on a node
+         Google has since reparented - "Failed to execute 'removeChild' on 'Node'",
+         thrown mid-commit, no recovery path, white screen. In this app every hash
+         route change replaces the whole <main> subtree, so translated page content
+         would make route changes a crash on a timer.
+
+         Keeping the container outside #root means React never owns these nodes and
+         can never try to remove one. It is positioned into the header visually, by
+         CSS - see useTranslateSlot.js. It is never moved in the DOM, because
+         moving it back under #root would reintroduce exactly the bug it avoids.
+
+         Deliberately NOT aria-hidden. It is empty until Google fills it, but what
+         Google puts in it is a focusable <select>, and a focusable control inside
+         an aria-hidden subtree is the phantom-focus defect of SC 4.1.2 - hidden
+         from assistive tech while still catching a Tab. The <select> carries its
+         own aria-label from Google.
+
+         Being a sibling of #root also fixes its position in the tab order: it is
+         the first focusable thing in the document, not a stop between the nav and
+         the theme toggle where it sits visually. DOM order is what drives tab
+         order, and DOM order here is dictated by the containment. -->
+    <div id="google_translate_element"></div>
     <div id="root"></div>
+
+    <!-- Defined before the loader so the callback exists whenever Google calls it.
+         Every guard here is deliberate: ad blockers block this specific widget very
+         commonly, so google.translate may never exist. In that case the callback
+         simply never fires, the container stays empty, and the header slot collapses
+         to zero width - no gap, no error thrown by our code. -->
+    <script>
+      window.googleTranslateElementInit = function () {
+        var t = window.google && window.google.translate && window.google.translate.TranslateElement
+        if (!t) return
+        new t(
+          {
+            pageLanguage: 'en',
+            // The markets the site actually names: UAE, Vietnam, China, plus the
+            // source language so a reader can get back to English.
+            includedLanguages: 'ar,vi,zh-CN,en',
+            // HORIZONTAL, not SIMPLE. Verified against the live widget: SIMPLE
+            // now renders `goog-te-gadget-simple` - an <a> plus a Google-drawn
+            // menu, no <select> anywhere - while HORIZONTAL still renders the
+            // native <select class="goog-te-combo"> with tabIndex 0. The native
+            // control is what makes this keyboard-operable without wrapping it,
+            // and .goog-te-combo is the hook the restyling needs.
+            layout: t.InlineLayout.HORIZONTAL,
+            // Google otherwise auto-shows its banner on first visit, which is the
+            // thing that pushes the whole document down by ~40px.
+            autoDisplay: false
+          },
+          'google_translate_element'
+        )
+      }
+    </script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

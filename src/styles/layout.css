@@ -34,6 +34,23 @@
 .nav-cta:hover{background:var(--green-600)!important;color:var(--on-green)!important}
 .nav-cta:active{background:var(--green-700)!important;color:var(--on-green)!important}
 .nav-tools{display:flex;align-items:center;gap:10px}
+
+/* Language switcher.
+
+   The slot is an empty box in the header flexbox; Google's <select> is parked on
+   top of it with position:fixed by useTranslateSlot.js, because the widget lives
+   outside #root and therefore cannot participate in this flex row. Zero width
+   until the script has actually built the widget, so a blocked script leaves no
+   gap rather than a hole where the switcher should be.
+
+   z-index 101 clears the header (100, and isolated) while staying under the
+   lightbox (200) and the film grain (300) - the same band the rest of the header
+   chrome paints in. */
+.lang-slot{flex:0 0 0;width:0;height:34px;transition:width .25s var(--ease)}
+.lang-slot.is-ready{flex:0 0 118px;width:118px}
+#google_translate_element{position:fixed;z-index:101;display:none}
+#google_translate_element[data-ready='true']{display:block}
+
 .theme-toggle,.menu-toggle{border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;width:34px;height:34px;border-radius:50%;transition:border-color .2s,transform .3s var(--ease)}
 .theme-toggle:hover{border-color:var(--green-600);transform:rotate(14deg)}
 .menu-toggle{display:none}

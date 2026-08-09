@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../ui/Icon.jsx'
 import { Nav } from './Nav.jsx'
 import { useNavigate } from '../../app/navigation.js'
+import { useTranslateSlot } from './useTranslateSlot.js'
 
 export function Header({ route, theme, setTheme }) {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const toggleRef = useRef(null)
+  const [langSlotRef, langReady] = useTranslateSlot()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10)
@@ -49,6 +51,16 @@ export function Header({ route, theme, setTheme }) {
         </button>
         <Nav route={route} open={menuOpen} onNavigate={onNavigate}/>
         <div className="nav-tools">
+          {/* Empty on purpose. Google's <select> is parked over this box with
+              position:fixed from outside #root; nothing is rendered into it here,
+              because anything React puts inside a translated subtree is what
+              causes the removeChild crash. Collapses to zero width when the
+              script is blocked, so no gap is left behind. */}
+          <div
+            ref={langSlotRef}
+            className={langReady ? 'lang-slot is-ready' : 'lang-slot'}
+            aria-hidden="true"
+          />
           <button
             className="theme-toggle"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
