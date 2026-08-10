@@ -1,34 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useAdminProducts, deleteProduct } from '../../features/admin/index.js'
 import { goTo } from '../../app/router.js'
-
-// A dedicated confirmation panel rather than window.confirm(). The browser
-// dialog cannot be styled, cannot carry the danger token, and gives no room to
-// name what is about to be destroyed - which is the entire job of a delete
-// confirmation. It is also modal to the whole tab, which blocks the live region
-// announcing the result.
-function DeleteConfirm({ product, busy, error, onCancel, onConfirm }) {
-  return (
-    <div className="admin-danger-panel" role="alertdialog" aria-modal="false"
-         aria-labelledby="del-title" aria-describedby="del-body">
-      <h3 id="del-title">Delete “{product.name}”?</h3>
-      <p id="del-body">
-        This removes the product, its {product.varieties.length} varieties and
-        its {product.certifications.length} certification records. It cannot be undone.
-      </p>
-      {error && <p className="admin-error" role="alert">{error}</p>}
-      {/* Focus lands on Cancel, not on the destructive button. The panel appears
-          under the operator's hand; a stray Enter should dismiss it, never
-          delete a product. */}
-      <div className="admin-danger-actions">
-        <button className="admin-btn" onClick={onCancel} disabled={busy} autoFocus>Cancel</button>
-        <button className="admin-btn admin-btn-danger" onClick={onConfirm} disabled={busy}>
-          {busy ? 'Deleting…' : 'Delete permanently'}
-        </button>
-      </div>
-    </div>
-  )
-}
+import { DangerConfirm } from '../../components/admin/DangerConfirm.jsx'
 
 export default function AdminProductsPage() {
   const { products, status, error, reload } = useAdminProducts()
@@ -152,8 +125,12 @@ export default function AdminProductsPage() {
       )}
 
       {confirming && (
-        <DeleteConfirm
-          product={confirming} busy={busy} error={deleteError}
+        <DangerConfirm
+          title={`Delete \u201c${confirming.name}\u201d?`}
+          body={`This removes the product, its ${confirming.varieties.length} varieties and its ${confirming.certifications.length} certification records. It cannot be undone.`}
+          confirmLabel="Delete permanently"
+          busyLabel="Deleting…"
+          busy={busy} error={deleteError}
           onCancel={() => setConfirming(null)} onConfirm={confirmDelete}
         />
       )}

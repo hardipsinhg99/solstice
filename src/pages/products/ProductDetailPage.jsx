@@ -39,14 +39,24 @@ export default function ProductDetailPage({ product, selectProduct }) {
             fetchPriority high pulls it ahead of the catalogue thumbnails that
             the browser would otherwise schedule alongside it. */}
         <Reveal as="div" className="detail-image">
+          {product.image ? (
           <img
             src={unsplashAt(product.image, 1000)}
             srcSet={unsplashSrcSet(product.image, [600, 1000, 1400])}
             sizes="(max-width: 780px) 89vw, 50vw"
-            alt={product.name}
+            {...(product.imageWidth ? { width: product.imageWidth, height: product.imageHeight } : {})}
+            /* The admin-supplied alt text, not the product name. A name is not a
+               description of a photograph, and this is the LCP image. */
+            alt={product.imageAlt || product.name}
             fetchPriority="high"
             decoding="async"
           />
+          ) : (
+            <div className="product-list-image-empty" role="img" aria-label={`${product.name} — photograph to follow`}>
+              <Icon name="box" size={30}/>
+              <span>Photograph to follow</span>
+            </div>
+          )}
         </Reveal>
       </div>
     </section>

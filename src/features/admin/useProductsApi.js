@@ -46,7 +46,27 @@ export function toStaticShape(row) {
     slug: row.slug,
     name: row.name,
     type: row.type,
-    image: row.image,
+    // Phase 1b: the API now returns primaryImage as an object. Flattened back to
+    // `image` (a URL string) here because that is what the display components
+    // already consume, and because both unsplashAt() and unsplashSrcSet() pass
+    // a non-Unsplash URL through untouched - so an uploaded /api/uploads/... URL
+    // needs no change to the existing delivery helpers at all.
+    image: row.primaryImage?.url ?? null,
+    // Alt text could NOT be adapted away: ProductCard hardcoded alt="". That is
+    // a component change, and a required one - the brief makes alt text
+    // first-class and the site holds a WCAG standard everywhere else.
+    imageAlt: row.primaryImage?.altText || null,
+    // Width/height are 0 for the seeded EXTERNAL Unsplash rows, whose intrinsic
+    // size we never measured. Emitted only when real, so the attributes are
+    // omitted rather than set to zero.
+    imageWidth: row.primaryImage?.width || null,
+    imageHeight: row.primaryImage?.height || null,
+    gallery: (row.gallery ?? []).map((g) => ({
+      url: g.mediaAsset.url,
+      alt: g.mediaAsset.altText || null,
+      width: g.mediaAsset.width || null,
+      height: g.mediaAsset.height || null
+    })),
     description: row.description,
     season: row.season,
     origin: row.origin,

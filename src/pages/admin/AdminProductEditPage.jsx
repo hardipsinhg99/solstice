@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { getAdminProduct, createProduct, updateProduct } from '../../features/admin/index.js'
 import { goTo } from '../../app/router.js'
+import { ProductImageManager } from './sections/ProductImageManager.jsx'
 
 const BLANK = {
-  slug: '', name: '', type: '', image: '', description: '',
+  slug: '', name: '', type: '', description: '',
   season: '', origin: '', packaging: '',
   trade: 'EXPORT', status: 'DRAFT', placeholder: false,
   hsCode: '', moqValue: '', moqUnit: '', shelfLifeDays: '',
@@ -132,6 +133,9 @@ export default function AdminProductEditPage({ productId }) {
   const [errors, setErrors] = useState({})
   const [saveError, setSaveError] = useState('')
   const [saved, setSaved] = useState('')
+  // Media is server-owned state, not form state: uploads write immediately and
+  // return the whole product, so it never travels in the Save payload.
+  const [media, setMedia] = useState({ primaryImage: null, gallery: [] })
 
   useEffect(() => {
     if (isNew) return
@@ -141,7 +145,7 @@ export default function AdminProductEditPage({ productId }) {
         if (cancelled) return
         setForm({
           ...BLANK, ...p,
-          image: p.image ?? '', hsCode: p.hsCode ?? '',
+          hsCode: p.hsCode ?? '',
           moqValue: p.moqValue ?? '', moqUnit: p.moqUnit ?? '',
           shelfLifeDays: p.shelfLifeDays ?? '', storageTempC: p.storageTempC ?? '',
           storageHumidity: p.storageHumidity ?? '',
@@ -154,6 +158,7 @@ export default function AdminProductEditPage({ productId }) {
           })),
           certifications: p.certifications.map((c) => ({ ...c, reference: c.reference ?? '' }))
         })
+        setMedia({ primaryImage: p.primaryImage ?? null, gallery: p.gallery ?? [] })
         setStatus('ready')
       })
       .catch((err) => { if (!cancelled) { setSaveError(err.message); setStatus('error') } })
@@ -187,7 +192,6 @@ export default function AdminProductEditPage({ productId }) {
       slug: form.slug.trim(), name: form.name.trim(), type: form.type.trim(),
       description: form.description.trim(), season: form.season.trim(),
       origin: form.origin.trim(), packaging: form.packaging.trim(),
-      image: form.image.trim() || null,
       trade: form.trade, status: form.status, placeholder: Boolean(form.placeholder),
       hsCode: form.hsCode.trim() || null,
       incoterms: form.incoterms,
@@ -281,9 +285,6 @@ export default function AdminProductEditPage({ productId }) {
             <option value="IMPORT">Import</option>
           </select>
         </Field>
-        <Field label="Image URL" hint="Optional — placeholder products have none.">
-          <input value={form.image} onChange={(e) => set('image', e.target.value)}/>
-        </Field>
         <Field label="Description" error={errors.description}>
           <textarea rows={4} value={form.description} onChange={(e) => set('description', e.target.value)}/>
         </Field>
@@ -303,6 +304,26 @@ export default function AdminProductEditPage({ productId }) {
           </select>
         </Field>
       </fieldset>
+
+      {/* Only for a saved product: uploads need an id to attach to. */}
+      {!isNew && (
+        <ProductImageManager
+          productId={productId}
+          primaryImage={media.primaryImage}
+          gallery={media.gallery}
+          onChange={(product) => {
+            if (product) setMedia({ primaryImage: product.primaryImage ?? null, gallery: product.gallery ?? [] })
+            else getAdminProduct(productId).then((p) => setMedia({ primaryImage: p.primaryImage ?? null, gallery: p.gallery ?? [] }))
+            setSaved('Images updated')
+          }}
+        />
+      )}
+      {isNew && (
+        <fieldset className="admin-fieldset">
+          <legend>Images</legend>
+          <p className="admin-meta">Save the product first — images attach to a saved record.</p>
+        </fieldset>
+      )}
 
       <fieldset className="admin-fieldset">
         <legend>Varieties</legend>

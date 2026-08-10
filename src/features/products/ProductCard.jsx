@@ -52,14 +52,27 @@ export function ProductCard({ product, delay = 0, onSelect }) {
   return (
     <Reveal as="article" delay={delay} className="product-list-card" {...cardProps(() => onSelect(product.slug), `View ${product.name} specification`)}>
       <div className="product-list-image">
+        {/* No image is a real state now that imagery is admin-managed: an editor
+            can delete the only photograph. Rendering <img src={null}> would give
+            every buyer a broken-image glyph, so the awaiting-image plate stands
+            in - the same visual language as the placeholder card, without
+            claiming the product itself is unresolved. */}
+        {product.image ? (
         <img
           src={unsplashAt(product.image, 800)}
           srcSet={unsplashSrcSet(product.image)}
           sizes="(max-width: 780px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          alt=""
+          {...(product.imageWidth ? { width: product.imageWidth, height: product.imageHeight } : {})}
+          alt={product.imageAlt || ''}
           loading="lazy"
           decoding="async"
         />
+        ) : (
+          <div className="product-list-image-empty" role="img" aria-label={`${product.name} — photograph to follow`}>
+            <Icon name="box" size={24}/>
+            <span>Photograph to follow</span>
+          </div>
+        )}
         {/* Category chip sits on the image so the card's body is left entirely
             to specification. */}
         <span className="product-list-tag">{product.type}</span>
