@@ -1,11 +1,12 @@
 import { Eyebrow } from '../ui/Eyebrow.jsx'
 import { Button } from '../ui/Button.jsx'
 import { navItems } from '../../data/navigation.js'
-import { ENQUIRY_EMAIL } from '../../lib/constants.js'
 import { useNavigate } from '../../app/navigation.js'
+import { useSiteSettings } from '../../features/settings/index.js'
 
 export function Footer() {
   const navigate = useNavigate()
+  const { contactEmail } = useSiteSettings()
   return (
     <footer>
       <div className="footer-cta">
@@ -31,7 +32,7 @@ export function Footer() {
         </div>
         <div className="footer-col">
           <span className="footer-heading">Get in touch</span>
-          <a href={`mailto:${ENQUIRY_EMAIL}`}>{ENQUIRY_EMAIL}</a>
+          <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
           <span className="footer-note">International buyer enquiries welcome</span>
         </div>
       </div>

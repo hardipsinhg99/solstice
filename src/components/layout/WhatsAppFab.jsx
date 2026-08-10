@@ -1,9 +1,9 @@
-import { WHATSAPP_NUMBER, WHATSAPP_MESSAGE } from '../../lib/constants.js'
+import { useSiteSettings, isUsableWhatsappNumber, whatsappHref } from '../../features/settings/index.js'
 
-// Built once at module scope: the href never varies per render, and hand-escaping
-// the message is what breaks wa.me links - an apostrophe or an accented character
-// arrives as a truncated or mojibake'd draft in the buyer's WhatsApp composer.
-const HREF = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
+// The number now comes from site settings rather than a build-time constant, so
+// changing it is an admin save and not a redeploy. Encoding still happens in
+// whatsappHref() - hand-escaping the message is what breaks wa.me links, an
+// apostrophe or an accented character arrives as a truncated or mojibake'd draft.
 
 const LABEL = 'Chat with us on WhatsApp'
 
@@ -12,10 +12,18 @@ const LABEL = 'Chat with us on WhatsApp'
 // still works if the bundle fails to execute. No click handler - there is no
 // analytics layer on the site yet, so there is nothing for one to report to.
 export function WhatsAppFab() {
+  const settings = useSiteSettings()
+
+  // Until a real number is saved the seed value is the literal placeholder
+  // "[WHATSAPP_NUMBER]", which wa.me answers with "phone number shared via url
+  // is invalid". Rendering nothing is better than handing a buyer a dead button:
+  // the contact form and the footer email are both still one tap away.
+  if (!isUsableWhatsappNumber(settings.whatsappNumber)) return null
+
   return (
     <a
       className="whatsapp-fab"
-      href={HREF}
+      href={whatsappHref(settings)}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={LABEL}

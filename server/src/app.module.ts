@@ -7,6 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { ProductsModule } from './products/products.module';
 import { StorageModule } from './storage/storage.module';
 import { MediaModule } from './media/media.module';
+import { SettingsModule } from './settings/settings.module';
+import { EnquiriesModule } from './enquiries/enquiries.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { MediaModule } from './media/media.module';
     ProductsModule,
     StorageModule,
     MediaModule,
+    SettingsModule,
+    EnquiriesModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

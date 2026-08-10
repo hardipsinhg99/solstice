@@ -3,6 +3,8 @@ import { goTo, adminSection, adminParam } from '../../app/router.js'
 import AdminLoginPage from './AdminLoginPage.jsx'
 import AdminProductsPage from './AdminProductsPage.jsx'
 import AdminProductEditPage from './AdminProductEditPage.jsx'
+import AdminEnquiriesPage from './AdminEnquiriesPage.jsx'
+import AdminSettingsPage from './AdminSettingsPage.jsx'
 
 // The guard. Any #admin/* route except #admin/login requires a valid token; the
 // token is validated against /auth/me on boot rather than trusted because it
@@ -31,6 +33,18 @@ export default function AdminApp({ route }) {
         >
           Products
         </button>
+        <button
+          className={section === 'enquiries' ? 'admin-nav-link is-active' : 'admin-nav-link'}
+          onClick={() => goTo('admin/enquiries')}
+        >
+          Enquiries
+        </button>
+        <button
+          className={section === 'settings' ? 'admin-nav-link is-active' : 'admin-nav-link'}
+          onClick={() => goTo('admin/settings')}
+        >
+          Settings
+        </button>
         <div className="admin-nav-foot">
           <span className="admin-meta">{auth.admin?.email}</span>
           <button className="admin-btn" onClick={auth.logout}>Sign out</button>
@@ -39,9 +53,12 @@ export default function AdminApp({ route }) {
       </nav>
 
       <main className="admin-main">
-        {section === 'product'
-          ? <AdminProductEditPage productId={param}/>
-          : <AdminProductsPage/>}
+        {/* Products stays the fallback: adminSection() defaults to 'products',
+            so a bare #admin and any unknown section land on the catalogue. */}
+        {section === 'product' ? <AdminProductEditPage productId={param}/>
+          : section === 'enquiries' ? <AdminEnquiriesPage/>
+            : section === 'settings' ? <AdminSettingsPage/>
+              : <AdminProductsPage/>}
       </main>
     </div>
   )

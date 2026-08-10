@@ -115,6 +115,7 @@
   .admin-nav-foot{margin:0 0 0 auto;display:flex;padding-top:0;border-top:0}
   .admin-main{padding:20px 16px;max-height:none}
   .admin-row-actions{justify-content:flex-start}
+  td.admin-row-actions{text-align:left}
 }
 
 /* The site-wide reduced-motion backstop in base.css already collapses every
@@ -147,3 +148,31 @@
 .admin-media-tile-actions{display:flex;gap:6px;flex-wrap:wrap}
 .admin-media-tile-actions .admin-btn{padding:5px 9px;font-size:12px}
 .admin-alt-editor{margin-bottom:0}
+
+/* ── Enquiries ──────────────────────────────────────────────────────────────
+   No new tokens and no new colours. The status chips reuse the existing draft /
+   published borders because the semantics line up: NEW is "needs action" the
+   same way a draft product does, CONTACTED is "handled". CLOSED takes the
+   neutral chip - it is not a success state, just a finished one. */
+/* `.admin-row-actions` sets display:flex, which on a <td> takes the cell out of
+   table layout so it no longer stretches to the row height - its bottom border
+   then floats above the rest of the row. Invisible on the Products table, whose
+   rows are one line tall; obvious here, where a row is four. Restoring
+   table-cell and doing the spacing with a margin keeps both tables aligned. */
+td.admin-row-actions{display:table-cell;text-align:right;white-space:nowrap}
+td.admin-row-actions>*+*{margin-left:8px}
+
+/* An inline error sits between two fields, so it needs the same gap the fields
+   have below them - otherwise it reads as a caption on the next label. */
+.admin-fieldset .admin-error{margin-bottom:14px}
+
+.admin-filter,.admin-status-set{margin-bottom:0}
+.admin-filter select{width:auto;min-width:130px}
+.admin-status-set{margin-top:8px}
+.admin-status-set select{width:auto;min-width:104px;font-size:12px;padding:5px 8px;color:var(--muted)}
+
+/* The message is the reason the row exists, so it is shown in full rather than
+   behind a disclosure - but clamped in width so a long paragraph cannot push the
+   action column off screen. */
+.admin-enquiry-message{margin:0 0 4px;max-width:44ch;font-size:12.5px;line-height:1.6;color:var(--body);white-space:pre-wrap;overflow-wrap:anywhere}
+.admin-table td>.admin-link{font-size:12px}

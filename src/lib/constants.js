@@ -8,6 +8,11 @@ export const HERO_IMAGE_SRCSET = [
   '/hero/hero-1672.webp 1672w'
 ].join(', ')
 
+// Contact details moved into the SiteSettings row in Phase 1c and are edited at
+// #admin/settings. What is left here is the FALLBACK the site renders before the
+// settings fetch resolves, and if it fails - see features/settings. Keeping real
+// values here means an unreachable API degrades to the old behaviour rather than
+// to a mailto: pointing at "undefined".
 export const ENQUIRY_EMAIL = 'hello@solsticetrading.com'
 
 // wa.me takes the number in international format as DIGITS ONLY - no leading +,
@@ -17,8 +22,3 @@ export const ENQUIRY_EMAIL = 'hello@solsticetrading.com'
 // The message is URL-encoded at the call site, so write it here as plain prose.
 export const WHATSAPP_NUMBER = '[WHATSAPP_NUMBER]'
 export const WHATSAPP_MESSAGE = '[PRE_FILLED_MESSAGE]'
-
-// VITE_ vars are inlined into the client bundle and are therefore public -
-// only ever put a form-provider public form id / access key here.
-export const FORM_ENDPOINT = import.meta.env.VITE_FORM_ENDPOINT
-export const FORM_ACCESS_KEY = import.meta.env.VITE_FORM_ACCESS_KEY

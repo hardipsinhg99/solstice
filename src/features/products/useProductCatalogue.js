@@ -1,50 +1,29 @@
-import { useEffect, useState } from 'react'
 import { fetchPublicProducts } from '../admin/useProductsApi.js'
+import { useApiResource, primeResource, clearResource } from '../api/useApiResource.js'
 
-// One fetch, module-scope cache, shared by every consumer. The catalogue is 8
-// records that change a few times a season, so re-requesting it on each route
-// change would be waste - and the product detail page, the home page and the
-// catalogue all want the same array.
+// Thin wrapper over the generalised hook. The cache, the in-flight de-duplication
+// and the [data, status, retry] contract all moved into useApiResource when
+// Settings became the second resource; what remains here is the products-specific
+// part - the key, the fetcher, and an empty array as the pre-load value.
 //
-// Native fetch and useState only: no data-fetching library, per the standing
-// no-new-frontend-dependency rule.
-let cache = null
-let inflight = null
+// The exported names and return shape are deliberately unchanged, so App.jsx,
+// HomePage, ProductsPage and ProductDetailPage did not have to be touched.
+const KEY = 'products'
 
 export function primeProductCatalogue() {
-  if (cache) return Promise.resolve(cache)
-  if (!inflight) {
-    inflight = fetchPublicProducts()
-      .then((rows) => { cache = rows; inflight = null; return rows })
-      .catch((err) => { inflight = null; throw err })
-  }
-  return inflight
+  return primeResource(KEY, fetchPublicProducts)
 }
 
 /** Lets the admin invalidate after a save without a full reload. */
-export function clearProductCatalogue() { cache = null; inflight = null }
+export function clearProductCatalogue() {
+  clearResource(KEY)
+}
 
 /**
  * Returns [products, status, retry]. `status` is 'loading' | 'ready' | 'error'.
  * Consumers get the same flat shape src/data/products.js exported, because the
- * mapping happens at the fetch boundary - ProductCard, ProductGrid,
- * ProductFilter and ProductDetailPage were built and tested against that shape
- * and are deliberately not touched by this change.
+ * mapping happens at the fetch boundary in useProductsApi.toStaticShape().
  */
 export function useProductCatalogue() {
-  const [products, setProducts] = useState(cache ?? [])
-  const [status, setStatus] = useState(cache ? 'ready' : 'loading')
-  const [attempt, setAttempt] = useState(0)
-
-  useEffect(() => {
-    if (cache) { setProducts(cache); setStatus('ready'); return }
-    let cancelled = false
-    setStatus('loading')
-    primeProductCatalogue()
-      .then((rows) => { if (!cancelled) { setProducts(rows); setStatus('ready') } })
-      .catch(() => { if (!cancelled) setStatus('error') })
-    return () => { cancelled = true }
-  }, [attempt])
-
-  return [products, status, () => { clearProductCatalogue(); setAttempt((n) => n + 1) }]
+  return useApiResource(KEY, fetchPublicProducts, [])
 }

@@ -1,21 +1,26 @@
 import { useState } from 'react'
-import { ENQUIRY_EMAIL, FORM_ENDPOINT, FORM_ACCESS_KEY } from '../../lib/constants.js'
+import { useSiteSettings } from '../settings/index.js'
 
 // Failure fallback: never lose a lead to a dead endpoint - hand the buyer a
 // prefilled mail draft carrying everything they already typed.
-function mailtoFallback(payload) {
+function mailtoFallback(payload, address) {
   const lines = [
     ['Name', payload.name], ['Email', payload.email],
     ['Phone', payload.phone], ['Message', payload.message]
   ].filter(([, value]) => value).map(([label, value]) => `${label}: ${value}`)
   const subject = `Enquiry from ${payload.name || 'the website'}`
-  return `mailto:${ENQUIRY_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`
+  return `mailto:${address}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`
 }
 
 export function useEnquirySubmit() {
+  // The fallback address is now the one saved in site settings rather than a
+  // build-time constant, so changing it does not need a redeploy. useSiteSettings
+  // returns the constant as its fallback, so this is never undefined.
+  const { contactEmail } = useSiteSettings()
+
   const [status, setStatus] = useState('idle') // idle | submitting | success | error
   const [errorDetail, setErrorDetail] = useState('')
-  const [fallbackHref, setFallbackHref] = useState(`mailto:${ENQUIRY_EMAIL}`)
+  const [fallbackHref, setFallbackHref] = useState(`mailto:${contactEmail}`)
 
   // Both terminal states used to be permanent. After a success the button read
   // "Enquiry received" forever, so a buyer sending a second enquiry for another
@@ -28,27 +33,34 @@ export function useEnquirySubmit() {
     event.preventDefault()
     const form = event.currentTarget
     const payload = Object.fromEntries(new FormData(form))
-    if (payload.company_website) return // honeypot tripped - drop silently
-    delete payload.company_website
-    setFallbackHref(mailtoFallback(payload))
+    setFallbackHref(mailtoFallback(payload, contactEmail))
 
-    if (!FORM_ENDPOINT) {
-      setStatus('error')
-      setErrorDetail('The enquiry endpoint is not configured (VITE_FORM_ENDPOINT is unset).')
-      return
-    }
+    // The honeypot is posted rather than dropped here. The server discards a
+    // tripped submission silently and still answers 200: a bot that is told it
+    // failed simply retries with the field cleared, and dropping it client-side
+    // only ever caught the bots that run JavaScript.
 
+    // No configuration check any more. The enquiry endpoint is this site's own
+    // API - the same origin that serves the catalogue - so there is no
+    // VITE_FORM_ENDPOINT to be unset and no third-party form provider in the
+    // path. An unreachable API is a runtime failure, handled below.
     setStatus('submitting')
     setErrorDetail('')
     try {
-      if (FORM_ACCESS_KEY) payload.access_key = FORM_ACCESS_KEY
-      payload.subject = `New enquiry from ${payload.name || 'the website'}`
-      const response = await fetch(FORM_ENDPOINT, {
+      const response = await fetch('/api/enquiries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(payload)
       })
-      if (!response.ok) throw new Error(`The enquiry service responded ${response.status}.`)
+      if (!response.ok) {
+        const detail = await response.json().catch(() => null)
+        const message = Array.isArray(detail?.message) ? detail.message.join(' ') : detail?.message
+        // 429 is the per-IP throttle on the public endpoint. It reads as a real
+        // sentence rather than a status code, because the person seeing it is a
+        // buyer, not an operator.
+        if (response.status === 429) throw new Error('Too many enquiries sent from this connection. Please try again in a minute.')
+        throw new Error(message || `The enquiry service responded ${response.status}.`)
+      }
       setStatus('success')
       form.reset()
     } catch (error) {

@@ -51,6 +51,7 @@ model Admin {
   certifications ProductCertification[]
   auditEntries   AuditLog[]
   mediaAssets    MediaAsset[]
+  settingsEdits  SiteSettings[]
 
   @@map("admins")
 }
@@ -221,6 +222,70 @@ model ProductCertification {
 
   @@index([productId, order])
   @@map("product_certifications")
+}
+
+/// Global site settings. ONE ROW, id "singleton".
+///
+/// Named columns, not a generic settings(key, value) table. The key/value shape
+/// needs no migration to add a setting, and that is exactly how the PRIM AI panel
+/// ended up with a hundred-plus ungrouped free-text rows the server could not
+/// validate. Named columns let the API check that whatsappNumber is a WhatsApp
+/// number and let the form label it in the operator's language. One migration per
+/// new setting is the cheaper side of that trade at this site's rate of change.
+///
+/// There is no contactPhone and no address: no phone number, postal address or
+/// social link exists anywhere in the codebase today, and columns invented ahead
+/// of the content that fills them are how a table ends up mostly null.
+model SiteSettings {
+  id String @id @default("singleton")
+
+  /// Digits only, international format - validated against the same regex the
+  /// admin form uses. wa.me silently resolves a malformed number to "phone number
+  /// shared via url is invalid", so the failure only shows on a buyer's screen.
+  whatsappNumber  String
+  whatsappMessage String
+  contactEmail    String
+
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+  updatedBy   Admin?   @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@map("site_settings")
+}
+
+enum EnquiryStatus {
+  NEW
+  CONTACTED
+  CLOSED
+}
+
+/// Submissions from the public contact form.
+///
+/// The columns are exactly the fields the live form collects. The richer RFQ
+/// schema in docs/website-strategy.md - product context, quantity, destination
+/// port, Incoterm - is NOT modelled: the form does not collect it, and adding
+/// columns ahead of the fields that fill them is how a table ends up 80% null.
+model Enquiry {
+  id      String        @id @default(cuid())
+  name    String
+  email   String
+  phone   String
+  message String        @db.Text
+  status  EnquiryStatus @default(NEW)
+
+  /// Proof-of-consent timestamp. The form requires the checkbox, so recording
+  /// when it was given costs one column and answers the only question a data
+  /// request actually asks.
+  consentAt DateTime?
+
+  /// Set when the notification email was accepted by the SMTP server. Null means
+  /// nobody was told - which is the state worth being able to find.
+  notifiedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([status, createdAt])
+  @@map("enquiries")
 }
 
 /// Lightweight audit trail - answers "who changed the Alphonso MOQ last Tuesday".
