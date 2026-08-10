@@ -28,7 +28,17 @@ img{max-width:100%}
    keyboard users land at the new page rather than wherever they last were.
    tabindex="-1" makes that possible; the outline would otherwise be noise. */
 main:focus{outline:none}
-::selection{background:var(--lime);color:#153828}
+/* Text selection, declared once and bare so it inherits to every element on
+   every page - headings, body, buttons, nav, form fields, footer, and anything
+   rendered later. The previous fill was --lime, a yellow-green, which read as a
+   highlighter pen rather than as the brand.
+   --green-600 rather than the identity --green-500: white on -500 measures
+   4.43:1, under AA for the normal-size text selection actually covers, which is
+   the reason the ramp has a working step at all. --on-green is the token that
+   already exists for "the label that sits on a green fill", so the pair flips
+   with the theme on its own.
+   Measured: light #ffffff on #046A3A 6.71:1, dark #12211B on #8AD6AB 9.76:1. */
+::selection{background:var(--green-600);color:var(--on-green)}
 /* Dual-tone focus ring, so at least one edge clears 3:1 on any backdrop -
    including the photographic hero and the deep-green footer. SC 2.4.11 / 2.4.13.
    The ring is --green-700 and the halo --on-green, which is exactly the pair the
@@ -53,7 +63,22 @@ h1,h2,h3,p{margin-top:0}
    heading and every paragraph carried identical weight on the page. */
 h1,h2,h3,h4,h5,h6{color:var(--ink)}
 h1,h2{letter-spacing:-2.6px;line-height:.98}
-h1 em,h2 em{font-family:'Playfair Display';font-weight:500;font-style:italic;color:var(--green-500)}
+/* The accent words - "your table.", "footprint.", "growth partner." - are the
+   one editorial gesture in the headline. They were Playfair Display ITALIC,
+   which at 65px reads as script and undercut the corporate register the rest of
+   the page works to build.
+   Upright Playfair keeps the serif contrast against DM Sans that makes the
+   headline look composed rather than defaulted, and loses the calligraphic
+   quality entirely - the ui-ux-pro-max "Classic Elegant" pairing specifies
+   Playfair for exactly this premium/editorial job and loads no italic axis.
+   font-style:normal is explicit because <em> is italic by default.
+   Tracking is relaxed from the -2.6px h1/h2 carry: that value is tuned for DM
+   Sans at weight 700, and a high-contrast serif set that tight collides on the
+   thin strokes.
+   Colour is unchanged - --green-500 is the identity green off the logo, and at
+   this size it clears the 3:1 large-text bar on every surface it lands on
+   (4.12:1 on --bg, 4.39:1 on --surface, 8.55:1 dark). */
+h1 em,h2 em{font-family:'Playfair Display',Georgia,serif;font-weight:500;font-style:normal;letter-spacing:-1.1px;color:var(--green-500)}
 h2{font-size:clamp(41px,4.6vw,65px)}
 
 /* ============================================================
