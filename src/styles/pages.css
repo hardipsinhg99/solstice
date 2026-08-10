@@ -560,12 +560,26 @@
 .gallery-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .gallery-tile:before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(0deg,#0007,transparent 40%);opacity:0;transition:opacity .3s}
 .gallery-tile:hover:before{opacity:1}
-.gallery-tile span{position:absolute;z-index:2;top:13px;left:13px;color:#fff;font:9px 'DM Mono';letter-spacing:1px;text-shadow:0 1px 5px #000}
+/* The index badge carries a class now that the tile can also hold a caption -
+   an unqualified `.gallery-tile span` would absolutely-position both into the
+   same corner. */
+.gallery-index{position:absolute;z-index:2;top:13px;left:13px;color:#fff;font:9px 'DM Mono';letter-spacing:1px;text-shadow:0 1px 5px #000}
+/* Captions are editable at #admin/gallery. They sit on the scrim the tile
+   already paints on hover, and stay legible without it because of the shadow -
+   #fff on a photograph is not a contrast ratio anyone can guarantee, so the
+   gradient is raised to permanent whenever a caption is present. */
+.gallery-caption{position:absolute;z-index:2;left:13px;right:13px;bottom:11px;color:#fff;font-size:12px;line-height:1.4;text-shadow:0 1px 6px #000,0 0 18px #000}
+.gallery-tile:has(.gallery-caption):before{opacity:.85}
+.gallery-tile:has(.gallery-caption):hover:before{opacity:1}
+.gallery-status{color:var(--muted);font-size:14px;padding:10px 0 0}
 .tile-1{grid-row:span 2}
 .tile-4{grid-row:span 2}
 .lightbox{position:fixed;inset:0;z-index:200;background:rgba(6,14,10,.92);display:flex;align-items:center;justify-content:center;padding:40px;animation:fadeIn .25s var(--ease)}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.lightbox-figure{margin:0;display:grid;gap:12px;justify-items:center;max-width:min(90vw,1100px)}
 .lightbox img{max-width:min(90vw,1100px);max-height:82vh;object-fit:contain;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.lightbox-figure:has(figcaption) img{max-height:74vh}
+.lightbox figcaption{color:#fff;font-size:14px;line-height:1.55;text-align:center;max-width:62ch}
 .lightbox-close{position:absolute;top:24px;right:28px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;transition:background .2s}
 .lightbox-close:hover{background:rgba(255,255,255,.2)}
 .lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;transition:background .2s}

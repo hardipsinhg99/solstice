@@ -3,23 +3,17 @@ import { Icon } from '../../components/ui/Icon.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
 import { PageTitle } from '../../components/layout/PageTitle.jsx'
 import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
+import { usePublicGallery } from '../../features/gallery/index.js'
 
-// Hoisted out of the component: rebuilt on every render it was a fresh array
-// identity each time, which is exactly the dependency trap the globe was fixed
-// for. It is constant data and belongs at module scope.
-const images = [
-  'https://images.unsplash.com/photo-1603048297172-c92544798d5a?auto=format&fit=crop&w=1000&q=85',
-  'https://images.unsplash.com/photo-1557844352-761f2565b576?auto=format&fit=crop&w=1000&q=85',
-  'https://images.unsplash.com/photo-1518843875459-f738682238a6?auto=format&fit=crop&w=1000&q=85',
-  'https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?auto=format&fit=crop&w=1000&q=85',
-  'https://images.unsplash.com/photo-1558818498-28c1e002b655?auto=format&fit=crop&w=1000&q=85',
-  'https://images.unsplash.com/photo-1573246123716-6b1782bfc499?auto=format&fit=crop&w=1000&q=85'
-]
-
-const step = (index, by) => (index + by + images.length) % images.length
+// The six photographs used to live in a hardcoded array at module scope here.
+// They are now GalleryImage rows, edited at #admin/gallery - the migration moved
+// the same URLs across as EXTERNAL media assets, so this page shows exactly what
+// it showed before until somebody uploads a replacement.
 
 export default function GalleryPage() {
+  const [images, status] = usePublicGallery()
   const [active, setActive] = useState(null)
+  const step = (index, by) => (index + by + images.length) % images.length
   const dialogRef = useRef(null)
   const openerRef = useRef(null)
 
@@ -62,6 +56,12 @@ export default function GalleryPage() {
     // the scroll lock and focus calls are idempotent across those re-runs.
   }, [active])
 
+  // The lightbox indexes into `images`. If a refetch shortens the list while it
+  // is open, the index would point past the end and render undefined.
+  useEffect(() => {
+    if (active !== null && active >= images.length) setActive(null)
+  }, [images.length, active])
+
   return <>
     <PageTitle mark="06" eyebrow="A LOOK AT THE PRODUCE" title="Freshness, in" accent="focus." copy="A glimpse into the colour, texture and care behind our fresh-produce conversations."/>
     <section className="gallery section">
@@ -69,27 +69,43 @@ export default function GalleryPage() {
         {images.map((image, index) => (
           <Reveal
             as="button"
-            key={image}
+            key={image.id}
             delay={(index % 3) * 70}
             className={`gallery-tile tile-${index + 1}`}
             onClick={(event) => open(index, event)}
-            aria-label={`Open image ${index + 1} of ${images.length}`}
+            aria-label={image.caption
+              ? `Open image ${index + 1} of ${images.length}: ${image.caption}`
+              : `Open image ${index + 1} of ${images.length}`}
           >
             {/* Was a CSS background-image, which no browser can lazy-load or
                 size-negotiate: all six full-width photographs were fetched
                 eagerly on page load. */}
             <img
-              src={unsplashAt(image, 800)}
-              srcSet={unsplashSrcSet(image)}
+              src={unsplashAt(image.url, 800)}
+              srcSet={unsplashSrcSet(image.url)}
               sizes="(max-width: 780px) 50vw, 33vw"
+              {...(image.width && image.height ? { width: image.width, height: image.height } : {})}
+              // The tile is inside a button that already announces the image and
+              // its caption, so alt="" here would be correct even with alt text
+              // set - a screen reader would otherwise hear the description twice.
               alt=""
               loading="lazy"
               decoding="async"
             />
-            <span>0{index + 1}</span>
+            <span className="gallery-index">0{index + 1}</span>
+            {image.caption && <span className="gallery-caption">{image.caption}</span>}
           </Reveal>
         ))}
       </div>
+
+      {status === 'loading' && images.length === 0 && (
+        <p className="container gallery-status" role="status">Loading the gallery…</p>
+      )}
+      {status === 'error' && (
+        <p className="container gallery-status" role="status">
+          The gallery could not be loaded just now. Everything else on the site is unaffected.
+        </p>
+      )}
     </section>
     {active !== null && (
       <div
@@ -103,11 +119,16 @@ export default function GalleryPage() {
       >
         <button className="lightbox-close" onClick={close} aria-label="Close"><Icon name="close" size={20}/></button>
         <button className="lightbox-nav prev" onClick={event => { event.stopPropagation(); setActive(a => step(a, -1)) }} aria-label="Previous image"><Icon name="arrow" size={20}/></button>
-        <img
-          src={unsplashAt(images[active], 1400)}
-          alt={`Fresh produce gallery ${active + 1}`}
-          onClick={event => event.stopPropagation()}
-        />
+        <figure className="lightbox-figure" onClick={event => event.stopPropagation()}>
+          <img
+            src={unsplashAt(images[active].url, 1400)}
+            // The real description now, where there is one. The generic
+            // "Fresh produce gallery 3" it used to carry told a screen-reader
+            // user nothing they could not already work out from the dialog label.
+            alt={images[active].alt || `Fresh produce gallery ${active + 1}`}
+          />
+          {images[active].caption && <figcaption>{images[active].caption}</figcaption>}
+        </figure>
         <button className="lightbox-nav next" onClick={event => { event.stopPropagation(); setActive(a => step(a, 1)) }} aria-label="Next image"><Icon name="arrow" size={20}/></button>
       </div>
     )}
