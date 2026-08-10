@@ -50,8 +50,64 @@ model Admin {
   packOptions    ProductPackOption[]
   certifications ProductCertification[]
   auditEntries   AuditLog[]
+  mediaAssets    MediaAsset[]
 
   @@map("admins")
+}
+
+/// Where the bytes for a MediaAsset actually live. LOCAL assets are files this
+/// server wrote through StorageService and can delete. EXTERNAL assets are URLs
+/// we only reference - the six seeded Unsplash photographs - and StorageService
+/// must never try to delete them. Adding S3 later is one more value here plus
+/// one more StorageService implementation, not a schema change.
+enum StorageDriver {
+  LOCAL
+  EXTERNAL
+}
+
+/// One media system, deliberately generic. Products are its only consumer this
+/// phase, but Pages and TipTap in Phase 2 reuse this table and this pipeline
+/// rather than growing a second one - the failure the PRIM AI audit found, where
+/// SiteSetting, PageContent and localStorage all did overlapping jobs because
+/// nobody built one system first.
+model MediaAsset {
+  id          String        @id @default(cuid())
+  /// Original upload name, kept for display only. Never used as a storage path.
+  filename    String
+  /// Opaque key the StorageService understands. Nothing outside a StorageService
+  /// implementation may interpret this as a filesystem path.
+  storagePath String
+  driver      StorageDriver @default(LOCAL)
+  url         String
+  mimeType    String
+  width       Int
+  height      Int
+  sizeBytes   Int
+  /// First-class, not an afterthought: the public <img alt=""> renders this.
+  altText     String?
+
+  uploadedById String?
+  uploadedBy   Admin?  @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  createdAt    DateTime @default(now())
+
+  primaryFor   Product[]      @relation("ProductPrimaryImage")
+  productMedia ProductMedia[]
+
+  @@map("media_assets")
+}
+
+/// Ordered gallery join. Separate from Product.primaryImageId so a product can
+/// have a hero image and an ordered set of secondary images independently.
+model ProductMedia {
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId    String
+  mediaAsset   MediaAsset @relation(fields: [mediaAssetId], references: [id], onDelete: Cascade)
+  mediaAssetId String
+  order        Int        @default(0)
+
+  @@id([productId, mediaAssetId])
+  @@index([productId, order])
+  @@map("product_media")
 }
 
 model Product {
@@ -61,12 +117,17 @@ model Product {
   trade  TradeDirection @default(EXPORT)
   status ProductStatus  @default(DRAFT)
 
-  // The fields that carry real data today. `image` is nullable on purpose: the
-  // two import placeholder records have image: null, so a NOT NULL here would
-  // block seeding the very data this table exists to hold.
+  // The fields that carry real data today. The imagery moved to MediaAsset in
+  // Phase 1b; primaryImageId is nullable for the same reason the old `image`
+  // column was - the two import placeholder records genuinely have no picture.
   type        String
-  image       String?
   description String  @db.Text
+
+  /// Replaces the old `image String?`. The six seeded Unsplash URLs were migrated
+  /// into MediaAsset rows with driver EXTERNAL, so nothing was lost.
+  primaryImageId String?
+  primaryImage   MediaAsset? @relation("ProductPrimaryImage", fields: [primaryImageId], references: [id], onDelete: SetNull)
+  gallery        ProductMedia[]
   season      String
   origin      String
   packaging   String
