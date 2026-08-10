@@ -9,8 +9,23 @@ import ProductsPage from './ProductsPage.jsx'
 
 export default function ProductDetailPage({ product, selectProduct }) {
   const navigate = useNavigate()
-  const [products] = useProductCatalogue()
-  if (!product) return <ProductsPage selectProduct={selectProduct}/>
+  const [products, catalogueStatus] = useProductCatalogue()
+
+  // A deep link straight to #product/<slug> arrives before the catalogue does,
+  // so `product` is undefined for the first frames. Treating that as "not found"
+  // and falling through to ProductsPage rendered it with no trade prop, which
+  // threw on HEADINGS[undefined] - a white screen on every shared product URL.
+  // Loading and missing are different states and now render differently.
+  if (!product) {
+    if (catalogueStatus === 'loading') {
+      return (
+        <section className="section">
+          <div className="container"><p className="products-loading" role="status">Loading product…</p></div>
+        </section>
+      )
+    }
+    return <ProductsPage trade="export" selectProduct={selectProduct}/>
+  }
   const index = products.findIndex(p => p.slug === product.slug)
   const related = [...products.filter(p => p.slug !== product.slug && p.type === product.type), ...products.filter(p => p.slug !== product.slug && p.type !== product.type)].slice(0, 3)
   const meta = [

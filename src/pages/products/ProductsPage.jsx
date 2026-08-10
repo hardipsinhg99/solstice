@@ -38,7 +38,10 @@ export default function ProductsPage({ trade, selectProduct }) {
   const countLabel = filtered.length > 0
     ? `${filtered.length} ${trade} ${noun}`
     : `No ${trade} products published yet`
-  const heading = HEADINGS[trade]
+  // Defensive: an unknown or absent trade must degrade to the default view, not
+  // throw. This page is the fallback target for a missing product, so a crash
+  // here takes out the detail route as well.
+  const heading = HEADINGS[trade] ?? HEADINGS.export
 
   return <>
     <PageTitle mark="04" eyebrow={heading.eyebrow} title={heading.title} accent={heading.accent} copy={heading.copy}/>
