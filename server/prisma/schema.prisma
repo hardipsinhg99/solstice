@@ -52,6 +52,7 @@ model Admin {
   auditEntries   AuditLog[]
   mediaAssets    MediaAsset[]
   settingsEdits  SiteSettings[]
+  galleryEdits   GalleryImage[]
 
   @@map("admins")
 }
@@ -93,6 +94,7 @@ model MediaAsset {
 
   primaryFor   Product[]      @relation("ProductPrimaryImage")
   productMedia ProductMedia[]
+  galleryUse   GalleryImage[]
 
   @@map("media_assets")
 }
@@ -222,6 +224,39 @@ model ProductCertification {
 
   @@index([productId, order])
   @@map("product_certifications")
+}
+
+/// The public #gallery page, which until now was six Unsplash URLs hardcoded at
+/// module scope in GalleryPage.jsx.
+///
+/// A join onto MediaAsset rather than a url column, so gallery images go through
+/// the same upload pipeline as product images - magic-byte validation, sharp
+/// re-encode, EXIF stripped, StorageService for the bytes. Adding a second way
+/// to get a file onto this server is the thing the media module exists to
+/// prevent.
+///
+/// `caption` is nullable and separate from MediaAsset.altText. They answer
+/// different questions: altText is what a screen reader hears in place of the
+/// image, caption is the visible line a sighted visitor reads underneath. A
+/// gallery of harvest photographs wants both, and conflating them produces
+/// captions that read like alt text.
+model GalleryImage {
+  id           String     @id @default(cuid())
+  mediaAsset   MediaAsset @relation(fields: [mediaAssetId], references: [id], onDelete: Cascade)
+  mediaAssetId String
+  caption      String?
+  order        Int        @default(0)
+  /// Unpublished images stay in the admin but never reach the public page - the
+  /// same DRAFT/PUBLISHED escape hatch Product has, for a photograph that is
+  /// uploaded but not cleared for use yet.
+  published    Boolean    @default(true)
+
+  updatedById String?
+  updatedBy   Admin?   @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+
+  @@index([published, order])
+  @@map("gallery_images")
 }
 
 /// Global site settings. ONE ROW, id "singleton".

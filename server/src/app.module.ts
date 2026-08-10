@@ -9,6 +9,8 @@ import { StorageModule } from './storage/storage.module';
 import { MediaModule } from './media/media.module';
 import { SettingsModule } from './settings/settings.module';
 import { EnquiriesModule } from './enquiries/enquiries.module';
+import { GalleryModule } from './gallery/gallery.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { EnquiriesModule } from './enquiries/enquiries.module';
     MediaModule,
     SettingsModule,
     EnquiriesModule,
+    GalleryModule,
+    DashboardModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
