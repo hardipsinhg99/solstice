@@ -25,7 +25,21 @@ export const Icon = ({ name, size = 20 }) => {
     // weight and cap style as the rest of the sprite - no second icon system.
     ceramic: <><path d="M9.5 3h5l-.8 3.2c1.9 1 3.3 3 3.3 5.6V18a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3v-6.2c0-2.6 1.4-4.6 3.3-5.6L9.5 3Z"/><path d="M8 13h8"/></>,
     layers: <><path d="m12 3 8.5 4.7L12 12.4 3.5 7.7 12 3Z"/><path d="m3.5 12.3 8.5 4.7 8.5-4.7"/></>,
-    factory: <><path d="M3 21V10.5l6 3.6V10.5l6 3.6V7l6 3.6V21Z"/><path d="M7.5 21v-3.4M13 21v-3.4M18 21v-2.6"/></>
+    factory: <><path d="M3 21V10.5l6 3.6V10.5l6 3.6V7l6 3.6V21Z"/><path d="M7.5 21v-3.4M13 21v-3.4M18 21v-2.6"/></>,
+    // Added for the admin shell. Same 24x24 grid, same 1.8 stroke, same cap and
+    // join as every glyph above - extending the sprite, not starting a second
+    // icon system, and still no icon-library weight in the bundle. These five
+    // are the only ones the sidebar, the bell and the gallery manager needed;
+    // Products reuses `box` and the collapse toggle reuses `menu`.
+    grid: <><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></>,
+    mail: <><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6 8.5-6"/></>,
+    image: <><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.8"/><path d="m4 17 5-4.5 4 3.2 3-2.4 4 3.7"/></>,
+    // Sliders rather than a cog. A minimal cog at 17px is a small circle with
+    // eight radial ticks, which is pixel-for-pixel the `sun` glyph above - and
+    // `sun` is the public site's theme toggle. Two icons that mean different
+    // things must not look the same at the size they are actually used.
+    sliders: <><path d="M4 8h9M17 8h3M4 16h3M11 16h9"/><circle cx="15" cy="8" r="2.2"/><circle cx="9" cy="16" r="2.2"/></>,
+    bell: <><path d="M18 8.5a6 6 0 1 0-12 0c0 5-2 6.5-2 6.5h16s-2-1.5-2-6.5Z"/><path d="M13.7 19a2 2 0 0 1-3.4 0"/></>
   }
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>
 }

@@ -27,5 +27,7 @@ export const productSlug = (route) => route.split('/')[1]
 // is how the PRIM AI panel is actually built. 'admin' and 'admin/...' cannot
 // collide with the product routes above: neither starts with 'product'.
 export const isAdminRoute = (route) => route === 'admin' || route.startsWith('admin/')
-export const adminSection = (route) => route.split('/')[1] || 'products'
+// Dashboard is the landing section from Phase 1d: a bare #admin should show the
+// overview, not drop the operator straight into the catalogue.
+export const adminSection = (route) => route.split('/')[1] || 'dashboard'
 export const adminParam = (route) => route.split('/')[2] || null
