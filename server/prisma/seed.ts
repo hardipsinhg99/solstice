@@ -9,7 +9,7 @@
  * rather than imported - keeping the server free of any build-time coupling to
  * the frontend source tree.
  */
-import { PrismaClient, ProductStatus, TradeDirection } from '@prisma/client';
+import { PrismaClient, ProductStatus, StorageDriver, TradeDirection } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
@@ -68,12 +68,32 @@ async function seedProducts(adminId: string) {
       continue;
     }
 
+    // On a fresh database the Phase 1b migration has no rows to backfill, so the
+    // seed creates the external asset itself. Those six URLs are Unsplash photos
+    // we only reference - driver EXTERNAL, so StorageService never tries to
+    // unlink a file for them. Dimensions are 0 because measuring a remote image
+    // would need a network call the seed has no business making.
+    const primaryImage = p.image
+      ? await prisma.mediaAsset.create({
+          data: {
+            filename: `${p.slug} (external)`,
+            storagePath: p.image,
+            driver: StorageDriver.EXTERNAL,
+            url: p.image,
+            mimeType: 'image/jpeg',
+            width: 0, height: 0, sizeBytes: 0,
+            altText: p.name,
+            uploadedById: adminId,
+          },
+        })
+      : null;
+
     await prisma.product.create({
       data: {
         slug: p.slug,
+        primaryImageId: primaryImage?.id ?? null,
         name: p.name,
         type: p.type,
-        image: p.image ?? null,
         description: p.description,
         season: p.season,
         origin: p.origin,

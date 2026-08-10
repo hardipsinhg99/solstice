@@ -5,6 +5,8 @@ import { sanitizeOptional, sanitizePlainText } from '../common/sanitize';
 import { UpsertProductDto } from './dto';
 
 const INCLUDE = {
+  primaryImage: true,
+  gallery: { include: { mediaAsset: true }, orderBy: { order: 'asc' } },
   varieties: { orderBy: { order: 'asc' } },
   packOptions: { orderBy: { order: 'asc' } },
   certifications: { orderBy: { order: 'asc' } },
@@ -59,7 +61,6 @@ export class ProductsService {
       season: sanitizePlainText(dto.season),
       origin: sanitizePlainText(dto.origin),
       packaging: sanitizePlainText(dto.packaging),
-      image: sanitizeOptional(dto.image),
       trade: dto.trade ?? undefined,
       status: dto.status ?? undefined,
       placeholder: dto.placeholder ?? undefined,

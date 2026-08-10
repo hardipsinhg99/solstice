@@ -45,9 +45,9 @@ export class UpsertProductDto {
   @IsString() @MinLength(1) @MaxLength(200) origin!: string;
   @IsString() @MinLength(1) @MaxLength(200) packaging!: string;
 
-  // Nullable: the two import placeholder records carry image: null, so requiring
-  // it would make the real data unrepresentable.
-  @IsOptional() @IsString() @MaxLength(1000) image?: string | null;
+  // `image` is gone: imagery moved to MediaAsset in Phase 1b and is managed
+  // through /api/media, not through the product payload. A stray `image` key now
+  // fails forbidNonWhitelisted, which is the intended loud failure.
 
   @IsOptional() @IsEnum(TradeDirection) trade?: TradeDirection;
   @IsOptional() @IsEnum(ProductStatus) status?: ProductStatus;
