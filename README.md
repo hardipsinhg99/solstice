@@ -14,6 +14,7 @@ expression. Specifications, certifications, packing and loadability outrank miss
 
 - [Quick start](#quick-start)
 - [Environment variables](#environment-variables)
+- [Admin CMS](#admin-cms)
 - [How the app fits together](#how-the-app-fits-together)
 - [Project structure](#project-structure)
 - [Request flow](#request-flow)
@@ -46,7 +47,12 @@ npm run dev          # http://localhost:5173
 | `npm run build` | Production build into `dist/` |
 | `npm run preview` | Serves the built `dist/` locally |
 
-Output is a **static folder**. No backend, no database, no server runtime.
+Output is a **static folder** — the public site still builds and deploys as one.
+
+> **There is now a backend**, added in Phase 1a: a NestJS + Prisma + PostgreSQL API in `server/`
+> that owns the product catalogue. The public site *fetches* products from it rather than importing
+> a static file, so **`npm run dev` alone will show a catalogue error state** until the API is
+> running. See [Admin CMS](#admin-cms).
 
 ---
 
@@ -69,6 +75,42 @@ cp .env.example .env.local
 
 **With no endpoint configured the form still works safely**: it reports a clear error and offers a
 `mailto:` fallback pre-filled with everything the buyer typed. A lead is never silently discarded.
+
+The API has its **own, separate** environment file at `server/.env` (`DATABASE_URL`, `JWT_SECRET`,
+`ADMIN_SEED_*`, `CORS_ORIGIN`). Those are server-side secrets and must **never** be given a `VITE_`
+prefix — see [`docs/admin.md`](docs/admin.md#environment-variables).
+
+---
+
+## Admin CMS
+
+Phase 1a shipped a database-backed admin panel. **Full manual: [`docs/admin.md`](docs/admin.md).**
+Design rationale: [`docs/admin-cms-blueprint.md`](docs/admin-cms-blueprint.md).
+
+| | |
+|---|---|
+| **API** | NestJS 10 + Prisma 5 + PostgreSQL, in `server/` |
+| **Admin UI** | Routes *inside this SPA* at `#admin/*`, not a separate app |
+| **Scope today** | Products only. Pages and Enquiries are designed, not built |
+| **Auth** | Single admin, JWT, no roles |
+
+```bash
+docker run -d --name solstice-cms-pg -e POSTGRES_USER=solstice \
+  -e POSTGRES_PASSWORD=solstice_dev_pw -e POSTGRES_DB=solstice_cms \
+  -p 55432:5432 postgres:16-alpine
+
+cd server && npm install && cp .env.example .env   # then fill it in
+npx prisma generate && npx prisma migrate dev && npm run seed
+npm run start:dev                                  # :3001
+
+npm run dev                                        # repo root, :5173
+```
+
+Admin at `http://localhost:5173/#admin/products`. `vite.config.js` proxies `/api` → `:3001`, so the
+two are same-origin locally and CORS never applies in development.
+
+> **`src/data/products.js` is no longer the live source.** It is kept only so `npm run seed` can
+> bootstrap a fresh database. Editing it changes nothing on the site — edit products in the admin.
 
 ---
 
@@ -196,19 +238,25 @@ to replace one file.
 
 ## Editing content
 
-All content lives in `src/data/` as plain JS. This is today's content model and the seam a CMS plugs
-into later.
+Content splits in two since Phase 1a:
+
+- **Products live in PostgreSQL** and are edited in the admin panel — see [Admin CMS](#admin-cms).
+- **Everything else still lives in `src/data/` as plain JS**, and that folder remains the seam the
+  rest of the CMS plugs into.
+
+`src/data/products.js` is still on disk because the seed script reads it to bootstrap a fresh
+database, but **editing it no longer changes the site**.
 
 | File | Holds |
 |---|---|
-| `products.js` | The 6 products — slug, name, type, image, description, varieties, season, origin, packaging, certification |
+| `products.js` | **Seed source only** — the 8 products the database is bootstrapped from. Not read at runtime |
 | `navigation.js` | Header nav and (via `.slice()`) the footer columns |
 | `faqs.js` | `contactFaq` (contact page accordion) and `chatFaq` (chat widget), exported separately |
 | `globe.js` | Globe markers and arcs (lat/lng) |
 
-**To add a product**, append one object to the array in `products.js`. Everything downstream —
-catalogue, filter, detail page, related products, home feature cards, and the enquiry form's product
-dropdown — derives from it.
+**To add a product**, use the admin panel (`#admin/products` → New product). Everything downstream —
+catalogue, filter, detail page, related products and home feature cards — derives from the API
+response, mapped to the historical flat shape at the fetch boundary.
 
 > ⚠️ **Never invent a certification, figure or credential.** Product copy is read by buyers whose
 > compliance teams will ask for the certificate. See `docs/website-strategy.md` for the full product
@@ -408,9 +456,14 @@ single run.
 
 | Branch | State |
 |---|---|
-| `master` | Original single-file application. Behind. |
-| `phase-0-triage` | **Current work.** Phase 0 triage, hero video, `src/` decomposition. |
-| `chore/ui-ux-pro-max-skill` | Design skills + `CLAUDE.md`, merged into `phase-0-triage`. |
+| `master` | **Production.** Everything through the release integration — hero composite, four-field enquiry form, colour ramp, WhatsApp FAB, back-to-top, Google Translate, Products dropdown |
+| `feat/admin-cms-phase1` | **Current work.** Admin CMS Phase 1a — `server/` API, admin routes, public catalogue wired to the API. Not merged |
+| `release/production` | The integration branch `master` was fast-forwarded from |
+| `feat/hero-video` | **Superseded** by the hero composite. Kept for reference; merging it would hide the composite hero |
+
+Older feature branches (`feat/trade-nav`, `feat/nav-dropdown`, `feat/products-trade-filter`,
+`fix/contact-form-fields`, `feat/hero-image`, `feat/light-mode-color-system`, `feat/whatsapp-fab`,
+`feat/back-to-top`) are all merged and pushed; they remain on the remote as history.
 
 ---
 

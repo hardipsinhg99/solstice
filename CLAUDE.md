@@ -7,9 +7,15 @@ worth sending an RFQ to. Every design and content decision serves that, not bran
 ## Current state
 
 - **Stack today:** Vite 8 + React 19 SPA, hash routing, hand-written CSS split across
-  `src/styles/` in cascade order. Content lives in `src/data/` and per-page components under
-  `src/pages/` (the single-file `main.jsx` era is over — it is mount-only now). GSAP drives the
-  homepage journey sequence. No backend.
+  `src/styles/` in cascade order. Per-page components under `src/pages/` (the single-file
+  `main.jsx` era is over — it is mount-only now). GSAP drives the homepage journey sequence.
+- **There is now a backend.** `server/` holds a NestJS 10 + Prisma 5 + PostgreSQL API added in
+  Phase 1a. It owns the **product catalogue**; the public site fetches products from it rather
+  than importing `src/data/products.js`. Admin UI is routes *inside this SPA* at `#admin/*`.
+  **`npm run dev` alone shows a catalogue error state until the API is running.**
+  **Read `docs/admin.md` before touching anything under `server/`, `src/pages/admin/` or
+  `src/features/admin/`** — it documents the schema, the auth model, the shape boundary and the
+  decisions that look arbitrary but are not. `docs/admin-cms-blueprint.md` is the rationale.
 - **Decided:** migrate the design system, rebuild the shell in Astro. The styles, `Globe.jsx`,
   the `Icon` sprite and the `Reveal` system port over. The hash router and client-only rendering
   do not. **Not started** — blocked on content and photography.
@@ -28,13 +34,23 @@ src/
 │                 navigation.js (the seam) · ThemeProvider.jsx
 ├── components/   ui/ (Icon, Button, Eyebrow, Card) · layout/ (Header, Nav, Footer, PageTitle)
 │                 motion/ (Reveal, useInView)
-├── features/     products/ · enquiry/ · globe/ · chat/     (one index.js barrel each)
+├── features/     products/ · enquiry/ · globe/ · chat/ · admin/   (one index.js barrel each)
 ├── pages/        <page>/<Page>Page.jsx + optional sections/
-├── data/         products · navigation · faqs · globe      (the seam a CMS plugs into)
+│                 admin/ — AdminApp (guard) + login, product list, product edit
+├── data/         navigation · faqs · globe · about-content   (still the CMS seam)
+│                 products.js — SEED SOURCE ONLY, not read at runtime
 ├── lib/          constants.js
 ├── styles/       tokens · base · layout · components · pages · footer · responsive
 └── main.jsx      mount only (10 lines)
+
+server/          separate app, TypeScript, never ships to a buyer's browser
+├── prisma/      schema.prisma · migrations/ · seed.ts
+└── src/         auth/ · products/ · prisma/ · common/sanitize.ts · main.ts
 ```
+
+**The admin renders *instead of* the marketing shell**, not inside it — `App.jsx` returns
+`<AdminApp/>` early on `isAdminRoute(route)`, so the admin inherits no header, footer, chat widget
+or corner column. `#admin/*` cannot collide with `product/` or `products/`.
 
 **Import direction is one-way: `pages → features → components → lib`.** A `features/` module must
 never import from `pages/`. A `components/ui` primitive must never import domain data. If you need
@@ -101,5 +117,14 @@ If a query returns no match, say so explicitly rather than quietly falling back 
 ## House rules
 
 - Don't add TypeScript, Tailwind, a router library, a test runner or a linter without asking.
+  **This applies to the public bundle.** `server/` is TypeScript because that is idiomatic Nest and
+  never reaches a buyer's browser; the same reasoning admits server-side dependencies there.
 - Don't self-host or swap the Unsplash imagery; that is a rebuild decision pending real photography.
-- Never commit a form key or secret. `VITE_*` vars are inlined into the client bundle and are public.
+- Never commit a form key or secret. `VITE_*` vars are inlined into the client bundle and are public
+  — **no server secret may ever carry a `VITE_` prefix.** `server/.env` is the separate, gitignored
+  home for `DATABASE_URL`, `JWT_SECRET` and the admin seed credentials.
+- The palette gained `--danger` / `--danger-bg` / `--on-danger` in both themes with Phase 1a, for
+  destructive actions and validation errors. Use them; don't introduce a second error colour.
+- Certification claims carry `verifiable`. Making one verifiable is deliberately a two-step,
+  reference-gated action, enforced on the server too — it guards a legal exposure in destination
+  markets, not a UI preference. See `docs/admin.md`.
