@@ -82,7 +82,7 @@ export default function AdminSettingsPage() {
     <section className="admin-page">
       <header className="admin-page-head">
         <div>
-          <h1>Site settings</h1>
+          <h2 className="admin-page-h2">Site settings</h2>
           <p className="admin-meta">
             The contact details the public site reads at runtime.
             {updatedAt && ` Last saved ${new Date(updatedAt).toLocaleString()}.`}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAdminEnquiries, setEnquiryStatus, deleteEnquiry } from '../../features/admin/index.js'
 import { DangerConfirm } from '../../components/admin/DangerConfirm.jsx'
 
@@ -26,7 +26,7 @@ const when = (iso) => new Date(iso).toLocaleString(undefined, {
  * would mean owning deliverability, threading and a sent-items store for a
  * feature the client did not ask for.
  */
-export default function AdminEnquiriesPage() {
+export default function AdminEnquiriesPage({ highlightId }) {
   const { enquiries, status, error, reload } = useAdminEnquiries()
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('')
@@ -65,13 +65,25 @@ export default function AdminEnquiriesPage() {
     }
   }
 
+  // Arriving from the notification bell at #admin/enquiries/<id>: bring that row
+  // into view and mark it, rather than dropping the operator at the top of a
+  // list and leaving them to find the enquiry they just clicked.
+  const rowRefs = useRef(new Map())
+  useEffect(() => {
+    if (!highlightId || status !== 'ready') return
+    const el = rowRefs.current.get(highlightId)
+    // 'auto' respects the reduced-motion backstop; the page's smooth scrolling
+    // is a CSS declaration this deliberately does not fight.
+    el?.scrollIntoView({ block: 'center', behavior: 'auto' })
+  }, [highlightId, status, enquiries])
+
   const newCount = enquiries.filter((e) => e.status === 'NEW').length
 
   return (
     <section className="admin-page">
       <header className="admin-page-head">
         <div>
-          <h1>Enquiries</h1>
+          <h2 className="admin-page-h2">Enquiries</h2>
           <p className="admin-meta">
             {enquiries.length} shown{newCount > 0 && `, ${newCount} not yet contacted`}. Newest first.
           </p>
@@ -131,7 +143,11 @@ export default function AdminEnquiriesPage() {
           </thead>
           <tbody>
             {enquiries.map((e) => (
-              <tr key={e.id}>
+              <tr
+                key={e.id}
+                ref={(node) => { node ? rowRefs.current.set(e.id, node) : rowRefs.current.delete(e.id) }}
+                className={e.id === highlightId ? 'is-highlighted' : undefined}
+              >
                 <td>
                   {when(e.createdAt)}
                   {/* Null notifiedAt is the state worth being able to see: the

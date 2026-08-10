@@ -250,7 +250,7 @@ export default function AdminProductEditPage({ productId }) {
       <header className="admin-page-head">
         <div>
           <button type="button" className="admin-link" onClick={() => goTo('admin/products')}>← Products</button>
-          <h1>{isNew ? 'New product' : form.name || 'Edit product'}</h1>
+          <h2 className="admin-page-h2">{isNew ? 'New product' : form.name || 'Edit product'}</h2>
         </div>
         <div className="admin-head-actions">
           <span className={form.status === 'PUBLISHED' ? 'admin-chip is-published' : 'admin-chip is-draft'}>

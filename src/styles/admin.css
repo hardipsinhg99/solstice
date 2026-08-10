@@ -11,22 +11,58 @@
    the marketing site's 15-16px, because this is a table-and-form tool used for
    minutes at a time, not a page read once.
    ============================================================ */
-.admin-shell{display:grid;grid-template-columns:232px 1fr;min-height:100vh;background:var(--bg);color:var(--body);font-size:13px}
-.admin-main{padding:28px 32px;overflow-y:auto;max-height:100vh}
+/* The sidebar width is a custom property so collapsing it is one value change
+   rather than a second grid definition to keep in sync. */
+.admin-shell{--admin-rail:236px;display:grid;grid-template-columns:var(--admin-rail) 1fr;min-height:100vh;background:var(--bg);color:var(--body);font-size:13px}
+.admin-shell:has(.admin-nav.is-collapsed){--admin-rail:64px}
+.admin-frame{display:flex;flex-direction:column;min-width:0;max-height:100vh}
+.admin-main{padding:24px 32px 40px;overflow-y:auto;flex:1;min-height:0}
 .admin-page{max-width:920px;display:grid;gap:24px}
 .admin-page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .admin-page-head h1{font-size:26px;letter-spacing:-.6px;margin:6px 0 0;color:var(--ink)}
+.admin-page-h2{font-size:19px;letter-spacing:-.3px;margin:0;color:var(--ink)}
+.admin-section-heading{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
 .admin-head-actions{display:flex;align-items:center;gap:10px}
 .admin-meta{color:var(--muted);font-size:11.5px}
 .admin-visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
-/* ── Sidebar ───────────────────────────────────────────────────────────────── */
-.admin-nav{background:var(--surface);border-right:1px solid var(--border);padding:22px 16px;display:flex;flex-direction:column;gap:6px}
-.admin-brand{font-weight:700;font-size:14px;letter-spacing:-.3px;color:var(--ink);margin-bottom:14px}
-.admin-nav-link{border:0;background:none;text-align:left;padding:9px 12px;border-radius:8px;color:var(--body);font-size:13px;transition:background .2s,color .2s}
+/* ── Sidebar ───────────────────────────────────────────────────────────────
+   Grouped, not a flat list: MAIN is what you open the panel to do, CONTENT is
+   what you edit occasionally, SETTINGS is what you touch twice a year. ───── */
+.admin-nav{background:var(--surface);border-right:1px solid var(--border);padding:18px 12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;max-height:100vh}
+.admin-nav-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;min-height:32px}
+.admin-brand{font-weight:700;font-size:14px;letter-spacing:-.3px;color:var(--ink)}
+.admin-nav-toggle{border:1px solid transparent;background:none;color:var(--muted);border-radius:8px;padding:6px;display:grid;place-items:center;transition:color .2s,border-color .2s}
+.admin-nav-toggle:hover{color:var(--ink);border-color:var(--line-strong)}
+
+.admin-nav-group{display:grid;gap:2px;margin-bottom:10px}
+.admin-nav-heading{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin:8px 0 4px;padding:0 12px}
+.admin-nav-list{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.admin-nav-sub{margin-left:14px;padding-left:10px;border-left:1px solid var(--border)}
+
+.admin-nav-link{width:100%;border:0;background:none;text-align:left;padding:8px 12px;border-radius:8px;color:var(--body);font-size:13px;display:flex;align-items:center;gap:10px;transition:background .2s,color .2s}
 .admin-nav-link:hover{background:var(--green-050);color:var(--ink)}
 .admin-nav-link.is-active{background:var(--green-050);color:var(--ink);font-weight:600}
+.admin-nav-link svg{flex:none}
+.admin-nav-caret{margin-left:auto;display:grid;place-items:center;transition:transform .2s var(--ease)}
+.admin-nav-caret.is-open{transform:rotate(180deg)}
+.admin-nav-action{display:flex;align-items:center;gap:8px;justify-content:flex-start}
 .admin-nav-foot{margin-top:auto;display:grid;gap:8px;padding-top:18px;border-top:1px solid var(--border)}
+
+/* Collapsed rail. The labels are hidden VISUALLY, with the visually-hidden
+   pattern rather than display:none, so every button keeps its accessible name
+   and the rail never becomes a column of unlabelled icons for a screen reader. */
+.admin-nav.is-collapsed{padding:18px 8px;align-items:stretch}
+.admin-nav.is-collapsed .admin-nav-text{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.admin-nav.is-collapsed .admin-nav-head{justify-content:center}
+.admin-nav.is-collapsed .admin-nav-link,
+.admin-nav.is-collapsed .admin-nav-action{justify-content:center;padding:9px 0}
+.admin-nav.is-collapsed .admin-nav-caret{display:none}
+.admin-nav.is-collapsed .admin-nav-sub{margin-left:0;padding-left:0;border-left:0}
+/* The group headings are the one thing that genuinely has no meaning at 64px -
+   a one-word heading over a single icon is noise. They stay in the a11y tree
+   via the same visually-hidden rule above, which is why this is not display:none. */
+.admin-nav.is-collapsed .admin-nav-group{margin-bottom:14px}
 
 /* ── Controls ──────────────────────────────────────────────────────────────── */
 .admin-btn{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);padding:8px 13px;border-radius:8px;font-size:12.5px;font-weight:600;transition:border-color .2s,background .2s}
@@ -109,11 +145,26 @@
 .admin-auth-lede{margin:6px 0 20px;color:var(--muted);font-size:12.5px}
 .admin-auth-card .admin-btn{width:100%;justify-content:center;margin-top:6px}
 
-@media(max-width:780px){
-  .admin-shell{grid-template-columns:1fr}
-  .admin-nav{flex-direction:row;align-items:center;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--border)}
+@media(max-width:900px){
+  /* Below this width the rail is a horizontal strip above the content, so the
+     grouped columns collapse into one scrolling row and the collapse toggle
+     stops applying - there is no rail left to narrow. */
+  .admin-shell,.admin-shell:has(.admin-nav.is-collapsed){grid-template-columns:1fr}
+  .admin-frame{max-height:none}
+  .admin-nav,.admin-nav.is-collapsed{flex-direction:row;align-items:center;flex-wrap:wrap;gap:8px;border-right:0;border-bottom:1px solid var(--border);max-height:none;padding:12px 16px}
+  .admin-nav.is-collapsed .admin-nav-text{position:static;width:auto;height:auto;margin:0;clip:auto;white-space:normal}
+  .admin-nav.is-collapsed .admin-nav-link,.admin-nav.is-collapsed .admin-nav-action{justify-content:flex-start;padding:8px 12px}
+  .admin-nav-head{margin:0}
+  .admin-nav-toggle{display:none}
+  .admin-nav-group{margin:0;display:flex;align-items:center;gap:4px}
+  .admin-nav-heading{display:none}
+  .admin-nav-list{display:flex;gap:4px}
+  .admin-nav-sub{margin:0;padding:0;border-left:0}
   .admin-nav-foot{margin:0 0 0 auto;display:flex;padding-top:0;border-top:0}
-  .admin-main{padding:20px 16px;max-height:none}
+  .admin-topbar{padding:12px 16px}
+  .admin-topbar-title{font-size:17px}
+  .admin-profile-name{display:none}
+  .admin-main{padding:20px 16px 32px;max-height:none}
   .admin-row-actions{justify-content:flex-start}
   td.admin-row-actions{text-align:left}
 }
@@ -176,3 +227,89 @@ td.admin-row-actions>*+*{margin-left:8px}
    action column off screen. */
 .admin-enquiry-message{margin:0 0 4px;max-width:44ch;font-size:12.5px;line-height:1.6;color:var(--body);white-space:pre-wrap;overflow-wrap:anywhere}
 .admin-table td>.admin-link{font-size:12px}
+
+/* ── Top bar ────────────────────────────────────────────────────────────────
+   Page title, notification bell, profile menu. Deliberately not the reference
+   mockup's mirror of the public site navigation: an operator editing a product
+   does not navigate to the public About page from here, and reproducing the
+   marketing nav would be a second navigation model to keep in sync with
+   data/navigation.js for a workflow nobody has. */
+.admin-topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 32px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
+.admin-topbar-title{margin:0;font-size:20px;letter-spacing:-.4px;color:var(--ink)}
+.admin-topbar-actions{display:flex;align-items:center;gap:10px}
+
+.admin-menu{position:relative}
+.admin-icon-btn{position:relative;border:1px solid var(--line-strong);background:var(--bg);color:var(--ink);border-radius:9px;padding:8px;display:grid;place-items:center;transition:border-color .2s}
+.admin-icon-btn:hover{border-color:var(--green-600)}
+/* The badge is aria-hidden; the count lives in the button's accessible name,
+   because a superscript number is invisible to a screen reader. */
+.admin-badge{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:var(--danger);color:var(--on-danger);font-size:10px;font-weight:700;line-height:17px;text-align:center}
+
+.admin-profile-btn{display:flex;align-items:center;gap:9px;border:1px solid var(--line-strong);background:var(--bg);border-radius:9px;padding:5px 10px 5px 6px;color:var(--ink);transition:border-color .2s}
+.admin-profile-btn:hover{border-color:var(--green-600)}
+.admin-avatar{width:28px;height:28px;border-radius:8px;background:var(--green-600);color:var(--on-green);display:grid;place-items:center;font-size:11px;font-weight:700;letter-spacing:.3px}
+.admin-profile-name{display:grid;text-align:left;line-height:1.3}
+.admin-profile-name strong{font-size:12.5px}
+
+.admin-menu-panel{position:absolute;top:calc(100% + 8px);right:0;min-width:280px;max-width:min(360px,90vw);background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--elev-1);padding:8px;z-index:20;display:grid;gap:2px}
+.admin-menu-head{margin:0;padding:8px 10px 6px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.admin-menu-empty{margin:0;padding:4px 10px 10px;font-size:12px;color:var(--muted);line-height:1.5}
+.admin-menu-list{list-style:none;margin:0;padding:0;display:grid;gap:2px;max-height:340px;overflow-y:auto}
+.admin-menu-item{width:100%;text-align:left;border:0;background:none;border-radius:8px;padding:8px 10px;color:var(--body);font-size:12.5px;display:grid;gap:2px;transition:background .2s}
+.admin-menu-item:hover{background:var(--green-050);color:var(--ink)}
+.admin-menu-item strong{color:var(--ink);font-size:13px}
+.admin-menu-item.is-danger{color:var(--danger);font-weight:600}
+.admin-menu-item.is-danger:hover{background:var(--danger-bg)}
+.admin-menu-snippet{color:var(--muted);line-height:1.45;overflow-wrap:anywhere}
+.admin-menu-foot{width:100%;border:0;border-top:1px solid var(--border);background:none;margin-top:6px;padding:10px 10px 6px;color:var(--green-600);font-weight:600;font-size:12.5px;text-align:left}
+
+/* ── Dashboard ──────────────────────────────────────────────────────────────
+   Every figure on this page is a count query. The reference mockup's fourth
+   card was "Exports This Month"; nothing in this schema records an export, so
+   that number could only ever have been invented. Open Enquiries replaces it. */
+.admin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.admin-stat{display:flex;align-items:flex-start;gap:14px;text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+/* Only the cards that navigate look like they do. Four cards that all appear
+   clickable when two are not is how an operator learns to distrust a panel. */
+.admin-stat.is-actionable{cursor:pointer;transition:border-color .2s}
+.admin-stat.is-actionable:hover{border-color:var(--green-600)}
+.admin-stat-icon{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;flex:none}
+.admin-stat-icon.is-neutral{background:var(--soft);color:var(--body)}
+.admin-stat-icon.is-good{background:var(--green-050);color:var(--green-600)}
+.admin-stat-icon.is-info{background:var(--green-050);color:var(--green-700)}
+.admin-stat-icon.is-warn{background:var(--danger-bg);color:var(--danger)}
+.admin-stat-body{display:grid;gap:1px;min-width:0}
+.admin-stat-label{font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:.2px}
+.admin-stat-value{font-size:26px;line-height:1.15;letter-spacing:-.8px;color:var(--ink)}
+
+.admin-activity{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.admin-activity li{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:11px 16px;border-bottom:1px solid var(--border);font-size:12.5px}
+.admin-activity li:last-child{border-bottom:0}
+.admin-activity-what{color:var(--body);line-height:1.5}
+.admin-activity strong{color:var(--ink)}
+.admin-activity em{font-style:normal;color:var(--ink)}
+
+/* ── Product row thumbnails ────────────────────────────────────────────────
+   The <img> goes through unsplashAt(), the same delivery helper ProductCard
+   uses, so a remote photograph is requested at thumbnail width instead of at
+   1000px and an uploaded WebP passes through untouched. No second image path. */
+.admin-thumb-cell{width:56px}
+.admin-thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;display:block;background:var(--soft);border:1px solid var(--border)}
+.admin-thumb.is-empty{display:grid;place-items:center;color:var(--muted);border-style:dashed}
+
+/* ── Pagination ───────────────────────────────────────────────────────────── */
+.admin-pagination{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:14px}
+.admin-pages{display:flex;gap:6px;flex-wrap:wrap}
+.admin-page-num{min-width:34px;padding:8px 10px}
+.admin-page-num.is-current{background:var(--green-600);border-color:var(--green-600);color:var(--on-green)}
+
+/* ── Gallery admin ────────────────────────────────────────────────────────── */
+.admin-upload-panel{display:grid;gap:0}
+.admin-optional{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)}
+.admin-media-tile .admin-chip{justify-self:start}
+
+/* The row the notification bell sent you to. A border, not a background wash:
+   --danger-bg-style tints are only ~1.1:1 against the surface, so a wash alone
+   would not be perceivable. */
+.admin-table tr.is-highlighted td{background:var(--green-050)}
+.admin-table tr.is-highlighted td:first-child{box-shadow:inset 3px 0 0 var(--green-600)}
