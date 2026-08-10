@@ -18,6 +18,9 @@ Operational and architectural reference for the Solstice admin panel and its API
 - [Data flow](#data-flow)
 - [Database schema](#database-schema)
 - [API surface](#api-surface)
+- [The admin shell](#the-admin-shell)
+- [Dashboard](#dashboard)
+- [Gallery](#gallery)
 - [Site settings](#site-settings)
 - [Enquiries](#enquiries)
 - [Auth](#auth)
@@ -143,8 +146,16 @@ src/                             (frontend - admin routes inside the existing SP
 │   └── useProductCatalogue.js   thin wrapper over useApiResource('products')
 ├── features/settings/
 │   └── useSiteSettings.js       public read, constants as fallback, wa.me helpers
+├── features/gallery/
+│   └── useGallery.js            admin CRUD + the public read, through useApiResource
+├── components/admin/
+│   ├── AdminSidebar.jsx         grouped, collapsible, localStorage-persisted
+│   ├── AdminTopBar.jsx          title, notification bell, account menu
+│   └── DangerConfirm.jsx        the ONE destructive-confirmation component
 ├── pages/admin/
 │   ├── AdminApp.jsx             shell + route guard
+│   ├── AdminDashboardPage.jsx   stat cards, warning panel, activity list
+│   ├── AdminGalleryPage.jsx     upload, caption, reorder, hide, delete
 │   ├── AdminLoginPage.jsx
 │   ├── AdminProductsPage.jsx    list, search, delete confirmation
 │   ├── AdminProductEditPage.jsx create/edit, repeaters, certification friction
@@ -236,6 +247,14 @@ Global prefix `/api`. Public routes are unguarded; every mutating route requires
 | `GET` | `/api/enquiries` | JWT | Newest first. `?search=` matches name/email/message, `?status=` filters |
 | `PATCH` | `/api/enquiries/:id/status` | JWT | NEW / CONTACTED / CLOSED |
 | `DELETE` | `/api/enquiries/:id` | JWT | Permanent |
+| `GET` | `/api/gallery` | — | **Published rows only.** `max-age=60` |
+| `GET` | `/api/gallery/admin` | JWT | Every row, including hidden ones |
+| `POST` | `/api/gallery` | JWT | Multipart upload — **the same `MediaService` pipeline products use** |
+| `PATCH` | `/api/gallery/order` | JWT | Full-list reorder |
+| `PATCH` | `/api/gallery/:id` | JWT | Caption and published flag |
+| `DELETE` | `/api/gallery/:id` | JWT | Removes the row **and the bytes** |
+| `GET` | `/api/dashboard` | JWT | Stats + notifications + activity, one request |
+| `GET` | `/api/dashboard/notifications` | JWT | The bell alone |
 
 ### Validation is not a mirror of the client
 
@@ -250,6 +269,136 @@ Global prefix `/api`. Public routes are unguarded; every mutating route requires
 | `verifiable: true` with no `reference` | Stored as `verifiable: false` |
 
 The global `ValidationPipe` runs `whitelist: true, forbidNonWhitelisted: true`, so `status` in particular **cannot** be set through create/update - only through the dedicated `PATCH /status` route.
+
+---
+
+## The admin shell
+
+`AdminSidebar` + `AdminTopBar` + a page, all under `AdminApp`.
+
+### The sidebar is grouped, not flat
+
+```
+MAIN      Dashboard · Catalogue ▾ (Products, Enquiries)
+CONTENT   Gallery
+SETTINGS  Settings
+```
+
+A flat list works at four items and stops working at eight. MAIN is what you open the
+panel to do, CONTENT is what you edit occasionally, SETTINGS is what you touch twice a year.
+
+**Collapsing hides labels visually, never from the accessibility tree.** The collapsed rail
+uses the visually-hidden pattern (`clip: rect(0 0 0 0)`), not `display: none`, so every
+button keeps its accessible name. `display: none` here would turn a 64px rail into a column
+of unlabelled icons for a screen-reader user.
+
+State lives in `localStorage` under `solstice-admin-nav-collapsed` and
+`solstice-admin-nav-catalogue`, matching the precedent `solstice-theme` set. This is a UI
+preference belonging to a person and a machine — it has no business in the database.
+
+**The Catalogue group reopens itself when it holds the current page**, so collapsing it can
+never hide where you are.
+
+### The top bar is not the reference mockup's top bar
+
+The design this phase was based on mirrored the whole public site navigation — Home, About
+us, Services, Products, Team, Gallery, Contact us — across the top of the admin. That was
+rejected. An operator editing a product does not navigate to the public About page from
+here, and reproducing the marketing nav means a second navigation model to keep in sync
+with `data/navigation.js` for a workflow nobody has. The sidebar already carries one
+"View site" button for the one time it is wanted.
+
+What it carries instead: the page title (the document's single `<h1>` — every page owns an
+`<h2>`), the notification bell, and an account menu.
+
+**The account menu prints no role.** There are no roles. "Administrator" under the name
+would imply a permission system that does not exist.
+
+Both menus are native buttons and a plain `<ul>`: no dropdown library, no focus trap. They
+are menus, not dialogs — Escape closes, outside pointerdown closes, Tab walks out. **Escape
+returns focus to the trigger** when focus was inside the panel; without that the browser
+drops focus to `<body>` and a keyboard user is silently returned to the top of the document.
+
+---
+
+## Dashboard
+
+`#admin` and `#admin/dashboard`. Four stat cards, a warning panel, a recent-activity list.
+
+### Every number is a count query
+
+`DashboardService.stats()` runs five `count()` queries in one `Promise.all`. Nothing is
+sampled, estimated or derived from a constant.
+
+| Card | Query |
+|---|---|
+| Total products | `product.count()` |
+| Published | `product.count({ status: PUBLISHED })` |
+| Unverified claims | `product.count({ certifications: { some: { verifiable: false } } })` — counted over **products**, not certification rows, because the operator acts on a product |
+| Open enquiries | `enquiry.count({ status: { not: CLOSED } })` |
+
+### "Exports This Month" was removed, not implemented
+
+The reference mockup carried an *Exports This Month: 12* card. **Nothing in this schema
+records an export, a shipment or a dispatch**, so that number could only ever have been
+invented — on a panel whose entire job is trustworthy status at a glance. It is replaced by
+**Open enquiries**: leads not yet closed, the one figure on the page that means "work
+waiting for you".
+
+Open rather than "new in the last 30 days" because the bell already counts NEW; a second
+card repeating it would be decoration.
+
+### The bell
+
+`notifications.count` and `notifications.items` come from the same query, so the badge and
+the list cannot disagree. **The count is in the button's `aria-label`, not only in the
+badge** — a superscript number is invisible to a screen reader. Clicking an item navigates
+to `#admin/enquiries/<id>`, which scrolls that row into view and marks it.
+
+### Recent activity
+
+`AuditLog` has been written to since Phase 1a and read by nothing. The last six entries are
+surfaced here — one query, no chart, no library. Action strings are mapped to English in
+`AdminDashboardPage.jsx`; that is a display concern and does not belong in the database.
+
+---
+
+## Gallery
+
+`#admin/gallery` edits the public `#gallery` page, which until Phase 1d was six Unsplash
+URLs in an array at module scope in `GalleryPage.jsx`.
+
+### It is not a second upload system
+
+`GalleryService` depends on **`MediaService`**, the same class `ProductMediaService` uses.
+There is no `fs` import anywhere under `server/src/gallery/`, no path construction, and no
+second call site for `StorageService.save()`. Uploads get the identical treatment: magic-byte
+content validation, 8 MB ceiling, resize to 1600px, WebP re-encode down a quality ladder to
+under 400 KB, EXIF stripped, UUID-sharded filename.
+
+### Caption and alt text are two fields
+
+They answer different questions. **Alt text** is what a screen reader hears *instead of* the
+photograph. **Caption** is the visible line a sighted visitor reads underneath. Merging them
+produces captions that read like alt text and alt text that reads like marketing.
+
+The six migrated photographs carry **no alt text**, because the page they came from rendered
+`alt=""` for all six. Inventing descriptions of pictures nobody has looked at would be
+fabricating content, so the gap is counted and surfaced in a warning panel instead.
+
+### Reorder is buttons first, drag second
+
+Explicit move-up/move-down buttons on every tile, with native HTML5 drag as the enhancement.
+Drag-only reordering is the classic accessibility failure of a media manager. Reorder sends
+the **whole list**, not a from/to pair, so a stale client is rejected rather than silently
+reshuffling rows somebody else added.
+
+### Deleting removes the bytes
+
+`GalleryService.remove()` calls `MediaService.deleteAsset()`, which unlinks through
+`StorageService` and then drops the row — storage first, so a failed unlink leaves a
+reachable asset rather than an orphaned file. `EXTERNAL` assets skip the unlink: there is no
+file of ours to remove. Remaining rows are compacted so `order` stays dense.
 
 ---
 
@@ -445,7 +594,9 @@ The seed imports the 8 live products as `PUBLISHED`, everything else defaults to
 
 | Not built | Why |
 |---|---|
-| **Pages / PageSection CRUD** | Blocked on an open question: `docs/website-strategy.md` says cut Team and Gallery, but both are **live** in the shipped app, and Privacy/Terms are specified but don't exist. Scoping Pages before that is resolved would ship a module that cannot edit two live pages |
+| **Pages / PageSection CRUD** | Still blocked on the open IA question: `docs/website-strategy.md` says cut Team and Gallery, but both are **live** in the shipped app, and Privacy/Terms are specified but don't exist. Phase 1d resolved this for **Gallery only** — it mapped onto the already-solved media-collection pattern rather than needing typed sections. Home, About, Services and Team still do |
+| **"Enquiry Quotes"** | Appeared in the reference mockup's sidebar. It implies a quoting subsystem — line items, pricing logic, PDF generation — that is not specified anywhere and that nothing in the schema supports. Not built, and not stubbed |
+| **Charts / analytics** | The dashboard is counts and a list. No chart library, no export or shipment tracking — there is no shipment data to track |
 | **Split-view live preview** | Phase 2. Non-trivial here because the Products page runs a scroll-driven GSAP explode sequence that a naively re-rendering preview iframe would fight |
 | **Rich text (TipTap)** | Arrives with Pages. Product descriptions are a plain textarea |
 | **Reply-from-the-admin / inbox UI** | Out of scope by decision. The notification email carries the buyer's address as `Reply-To`, so replying is one click in a real mail client. Building this here would mean owning deliverability, threading and a sent-items store |

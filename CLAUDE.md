@@ -35,6 +35,7 @@ src/
 ├── app/          App.jsx · router.js (hash - the one file the migration deletes)
 │                 navigation.js (the seam) · ThemeProvider.jsx
 ├── components/   ui/ (Icon, Button, Eyebrow, Card) · layout/ (Header, Nav, Footer, PageTitle)
+│                 admin/ (AdminSidebar, AdminTopBar, DangerConfirm)
 │                 motion/ (Reveal, useInView)
 ├── features/     products/ · enquiry/ · globe/ · chat/ · admin/ · settings/ · api/
 │                 (one index.js barrel each; api/useApiResource.js is the shared GET cache)
@@ -49,7 +50,7 @@ src/
 server/          separate app, TypeScript, never ships to a buyer's browser
 ├── prisma/      schema.prisma · migrations/ · seed.ts
 └── src/         auth/ · products/ · media/ · storage/ · settings/ · enquiries/
-                 prisma/ · common/sanitize.ts · main.ts
+                 gallery/ · dashboard/ · prisma/ · common/sanitize.ts · main.ts
 ```
 
 **The admin renders *instead of* the marketing shell**, not inside it - `App.jsx` returns

@@ -82,14 +82,14 @@ The API has its **own, separate** environment file at `server/.env` (`DATABASE_U
 
 ## Admin CMS
 
-Phases 1a–1c shipped a database-backed admin panel. **Full manual: [`docs/admin.md`](docs/admin.md).**
+Phases 1a–1d shipped a database-backed admin panel. **Full manual: [`docs/admin.md`](docs/admin.md).**
 Design rationale: [`docs/admin-cms-blueprint.md`](docs/admin-cms-blueprint.md).
 
 | | |
 |---|---|
 | **API** | NestJS 10 + Prisma 5 + PostgreSQL, in `server/` |
 | **Admin UI** | Routes *inside this SPA* at `#admin/*`, not a separate app |
-| **Scope today** | Products (with image upload), Site settings, Enquiries. Pages and live preview are designed, not built |
+| **Scope today** | Dashboard, Products (with image upload), Enquiries, Gallery, Site settings. Pages for Home/About/Services/Team and live preview are designed, not built |
 | **Auth** | Single admin, JWT, no roles |
 
 ```bash
@@ -104,7 +104,7 @@ npm run start:dev                                  # :3001
 npm run dev                                        # repo root, :5173
 ```
 
-Admin at `http://localhost:5173/#admin/products`. `vite.config.js` proxies `/api` → `:3001`, so the
+Admin at `http://localhost:5173/#admin`. `vite.config.js` proxies `/api` → `:3001`, so the
 two are same-origin locally and CORS never applies in development.
 
 > **`src/data/products.js` is no longer the live source.** It is kept only so `npm run seed` can
