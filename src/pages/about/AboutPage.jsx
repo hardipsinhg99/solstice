@@ -1,3 +1,5 @@
+import { usePage } from '../../features/pages/index.js'
+import { ABOUT_FALLBACK } from './aboutFallback.js'
 import { HeroQuote } from './sections/HeroQuote.jsx'
 import { StoryTimeline } from './sections/StoryTimeline.jsx'
 import { Founders } from './sections/Founders.jsx'
@@ -15,16 +17,22 @@ import { MissionVision } from './sections/MissionVision.jsx'
 //
 // HeroQuote replaces the shared PageTitle here and carries the "02" ghost
 // numeral itself, so the signature survives without two competing page headers.
+//
+// Phase 1e: the content moved from src/data/about-content.js into editable page
+// sections. One fetch at the page, passed down as props - each section stays a
+// pure renderer with no data import of its own, which is what makes them
+// testable and what will make them portable to Astro.
 export default function AboutPage() {
+  const { section } = usePage('about', ABOUT_FALLBACK)
   return <>
-    <HeroQuote/>
-    <StoryTimeline/>
-    <Founders/>
-    <WhatWeDo/>
-    <GlobalPresence/>
-    <JourneyStats/>
-    <WhyChooseUs/>
-    <IndustryRecognition/>
-    <MissionVision/>
+    <HeroQuote data={section('heroQuote')}/>
+    <StoryTimeline data={section('story')}/>
+    <Founders data={section('founders')}/>
+    <WhatWeDo data={section('whatWeDo')}/>
+    <GlobalPresence data={section('globalPresence')}/>
+    <JourneyStats data={section('journeyStats')}/>
+    <WhyChooseUs data={section('whyChooseUs')}/>
+    <IndustryRecognition data={section('industryRecognition')}/>
+    <MissionVision data={section('missionVision')}/>
   </>
 }

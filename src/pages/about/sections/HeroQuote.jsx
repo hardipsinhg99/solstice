@@ -1,5 +1,4 @@
 import { useTilt3d } from '../../../features/tilt/index.js'
-import { heroQuote } from '../../../data/about-content.js'
 
 // The page's opening statement, and the one-of-one moment.
 //
@@ -17,7 +16,8 @@ import { heroQuote } from '../../../data/about-content.js'
 // The ghost numeral is carried here rather than in PageTitle: this section
 // replaces the standard page header, and website-strategy.md Pillar 4 calls the
 // title-mark a signature worth keeping.
-export function HeroQuote() {
+export function HeroQuote({ data }) {
+  const heroQuote = data ?? {}
   const ref = useTilt3d({ max: 5 })
 
   return (

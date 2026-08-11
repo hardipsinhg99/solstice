@@ -1,7 +1,6 @@
 import { Eyebrow } from '../../../components/ui/Eyebrow.jsx'
 import { Reveal } from '../../../components/motion/Reveal.jsx'
 import { useInView } from '../../../components/motion/useInView.js'
-import { story } from '../../../data/about-content.js'
 
 // The story as a timeline, not stacked paragraphs.
 //
@@ -16,7 +15,8 @@ import { story } from '../../../data/about-content.js'
 //
 // Stagger is capped at three steps of 60ms per website-strategy.md Pillar 5,
 // which is tighter than the index * 90 used on older sections.
-export function StoryTimeline() {
+export function StoryTimeline({ data }) {
+  const story = data ?? {}
   const [spineRef, spineInView] = useInView()
 
   return (
@@ -28,7 +28,7 @@ export function StoryTimeline() {
         </Reveal>
 
         <ol className={spineInView ? 'about-timeline drawn' : 'about-timeline'} ref={spineRef}>
-          {story.nodes.map((node, index) => (
+          {(story.nodes ?? []).map((node, index) => (
             <Reveal as="li" key={node.id} delay={Math.min(index, 2) * 60} className="about-timeline-node">
               <span className="about-timeline-dot" aria-hidden="true"/>
               <div className="about-timeline-body">
@@ -39,7 +39,13 @@ export function StoryTimeline() {
                       story.foundingYear once the scope question is answered. */}
                   {index === 0 && story.foundingYear ? ` · ${story.foundingYear}` : ''}
                 </span>
-                <p>{node.body}</p>
+                {/* Rich text from the admin editor. The string was sanitized on
+                    the way IN, against an explicit tag allowlist in
+                    common/sanitize.ts - so what is stored is already safe and
+                    this is not trusting the client. Sanitizing only at render
+                    would leave hostile markup sitting in the database for the
+                    next consumer to forget about. */}
+                <div className="about-rich" dangerouslySetInnerHTML={{ __html: node.body ?? '' }}/>
               </div>
             </Reveal>
           ))}

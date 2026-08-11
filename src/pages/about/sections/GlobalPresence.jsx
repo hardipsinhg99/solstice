@@ -2,7 +2,6 @@ import { Eyebrow } from '../../../components/ui/Eyebrow.jsx'
 import { Reveal } from '../../../components/motion/Reveal.jsx'
 import { Globe, useGlobeTheme } from '../../../features/globe/index.js'
 import { aboutOfficeMarkers, aboutOfficeArcs } from '../../../data/globe.js'
-import { globalPresence } from '../../../data/about-content.js'
 import { useTheme } from '../../../app/ThemeProvider.jsx'
 
 // Wraps the existing WebGL globe with the About page's office data. It does not
@@ -23,7 +22,8 @@ import { useTheme } from '../../../app/ThemeProvider.jsx'
 // The office list is real DOM, not canvas labels. The globe is a decorative
 // supplement - every office it plots is readable, and screen-reader accessible,
 // in the list beside it.
-export function GlobalPresence() {
+export function GlobalPresence({ data }) {
+  const globalPresence = data ?? {}
   const { theme } = useTheme()
   const globeTheme = useGlobeTheme(theme)
 
@@ -48,7 +48,7 @@ export function GlobalPresence() {
           <Reveal as="div" delay={120} className="about-presence-list">
             <h3 className="about-presence-list-title">Operational offices</h3>
             <ul>
-              {globalPresence.offices.map(office => (
+              {(globalPresence.offices ?? []).map(office => (
                 <li key={office.id}>
                   <i aria-hidden="true"/>
                   <span className="about-office-country notranslate" translate="no">{office.country}</span>

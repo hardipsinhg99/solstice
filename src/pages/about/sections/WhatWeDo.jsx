@@ -2,7 +2,6 @@ import { Eyebrow } from '../../../components/ui/Eyebrow.jsx'
 import { Icon } from '../../../components/ui/Icon.jsx'
 import { Reveal } from '../../../components/motion/Reveal.jsx'
 import { useTilt3d } from '../../../features/tilt/index.js'
-import { whatWeDo } from '../../../data/about-content.js'
 
 // Industry cards. Same tilt hook and the same .about-tilt wrapper as the
 // founder cards and the mission panels, so all three sections share one 3D
@@ -22,7 +21,8 @@ function IndustryCard({ industry, delay }) {
   )
 }
 
-export function WhatWeDo() {
+export function WhatWeDo({ data }) {
+  const whatWeDo = data ?? {}
   return (
     <section className="about-industries section">
       <div className="container">
@@ -33,7 +33,7 @@ export function WhatWeDo() {
         </Reveal>
 
         <div className="about-industry-grid">
-          {whatWeDo.industries.map((industry, index) => (
+          {(whatWeDo.industries ?? []).map((industry, index) => (
             <IndustryCard key={industry.name} industry={industry} delay={Math.min(index, 2) * 60}/>
           ))}
         </div>

@@ -1,7 +1,6 @@
 import { Eyebrow } from '../../../components/ui/Eyebrow.jsx'
 import { Icon } from '../../../components/ui/Icon.jsx'
 import { Reveal } from '../../../components/motion/Reveal.jsx'
-import { industryRecognition } from '../../../data/about-content.js'
 
 // The intro line has not been written. Three independent safeguards stop it
 // shipping unnoticed, because a dev-only outline alone disappears in a
@@ -12,7 +11,8 @@ import { industryRecognition } from '../../../data/about-content.js'
 //   3. A dashed outline and a corner tag, in development only.
 // Writing the copy is explicitly out of scope; this section presents the gap
 // rather than papering over it.
-export function IndustryRecognition() {
+export function IndustryRecognition({ data }) {
+  const industryRecognition = data ?? {}
   const devFlag = import.meta.env.DEV ? ' about-unresolved' : ''
 
   return (
@@ -28,7 +28,7 @@ export function IndustryRecognition() {
         </Reveal>
 
         <ul className="about-recognition-list">
-          {industryRecognition.points.map((point, index) => (
+          {(industryRecognition.points ?? []).map((point, index) => (
             <Reveal
               as="li"
               key={point.text}

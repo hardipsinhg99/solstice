@@ -2,41 +2,69 @@ import { Button } from '../../components/ui/Button.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
 import { PageTitle } from '../../components/layout/PageTitle.jsx'
 import { useNavigate } from '../../app/navigation.js'
-import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
+import { usePage, usePublicTeam } from '../../features/pages/index.js'
+import { TEAM_FALLBACK } from './teamFallback.js'
+
+/**
+ * The people, from the database.
+ *
+ * What this replaced: three ANONYMOUS role cards - the array was
+ * [role, copy, image] with no name field at all - each illustrated with a stock
+ * Unsplash portrait of a stranger. website-strategy.md 2.5 calls that a
+ * falsifiable trust claim on a page whose entire job is trust, and it is the
+ * longest-standing flag in the original site audit.
+ *
+ * A member with no photograph now renders an initials monogram, the same
+ * treatment the founders' cards use. It never falls back to stock.
+ */
+const initials = (name) =>
+  (name || '?').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('')
 
 export default function TeamPage() {
   const navigate = useNavigate()
-  const team = [
-    ['Trade & sourcing', 'Our team works closely on fresh-produce enquiries from product selection through initial discussions.', 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=85'],
-    ['Export coordination', 'Practical, detail-oriented support for conversations around export preparation.', 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=85'],
-    ['Buyer relationships', 'A responsive point of contact for buyers exploring products from India.', 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=85']
-  ]
+  const { section } = usePage('team', TEAM_FALLBACK)
+  const [members] = usePublicTeam()
+  const intro = section('intro')
+  const cta = section('cta')
+
   return <>
-    <PageTitle mark="05" eyebrow="THE PEOPLE BEHIND SOLSTICE" title="A small team with a" accent="global outlook." copy="Meet the people ready to start a product conversation with your business."/>
+    <PageTitle mark={intro.mark} eyebrow={intro.eyebrow} title={intro.title} accent={intro.accent} copy={intro.copy}/>
     <section className="team section">
       <div className="container team-grid">
-        {team.map(([role, copy, image], index) => (
-          <Reveal as="article" key={role} delay={index * 90}>
+        {members.map((member, index) => (
+          <Reveal as="article" key={member.id} delay={index * 90}>
             <div className="team-image">
-              <img
-                src={unsplashAt(image, 800)}
-                srcSet={unsplashSrcSet(image, [480, 800])}
-                sizes="(max-width: 780px) 100vw, 33vw"
-                alt=""
-                loading="lazy"
-                decoding="async"
-              />
+              {member.photo ? (
+                <img
+                  src={member.photo.url}
+                  {...(member.photo.width && member.photo.height
+                    ? { width: member.photo.width, height: member.photo.height } : {})}
+                  alt={member.photo.alt || `${member.name}, ${member.role}`}
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <div className="team-monogram">
+                  <span aria-hidden="true">{initials(member.name)}</span>
+                  <span className="team-photo-note">Photograph to follow</span>
+                </div>
+              )}
             </div>
-            <span>0{index + 1}</span><h3>{role}</h3><p>{copy}</p>
+            <span>0{index + 1}</span>
+            <h3>{member.name}</h3>
+            {member.role && member.role !== member.name && <p className="team-role">{member.role}</p>}
+            {/* Sanitized server-side on write, against the allowlist in
+                common/sanitize.ts - not trusted at render. */}
+            {member.bio && <div className="about-rich" dangerouslySetInnerHTML={{ __html: member.bio }}/>}
           </Reveal>
         ))}
       </div>
     </section>
     <section className="team-join">
       <Reveal as="div" className="container">
-        <h2>People who care about<br/><em>what arrives.</em></h2>
-        <p>Have a produce enquiry? Start by telling us what you are looking for.</p>
-        <Button onClick={() => navigate('contact')} variant="lime">Contact our team</Button>
+        <h2>{cta.headingLine1}<br/><em>{cta.headingAccent}</em></h2>
+        <p>{cta.body}</p>
+        <Button onClick={() => navigate(cta.ctaRoute)} variant="lime">{cta.ctaLabel}</Button>
       </Reveal>
     </section>
   </>

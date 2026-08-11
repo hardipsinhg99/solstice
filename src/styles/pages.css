@@ -654,3 +654,25 @@
    is missing. Same hatched language so the two read as related states. */
 .product-list-image-empty{width:100%;height:100%;display:grid;place-items:center;align-content:center;gap:8px;color:var(--muted);background:repeating-linear-gradient(135deg,var(--soft),var(--soft) 10px,var(--bg) 10px,var(--bg) 20px)}
 .product-list-image-empty span{font:500 10px 'DM Mono';letter-spacing:.9px;text-transform:uppercase}
+
+/* ── Rich text from the admin editor ────────────────────────────────────────
+   Scoped, not global: this styles content an editor wrote, which is a different
+   problem from styling markup a developer wrote. The tag set matches the
+   allowlist in server/src/common/sanitize.ts exactly - anything outside it never
+   reaches the page. */
+.about-rich>*+*{margin-top:.85em}
+.about-rich p{margin:0}
+.about-rich strong{color:var(--ink)}
+.about-rich em{font-style:italic}
+.about-rich ul,.about-rich ol{margin:0;padding-left:1.25em;display:grid;gap:.35em}
+.about-rich blockquote{margin:0;padding-left:14px;border-left:2px solid var(--green-600);color:var(--ink)}
+.about-rich h2,.about-rich h3,.about-rich h4{margin:0;color:var(--ink);font-size:clamp(17px,2vw,20px)}
+.about-rich a{color:var(--green-600);text-decoration:underline;text-underline-offset:3px}
+.about-rich img{max-width:100%;height:auto;border-radius:10px;display:block}
+
+/* Team member without a photograph. Deliberately not a stock portrait - see
+   TeamPage.jsx and website-strategy.md 2.5. */
+.team-monogram{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:8px;background:var(--soft);border:1px dashed var(--line-strong)}
+.team-monogram>span:first-child{font-size:44px;font-weight:700;letter-spacing:2px;color:var(--muted);line-height:1}
+.team-photo-note{font:9px 'DM Mono';letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
+.team-role{font:9px 'DM Mono';letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:0 0 6px}

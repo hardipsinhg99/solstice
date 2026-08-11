@@ -1,6 +1,5 @@
 import { Reveal } from '../../../components/motion/Reveal.jsx'
 import { useTilt3d } from '../../../features/tilt/index.js'
-import { missionVision } from '../../../data/about-content.js'
 
 // Same .about-tilt wrapper and the same hook as the founder and industry cards,
 // so the page closes in the visual language it opened with rather than
@@ -12,14 +11,15 @@ function Panel({ panel, delay }) {
       <div className="about-tilt" ref={ref}>
         <div className="about-tilt-inner">
           <h2>{panel.heading}</h2>
-          <p>{panel.body}</p>
+          <div className="about-rich" dangerouslySetInnerHTML={{ __html: panel.body ?? '' }}/>
         </div>
       </div>
     </Reveal>
   )
 }
 
-export function MissionVision() {
+export function MissionVision({ data }) {
+  const missionVision = data?.items ?? []
   return (
     <section className="about-mv section">
       <div className="container about-mv-grid">

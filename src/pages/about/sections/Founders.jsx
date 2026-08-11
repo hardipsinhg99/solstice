@@ -1,7 +1,6 @@
 import { Eyebrow } from '../../../components/ui/Eyebrow.jsx'
 import { Reveal } from '../../../components/motion/Reveal.jsx'
 import { useTilt3d } from '../../../features/tilt/index.js'
-import { founders } from '../../../data/about-content.js'
 import { FounderPhoto } from './FounderPhoto.jsx'
 
 // One card per founder, with the shared pointer tilt. The card is a plain
@@ -25,7 +24,9 @@ function FounderCard({ person, delay }) {
   )
 }
 
-export function Founders() {
+export function Founders({ data }) {
+  const founders = data ?? {}
+  const people = founders.people ?? []
   return (
     <section className="about-founders section">
       <div className="container">
@@ -35,8 +36,12 @@ export function Founders() {
           <p className="about-lede">{founders.intro}</p>
         </Reveal>
 
+        {/* Positional by design - the principle sits BETWEEN the two cards as
+            the pivot of the section. Guarded because the admin can now remove a
+            founder, and people[1] on a one-person list would otherwise crash
+            the page rather than render one card. */}
         <div className="about-founder-grid">
-          <FounderCard person={founders.people[0]} delay={0}/>
+          {people[0] && <FounderCard person={people[0]} delay={0}/>}
 
           {/* The principle sits between the two cards, as the pivot of the
               section rather than a caption under it. */}
@@ -44,7 +49,7 @@ export function Founders() {
             <blockquote>{founders.principle}</blockquote>
           </Reveal>
 
-          <FounderCard person={founders.people[1]} delay={120}/>
+          {people[1] && <FounderCard person={people[1]} delay={120}/>}
         </div>
 
         <Reveal as="p" delay={60} className="about-founder-mission">{founders.mission}</Reveal>

@@ -20,10 +20,14 @@ const initials = (name) =>
     .join('')
 
 export function FounderPhoto({ name, photo }) {
-  if (photo) {
+  // Phase 1e: `photo` became a media object rather than a bare URL, because it
+  // now carries its own alt text from the upload. A string is still accepted so
+  // an older payload cannot blank the card.
+  const url = typeof photo === 'string' ? photo : photo?.url
+  if (url) {
     return (
       <div className="about-founder-photo">
-        <img src={photo} alt={name} width="640" height="800" decoding="async"/>
+        <img src={url} alt={photo?.alt || name} width="640" height="800" decoding="async"/>
       </div>
     )
   }

@@ -1,7 +1,6 @@
 import { Eyebrow } from '../../../components/ui/Eyebrow.jsx'
 import { Reveal } from '../../../components/motion/Reveal.jsx'
 import { useCountUp } from '../../../features/counters/index.js'
-import { journeyStats } from '../../../data/about-content.js'
 
 // Two tile types, chosen by the parent rather than branched inside one
 // component: a static tile mounts no observer at all, so the year and the
@@ -38,7 +37,8 @@ function StaticTile({ stat, delay }) {
   )
 }
 
-export function JourneyStats() {
+export function JourneyStats({ data }) {
+  const journeyStats = data ?? {}
   return (
     <section className="about-stats section">
       <div className="container">
@@ -48,7 +48,7 @@ export function JourneyStats() {
         </Reveal>
 
         <div className={`about-stat-grid${import.meta.env.DEV ? ' about-dev-flags' : ''}`}>
-          {journeyStats.stats.map((stat, index) => {
+          {(journeyStats.stats ?? []).map((stat, index) => {
             const delay = Math.min(index, 2) * 60
             return typeof stat.value === 'number'
               ? <CounterTile key={stat.label} stat={stat} delay={delay}/>
