@@ -1,0 +1,16 @@
+# Staging clone of solsticellp.com. Nothing here may be indexed.
+#
+# This file deliberately does NOT live in public/. Anything in public/ is copied
+# into every Vite build, including the production Vercel one - a Disallow-all
+# robots.txt shipped there would deindex the real site. It is copied over
+# dist/robots.txt by deploy/web.Dockerfile instead, so only the container that
+# serves test.solsticellp.com carries it.
+#
+# A crawlable duplicate of the site would compete with the real domain for the
+# exact queries this project exists to win. The Traefik X-Robots-Tag middleware
+# is the second layer, because robots.txt is a crawl directive and not an
+# indexing one - a URL discovered via a link elsewhere can still be indexed
+# without ever being fetched.
+
+User-agent: *
+Disallow: /

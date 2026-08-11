@@ -1,0 +1,212 @@
+# Solstice STAGING stack for the Hostinger VPS (69.62.85.208).
+#
+#   test.solsticellp.com      -> web (static SPA)
+#   test-api.solsticellp.com  -> api (NestJS)
+#   test.solsticellp.com/api  -> api  <- this is the one the SPA actually uses
+#
+# Routing is by Docker label only. Traefik v3.6 already runs on this box as
+# `coolify-proxy` and owns 80/443; this stack joins its network and publishes no
+# host ports whatsoever. Nothing here touches Traefik's own configuration, the
+# a2ztrading containers, or production DNS.
+#
+# Compose v2 required: the memory ceilings use `deploy.resources.limits`, which
+# v2 applies to plain `docker compose up` (it is not swarm-only).
+
+name: solstice-staging
+
+services:
+  # --------------------------------------------------------------- db ------
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      # Without this, a restore into a differently-collated image can fail.
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # internal only, and NO `ports:` key. Postgres must not be reachable from
+    # the internet, and it does not need to be from the coolify network either.
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  # -------------------------------------------------------------- api ------
+  api:
+    build:
+      # Repository root, NOT ./server - prisma/seed.ts reads
+      # src/data/products.js from the frontend tree. See server/Dockerfile.
+      context: .
+      dockerfile: server/Dockerfile
+      target: runtime
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: "3001"
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-12h}
+      # Both the storage driver and main.ts's useStaticAssets read this. It is
+      # the mount point of the uploads volume below - changing one without the
+      # other silently detaches every image from its file.
+      UPLOAD_DIR: /app/uploads
+      UPLOAD_PUBLIC_PREFIX: /api/uploads
+      # main.ts refuses "*" by design. Both hostnames are listed because the API
+      # is reachable on each, and a browser sends the page's origin.
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      NOTIFY_EMAIL: ${NOTIFY_EMAIL:-}
+    volumes:
+      # NAMED volume, not a bind mount. This is the durability gap the storage
+      # layer's own comment flags: a bind mount to a host path, or no volume at
+      # all, loses every uploaded product image on the next rebuild.
+      - uploads:/app/uploads
+    networks:
+      - internal
+      - coolify
+    labels:
+      - traefik.enable=true
+      # Required whenever a container is on more than one network - without it
+      # Traefik may pick the internal one and every request times out.
+      - traefik.docker.network=coolify
+
+      # --- middlewares, namespaced to THIS service ---------------------------
+      # Deliberately not shared with `web`. A middleware defined on one
+      # container and referenced from another disappears the moment that
+      # container stops, taking the other service's router down with it. Each
+      # service therefore declares its own copy under its own name.
+      - traefik.http.middlewares.solstice-api-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.solstice-api-https.redirectscheme.permanent=true
+      - "traefik.http.middlewares.solstice-api-noindex.headers.customresponseheaders.X-Robots-Tag=noindex, nofollow, noarchive"
+
+      # --- the API on its own subdomain -------------------------------------
+      - traefik.http.routers.solstice-api.rule=Host(`test-api.solsticellp.com`)
+      - traefik.http.routers.solstice-api.entrypoints=https
+      - traefik.http.routers.solstice-api.tls=true
+      - traefik.http.routers.solstice-api.tls.certresolver=letsencrypt
+      - traefik.http.routers.solstice-api.service=solstice-api
+      - traefik.http.routers.solstice-api.middlewares=solstice-api-noindex@docker
+      - traefik.http.routers.solstice-api-http.rule=Host(`test-api.solsticellp.com`)
+      - traefik.http.routers.solstice-api-http.entrypoints=http
+      - traefik.http.routers.solstice-api-http.middlewares=solstice-api-https@docker
+      - traefik.http.routers.solstice-api-http.service=solstice-api
+
+      # --- SAME-ORIGIN /api on the web host ---------------------------------
+      # This router is what makes the site work. Every fetch in the frontend is
+      # a relative '/api/...' path, so the browser sends it to
+      # test.solsticellp.com. Without this rule nginx would answer with
+      # index.html and the catalogue would fail to parse.
+      # Explicit priority so it can never lose to the web router; Traefik's
+      # default rule-length ordering already favours it, but not by contract.
+      - traefik.http.routers.solstice-web-api.rule=Host(`test.solsticellp.com`) && PathPrefix(`/api`)
+      - traefik.http.routers.solstice-web-api.entrypoints=https
+      - traefik.http.routers.solstice-web-api.priority=100
+      - traefik.http.routers.solstice-web-api.tls=true
+      - traefik.http.routers.solstice-web-api.tls.certresolver=letsencrypt
+      - traefik.http.routers.solstice-web-api.service=solstice-api
+      - traefik.http.routers.solstice-web-api.middlewares=solstice-api-noindex@docker
+
+      - traefik.http.services.solstice-api.loadbalancer.server.port=3001
+    deploy:
+      resources:
+        limits:
+          # sharp decodes full-resolution images in memory on upload; 512m is
+          # comfortable, 1g leaves headroom without threatening the box.
+          memory: 1g
+
+  # -------------------------------------------------------------- web ------
+  web:
+    build:
+      context: .
+      dockerfile: deploy/web.Dockerfile
+      target: runtime
+    restart: unless-stopped
+    networks:
+      - coolify
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=coolify
+
+      # This service's own copies, for the reason given on `api` above.
+      - traefik.http.middlewares.solstice-web-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.solstice-web-https.redirectscheme.permanent=true
+      # Second layer behind robots.txt: robots.txt asks crawlers not to FETCH,
+      # this header tells them not to INDEX. A URL discovered through a link
+      # elsewhere can be indexed without ever being fetched, so robots.txt alone
+      # would not keep the staging clone out of search results.
+      - "traefik.http.middlewares.solstice-web-noindex.headers.customresponseheaders.X-Robots-Tag=noindex, nofollow, noarchive"
+
+      - traefik.http.routers.solstice-web.rule=Host(`test.solsticellp.com`)
+      - traefik.http.routers.solstice-web.entrypoints=https
+      - traefik.http.routers.solstice-web.priority=1
+      - traefik.http.routers.solstice-web.tls=true
+      - traefik.http.routers.solstice-web.tls.certresolver=letsencrypt
+      - traefik.http.routers.solstice-web.service=solstice-web
+      - traefik.http.routers.solstice-web.middlewares=solstice-web-noindex@docker
+      - traefik.http.routers.solstice-web-http.rule=Host(`test.solsticellp.com`)
+      - traefik.http.routers.solstice-web-http.entrypoints=http
+      - traefik.http.routers.solstice-web-http.middlewares=solstice-web-https@docker
+      - traefik.http.routers.solstice-web-http.service=solstice-web
+      - traefik.http.services.solstice-web.loadbalancer.server.port=8080
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+  # ------------------------------------------------------------- seed ------
+  # Behind a profile, so `docker compose up -d` NEVER starts it. It is a
+  # one-time bootstrap run by hand:
+  #     docker compose --profile seed run --rm seed
+  # It carries the devDependencies (ts-node) and src/data/products.js, neither
+  # of which belongs in the API's runtime image. Both seeds are idempotent -
+  # see DEPLOY.md, finding 3 - so a repeat run is safe, but it is still not
+  # wired into container start.
+  seed:
+    profiles: ["seed"]
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+      target: seeder
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
+      # seed.ts throws unless BOTH of these are set. They create the first admin
+      # login and nothing else reads them - see DEPLOY.md.
+      ADMIN_SEED_EMAIL: ${ADMIN_SEED_EMAIL}
+      ADMIN_SEED_PASSWORD: ${ADMIN_SEED_PASSWORD}
+    networks:
+      - internal
+    restart: "no"
+
+volumes:
+  pgdata:
+  uploads:
+
+networks:
+  internal:
+    driver: bridge
+  coolify:
+    # Joining Traefik's existing network. `external` means compose will fail
+    # loudly if it is absent rather than creating a second, unrouted network.
+    external: true

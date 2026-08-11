@@ -1,0 +1,36 @@
+# The build context for BOTH images is this directory - the api image needs
+# src/data/products.js for its seeder stage, and the web image needs the whole
+# frontend. See the header of server/Dockerfile.
+#
+# Everything below is either rebuilt inside the image, secret, or irrelevant.
+# Keeping it out is not only about size: `.env` and `server/.env` must never
+# enter a layer, because anything copied in is readable from the image forever.
+.git
+.gitignore
+node_modules
+server/node_modules
+dist
+server/dist
+
+# Secrets. Belt and braces alongside .gitignore.
+.env
+.env.*
+!.env.example
+server/.env
+server/.env.*
+
+# Uploaded media lives in a named volume, never in the image.
+server/uploads
+
+# Local tooling and notes that have no business in a production layer.
+.claude
+.vscode
+.idea
+*.log
+npm-debug.log*
+coverage
+.DS_Store
+docs
+README.md
+DEPLOY.md
+VERIFY.md

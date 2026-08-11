@@ -1,0 +1,10 @@
+# Kept for anyone who builds with server/ as the context directly. The compose
+# file builds from the repository ROOT (see the header of server/Dockerfile),
+# so the file that actually governs those builds is /.dockerignore.
+node_modules
+dist
+.env
+.env.*
+uploads
+.git
+npm-debug.log*
