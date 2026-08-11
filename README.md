@@ -82,7 +82,7 @@ The API has its **own, separate** environment file at `server/.env` (`DATABASE_U
 
 ## Admin CMS
 
-Phases 1a–1d shipped a database-backed admin panel. **Full manual: [`docs/admin.md`](docs/admin.md).**
+Phases 1a–1e shipped a database-backed admin panel. **Full manual: [`docs/admin.md`](docs/admin.md).**
 Design rationale: [`docs/admin-cms-blueprint.md`](docs/admin-cms-blueprint.md).
 
 | | |

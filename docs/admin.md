@@ -18,6 +18,7 @@ Operational and architectural reference for the Solstice admin panel and its API
 - [Data flow](#data-flow)
 - [Database schema](#database-schema)
 - [API surface](#api-surface)
+- [Pages and typed sections](#pages-and-typed-sections)
 - [The admin shell](#the-admin-shell)
 - [Dashboard](#dashboard)
 - [Gallery](#gallery)
@@ -35,7 +36,7 @@ Operational and architectural reference for the Solstice admin panel and its API
 
 ## The one-paragraph version
 
-A NestJS + Prisma + PostgreSQL API lives in `server/`. It owns the product catalogue (which used to be a hardcoded array in `src/data/products.js`), the site's contact settings and the enquiries the public form receives. The admin UI is **not a separate application** - it is a set of routes inside the existing Vite SPA (`#admin/*`), guarded by a JWT check, rendering *instead of* the marketing shell. The public Products, Home and Product Detail pages now fetch from the API instead of importing the static file. One admin account, no roles.
+A NestJS + Prisma + PostgreSQL API lives in `server/`. It owns the product catalogue (which used to be a hardcoded array in `src/data/products.js`), the Home/About/Team page content, the team members, the gallery, the site's contact settings and the enquiries the public form receives. The admin UI is **not a separate application** - it is a set of routes inside the existing Vite SPA (`#admin/*`), guarded by a JWT check, rendering *instead of* the marketing shell. The public Products, Home and Product Detail pages now fetch from the API instead of importing the static file. One admin account, no roles.
 
 ---
 
@@ -148,14 +149,22 @@ src/                             (frontend - admin routes inside the existing SP
 │   └── useSiteSettings.js       public read, constants as fallback, wa.me helpers
 ├── features/gallery/
 │   └── useGallery.js            admin CRUD + the public read, through useApiResource
+├── features/pages/
+│   ├── sectionTypes.js          THE section contract - server seed, editor and page read it
+│   ├── usePagesApi.js           admin draft/publish + the public usePage(slug) read
+│   └── useTeamApi.js            team CRUD + the public usePublicTeam()
 ├── components/admin/
 │   ├── AdminSidebar.jsx         grouped, collapsible, localStorage-persisted
 │   ├── AdminTopBar.jsx          title, notification bell, account menu
+│   ├── RichTextEditor.jsx       TipTap - the one planned frontend dependency
+│   ├── SectionFields.jsx        the six field kinds the section config drives
 │   └── DangerConfirm.jsx        the ONE destructive-confirmation component
 ├── pages/admin/
 │   ├── AdminApp.jsx             shell + route guard
 │   ├── AdminDashboardPage.jsx   stat cards, warning panel, activity list
 │   ├── AdminGalleryPage.jsx     upload, caption, reorder, hide, delete
+│   ├── AdminPageEditor.jsx      ONE editor for every page, driven by sectionTypes.js
+│   └── sections/TeamMembersManager.jsx
 │   ├── AdminLoginPage.jsx
 │   ├── AdminProductsPage.jsx    list, search, delete confirmation
 │   ├── AdminProductEditPage.jsx create/edit, repeaters, certification friction
@@ -255,6 +264,15 @@ Global prefix `/api`. Public routes are unguarded; every mutating route requires
 | `DELETE` | `/api/gallery/:id` | JWT | Removes the row **and the bytes** |
 | `GET` | `/api/dashboard` | JWT | Stats + notifications + activity, one request |
 | `GET` | `/api/dashboard/notifications` | JWT | The bell alone |
+| `GET` | `/api/pages/:slug` | — | **PUBLISHED pages, `publishedData` only.** `max-age=0, must-revalidate` |
+| `GET` | `/api/pages/admin/:slug` | JWT | Draft + published, with `hasUnpublishedChanges` per section |
+| `PATCH` | `/api/pages/admin/:slug/section/:key` | JWT | Saves the **draft**. Never touches published |
+| `POST` | `/api/pages/admin/:slug/publish` | JWT | Copies every draft onto published, in one transaction |
+| `POST` | `/api/pages/admin/:slug/unpublish` | JWT | Off the public site. Drafts kept |
+| `POST` | `/api/pages/admin/:slug/discard` | JWT | Draft back to what is live |
+| `GET` | `/api/team` | — | Published members only |
+| `POST` `PATCH` `DELETE` | `/api/team[/:id]` | JWT | Full CRUD, plus `/order` and `/:id/photo` |
+| `POST` | `/api/media/assets` | JWT | An unattached asset — section image fields and TipTap image insert |
 
 ### Validation is not a mirror of the client
 
@@ -269,6 +287,92 @@ Global prefix `/api`. Public routes are unguarded; every mutating route requires
 | `verifiable: true` with no `reference` | Stored as `verifiable: false` |
 
 The global `ValidationPipe` runs `whitelist: true, forbidNonWhitelisted: true`, so `status` in particular **cannot** be set through create/update - only through the dedicated `PATCH /status` route.
+
+---
+
+## Pages and typed sections
+
+`#admin/page-home`, `#admin/page-about`, `#admin/page-team`. **One editor component**,
+`AdminPageEditor`, parametrized by slug and by the section config in
+`src/features/pages/sectionTypes.js`. Three near-identical editor files would have repeated
+the mistake `useApiResource` already fixed once in this project.
+
+### Fixed typed sections, not freeform blocks
+
+A section's `type` selects a known field set that a real React component already consumes.
+An editor picks values inside a section the site has a component for; they cannot invent a
+section, or drag a hero into the middle of the footer. That was the blueprint's whole
+argument against drag-and-drop page building, and `sectionTypes.js` is where it is enforced.
+
+`data` is `Json` rather than columns because the shape genuinely differs per type — a
+repeater of four cards and a two-CTA hero have nothing in common. **The type is the
+contract; the JSON is only its storage.**
+
+### Draft and published are separate payloads
+
+This is the one place the Page model deliberately does **not** copy Product. Product has a
+single status flag, and an edit to a published product goes live instantly. That cannot
+express *"save this wording but do not ship it yet"*, which is exactly what an editor needs.
+
+- `PageSection.draftData` — what the admin edits
+- `PageSection.publishedData` — what `/api/pages/:slug` returns, and nothing else
+- **Publish** copies draft onto published for every section, in one transaction
+
+An unpublished edit is not hidden by the UI; it is not in the public response. Verified by
+saving a section, reading the public endpoint (unchanged), publishing, and reading again.
+
+`hasUnpublishedChanges` is **computed** by comparing the two payloads, never stored — a
+stored flag is one more thing that can drift out of step with what it describes.
+
+**Publishing is blocked while a section has unsaved edits on screen**, because publishing
+then would silently ship the previous wording.
+
+### The cache header is `must-revalidate`, not `max-age=60`
+
+A minute of staleness is harmless on a catalogue. This is the endpoint an editor refreshes
+*the instant* they press Publish, and serving them their own pre-publish copy reads as
+"publishing is broken". Express still emits an ETag, so an unchanged page costs one 304.
+This shipped as a real bug during Phase 1e and was caught by the acceptance test.
+
+### Team members
+
+Records, not section JSON, because they need individual CRUD, ordering and a photograph
+through the media pipeline — the same three things `GalleryImage` needs. They publish
+immediately: someone who has left should come off the site when they are removed, not when
+somebody remembers to publish the page.
+
+**`name` did not exist before Phase 1e.** The live page rendered three *anonymous* role
+cards — the array was `[role, copy, image]` — each illustrated with a stock Unsplash
+portrait of a stranger. `docs/website-strategy.md` §2.5 calls that a falsifiable trust
+claim, and it was the longest-standing flag in the original audit. The stock photographs
+were **not** migrated; a member without a photograph renders an initials monogram, the same
+treatment the founders' cards use.
+
+### Rich text
+
+TipTap arrived here, exactly as the blueprint deferred it to. `sanitizeRichText()` in
+`common/sanitize.ts` is an **allowlist**, never a blocklist: the set of things that can
+execute script in HTML is open-ended, so the only defensible position is to name what is
+permitted and drop everything else. `ALLOWED_URI_REGEXP` is what stops `javascript:` and
+`data:` in an `href` or `src`.
+
+The editor cannot produce hostile markup either, but **the editor is a convenience and the
+endpoint is the control** — an attacker POSTs to the endpoint and never opens the editor.
+Verified by POSTing `<script>`, `onerror=`, `javascript:`, `<iframe>`, `<svg onload>`,
+`onclick=` and `<style>` directly, and reading back what was stored.
+
+Which keys are rich text is named explicitly in `PagesService` (`body`, `bio`). A default of
+"treat everything as rich text" would let markup into a plain field the day somebody adds
+one, so the safe direction is the default.
+
+### Adding a page later
+
+1. A row in `PAGE_CONFIG` in `sectionTypes.js` with its section types and fields.
+2. A seed row in `prisma/seed-pages.ts` carrying the copy that is live today.
+3. One sidebar entry in `AdminSidebar.jsx`.
+4. The public component calls `usePage(slug, FALLBACK)`.
+
+No new admin file, no schema change.
 
 ---
 
@@ -594,7 +698,8 @@ The seed imports the 8 live products as `PUBLISHED`, everything else defaults to
 
 | Not built | Why |
 |---|---|
-| **Pages / PageSection CRUD** | Still blocked on the open IA question: `docs/website-strategy.md` says cut Team and Gallery, but both are **live** in the shipped app, and Privacy/Terms are specified but don't exist. Phase 1d resolved this for **Gallery only** — it mapped onto the already-solved media-collection pattern rather than needing typed sections. Home, About, Services and Team still do |
+| **Services, Privacy, Terms** | The last of the original IA blocker. Home, About, Team and Gallery are now settled and editable. Services exists and is hardcoded; Privacy and Terms are specified and do not exist. Adding Services is a config entry plus a seed row — no schema change |
+| **Live / split-view preview** | Still deferred, for the reason the blueprint gave: a naively re-rendering preview iframe would fight the scroll-driven GSAP canvases on Home and Products |
 | **"Enquiry Quotes"** | Appeared in the reference mockup's sidebar. It implies a quoting subsystem — line items, pricing logic, PDF generation — that is not specified anywhere and that nothing in the schema supports. Not built, and not stubbed |
 | **Charts / analytics** | The dashboard is counts and a list. No chart library, no export or shipment tracking — there is no shipment data to track |
 | **Split-view live preview** | Phase 2. Non-trivial here because the Products page runs a scroll-driven GSAP explode sequence that a naively re-rendering preview iframe would fight |

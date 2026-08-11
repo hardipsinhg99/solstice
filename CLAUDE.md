@@ -38,6 +38,7 @@ src/
 │                 admin/ (AdminSidebar, AdminTopBar, DangerConfirm)
 │                 motion/ (Reveal, useInView)
 ├── features/     products/ · enquiry/ · globe/ · chat/ · admin/ · settings/ · api/
+│                 pages/ (sectionTypes.js is the section contract) · gallery/
 │                 (one index.js barrel each; api/useApiResource.js is the shared GET cache)
 ├── pages/        <page>/<Page>Page.jsx + optional sections/
 │                 admin/ - AdminApp (guard) + login, product list/edit, enquiries, settings
@@ -50,7 +51,8 @@ src/
 server/          separate app, TypeScript, never ships to a buyer's browser
 ├── prisma/      schema.prisma · migrations/ · seed.ts
 └── src/         auth/ · products/ · media/ · storage/ · settings/ · enquiries/
-                 gallery/ · dashboard/ · prisma/ · common/sanitize.ts · main.ts
+                 gallery/ · dashboard/ · pages/ · team/ · prisma/
+                 common/sanitize.ts · main.ts
 ```
 
 **The admin renders *instead of* the marketing shell**, not inside it - `App.jsx` returns
