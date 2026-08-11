@@ -55,8 +55,14 @@ WORKDIR /app
 
 # tini reaps zombies and forwards SIGTERM, so `docker compose down` stops the
 # API cleanly instead of waiting out the 10s kill timeout.
+#
+# openssl is NOT optional despite bookworm-slim appearing to work without it.
+# Prisma probes for a libssl version to pick its query engine, and on a slim
+# image the probe fails and it silently defaults to openssl-1.1.x - the wrong
+# engine for bookworm, which ships 3.x. Observed on the first real deploy as:
+#   prisma:warn Prisma failed to detect the libssl/openssl version to use
 RUN apt-get update \
- && apt-get install -y --no-install-recommends tini \
+ && apt-get install -y --no-install-recommends tini openssl ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
 COPY server/package.json server/package-lock.json ./
@@ -79,7 +85,13 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # and it is the path the named volume mounts over.
 ENV PORT=3001
 ENV UPLOAD_DIR=/app/uploads
-RUN mkdir -p /app/uploads && chown -R node:node /app/uploads
+# chown the WHOLE app tree, not just uploads. Everything above ran as root, so
+# node_modules is root-owned, and `prisma migrate deploy` writes into
+# node_modules/@prisma/engines when it resolves an engine at startup. Observed
+# on the first real deploy as a restart loop:
+#   Error: Can't write to /app/node_modules/@prisma/engines
+# chowning only uploads left the entrypoint unable to run its first command.
+RUN mkdir -p /app/uploads && chown -R node:node /app
 
 USER node
 EXPOSE 3001
