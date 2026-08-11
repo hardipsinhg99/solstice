@@ -263,7 +263,7 @@ points. Both must be `/app/uploads`:
 
 ```bash
 docker compose exec api sh -c 'echo $UPLOAD_DIR; ls -R /app/uploads | head'
-docker volume inspect solstice-staging_uploads
+docker volume inspect solstice_uploads
 ```
 
 A 404 here means every image an admin uploads is lost on the next deploy. Do not
@@ -362,7 +362,7 @@ under ~1GB idle, against ~6GB free. At least 3GB still available.
 **If `api` sits near its 1g ceiling:** it will be OOM-killed mid-upload.
 
 ```bash
-docker inspect solstice-staging-api-1 --format '{{.State.OOMKilled}}'   # expect false
+docker inspect solstice-api-1 --format '{{.State.OOMKilled}}'   # expect false
 ```
 
 Raise the limit in `docker-compose.yml` only after confirming the box has room —

@@ -179,7 +179,7 @@ docker logs coolify-proxy --tail 200 | grep -i acme
 | `DNS problem: NXDOMAIN` | Record not propagated to Let's Encrypt's resolvers | `dig +short test.solsticellp.com @1.1.1.1` — must return `69.62.85.208`. Wait, then `docker compose restart web api`. |
 | `Timeout during connect` / `connection refused` | The HTTP-01 challenge cannot reach port 80 | `sudo ufw status` — 80 and 443 must be open. Confirm nothing else grabbed 80: `sudo ss -tlnp | grep ':80 '` should show only the Traefik container. |
 | `unable to generate a certificate for the domains` with no ACME error | Router never matched, so no cert was ever requested | Entrypoint or resolver name mismatch — see below. |
-| Nothing about solstice at all | Traefik is not seeing the containers | `docker inspect solstice-staging-web-1 --format '{{json .NetworkSettings.Networks}}'` must include `coolify`. |
+| Nothing about solstice at all | Traefik is not seeing the containers | `docker inspect solstice-web-1 --format '{{json .NetworkSettings.Networks}}'` must include `coolify`. |
 
 **Name mismatch.** If Traefik's entrypoints are called something other than
 `http`/`https` (some installs use `web`/`websecure`), every router silently fails
@@ -242,7 +242,7 @@ docker compose -f /opt/solstice/docker-compose.yml exec -T db \
 
 # Uploaded media — the volume as a tarball
 docker run --rm \
-  -v solstice-staging_uploads:/data:ro \
+  -v solstice_uploads:/data:ro \
   -v /opt/solstice-backups:/backup \
   alpine tar czf "/backup/uploads-$(date +%F-%H%M).tar.gz" -C /data .
 ```
@@ -254,7 +254,7 @@ gunzip -c db-2026-08-11-2100.sql.gz \
   | docker compose exec -T db psql -U solstice -d solstice
 
 docker run --rm \
-  -v solstice-staging_uploads:/data \
+  -v solstice_uploads:/data \
   -v /opt/solstice-backups:/backup \
   alpine sh -c "rm -rf /data/* && tar xzf /backup/uploads-2026-08-11-2100.tar.gz -C /data"
 ```
@@ -333,7 +333,7 @@ cd /opt/solstice
 docker compose down                 # stops and removes THIS stack's containers
 ```
 
-`docker compose down` is scoped to the `solstice-staging` project. It will not
+`docker compose down` is scoped to the `solstice` project. It will not
 touch `coolify-proxy`, the a2ztrading containers, or the `coolify` network —
 that network is declared `external: true`, so compose removes the stack from it
 rather than removing it.

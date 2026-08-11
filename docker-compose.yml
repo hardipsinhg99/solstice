@@ -12,7 +12,7 @@
 # Compose v2 required: the memory ceilings use `deploy.resources.limits`, which
 # v2 applies to plain `docker compose up` (it is not swarm-only).
 
-name: solstice-staging
+name: solstice
 
 services:
   # --------------------------------------------------------------- db ------

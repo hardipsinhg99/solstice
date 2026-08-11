@@ -180,7 +180,7 @@ An untested backup is not a backup.
 cd /opt/solstice
 docker compose exec -T db pg_dump -U solstice -d solstice --clean --if-exists \
   | gzip > ~/preflight-db.sql.gz
-docker run --rm -v solstice-staging_uploads:/d:ro -v ~:/b alpine \
+docker run --rm -v solstice_uploads:/d:ro -v ~:/b alpine \
   tar czf /b/preflight-uploads.tar.gz -C /d .
 
 # Prove the dump restores — into a scratch database, never the live one
@@ -211,7 +211,7 @@ how a staging secret reaches production. Write a fresh file.
 | `ADMIN_SEED_EMAIL` | test address | client's real address | — |
 | `ADMIN_SEED_PASSWORD` | test value | throwaway, rotated immediately | See below |
 | `NOTIFY_EMAIL` | your inbox | client's enquiry inbox | Real leads land here |
-| Compose project name | `solstice-staging` | `solstice-prod` | Keeps volumes and containers distinct |
+| Compose project name | `solstice` | `solstice-prod` | Keeps volumes and containers distinct |
 | `robots.txt` / `X-Robots-Tag` | **present** | **absent** | See §2.3 |
 
 ### 2.1 Why secrets are never reused
@@ -268,7 +268,7 @@ domain is the single most expensive mistake available here.
   at 01:00 is not.
 
 Requirements: distinct compose project names (`solstice-prod` vs
-`solstice-staging`, giving distinct volumes), distinct Traefik router names
+`solstice`, giving distinct volumes), distinct Traefik router names
 (`solstice-prod-*`), distinct database credentials. Tear staging down after
 **48 hours stable** (§5.6).
 
