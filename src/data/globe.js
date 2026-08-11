@@ -1,4 +1,12 @@
-// Globe plot data. Two independent sets, deliberately not merged.
+// FALLBACK globe plot data.
+//
+// As of the admin-driven globe work, this file is no longer the source. Both
+// globes plot from the page's own location list - Home's footprint legend and
+// About's office list - so changing a country in the admin moves the pin. These
+// arrays are what renders while /api/pages/<slug> is in flight, and if a payload
+// arrives whose rows carry no coordinates yet.
+//
+// Two independent sets, deliberately not merged.
 //
 // `globeMarkers` / `globeArcs` belong to the Home page's "A truly global
 // footprint" section and are left exactly as they were. The About page needs a

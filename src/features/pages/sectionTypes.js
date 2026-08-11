@@ -23,6 +23,12 @@
 
 const f = (name, label, kind = 'text', extra = {}) => ({ name, label, kind, ...extra })
 
+// Both globes plot from the page's own list now, so the coordinate fields carry
+// the same explanation on Home and About.
+const COORD_HELP =
+  'Decimal degrees, e.g. 23.0225 / 72.5714 for Ahmedabad. Leave both empty and the ' +
+  'location is still listed, just not plotted on the globe.'
+
 // ── Home ────────────────────────────────────────────────────────────────────
 const HOME = [
   {
@@ -79,7 +85,13 @@ const HOME = [
       f('eyebrow', 'Eyebrow'),
       f('headingLine1', 'Heading, first line'),
       f('headingAccent', 'Heading, italic accent'),
-      f('legend', 'Legend', 'list', { itemLabel: 'Location', fields: [f('text', 'Label')] }),
+      f('legend', 'Legend', 'list', {
+        itemLabel: 'Location',
+        fields: [f('text', 'Label'),
+                 f('lat', 'Latitude', 'number', { help: COORD_HELP }),
+                 f('lng', 'Longitude', 'number'),
+                 f('hq', 'Headquarters', 'toggle', { help: 'Arcs on the globe radiate from the headquarters.' })]
+      }),
       f('body', 'Copy under the legend', 'textarea')
     ]
   },
@@ -181,8 +193,11 @@ const ABOUT = [
       f('exportMarkets', 'Export markets'),
       f('offices', 'Offices', 'list', {
         itemLabel: 'Office',
-        fields: [f('id', 'Globe id', 'text', { help: 'Matches a marker in src/data/globe.js.' }),
-                 f('country', 'Country'), f('city', 'City'), f('note', 'Note')]
+        fields: [f('id', 'Id', 'text', { help: 'A short slug. Only used as a stable key.' }),
+                 f('country', 'Country'), f('city', 'City'), f('note', 'Note'),
+                 f('lat', 'Latitude', 'number', { help: COORD_HELP }),
+                 f('lng', 'Longitude', 'number'),
+                 f('hq', 'Headquarters', 'toggle', { help: 'Arcs on the globe radiate from the headquarters.' })]
       })
     ]
   },

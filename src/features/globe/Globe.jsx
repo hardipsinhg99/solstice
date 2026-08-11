@@ -16,6 +16,11 @@ export function Globe({
   arcWidth = 0.5,
   arcHeight = 0.25,
   speed = 0.003,
+  // Opening rotation, in radians. Defaulted rather than required so nothing
+  // that already renders a globe has to pass it. phiForMarkers() derives the
+  // value that centres a given marker set - the globe used to open on the
+  // Americas with every Solstice office on the far side.
+  phi: initialPhi = 0,
   theta = 0.2,
   diffuse = 1.5,
   mapSamples = 16000
@@ -80,7 +85,7 @@ export function Globe({
     let globe = null
     let animationId = 0
     let revealTimer = 0
-    let phi = 0
+    let phi = initialPhi
 
     // Idle auto-rotation is a continuous, unstoppable animation - precisely what
     // SC 2.3.3 covers. Drag still works under reduced motion; only the
@@ -141,7 +146,7 @@ export function Globe({
         devicePixelRatio: dpr,
         width,
         height: width,
-        phi: 0,
+        phi: initialPhi,
         theta,
         dark,
         diffuse,
@@ -196,7 +201,7 @@ export function Globe({
       if (animationId) cancelAnimationFrame(animationId)
       if (globe) globe.destroy()
     }
-  }, [markers, arcs, markerColor, baseColor, arcColor, glowColor, dark, mapBrightness, markerSize, markerElevation, arcWidth, arcHeight, speed, theta, diffuse, mapSamples])
+  }, [markers, arcs, markerColor, baseColor, arcColor, glowColor, dark, mapBrightness, markerSize, markerElevation, arcWidth, arcHeight, speed, initialPhi, theta, diffuse, mapSamples])
 
   return (
     <div className={`globe-wrap ${className}`}>

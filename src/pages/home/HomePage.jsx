@@ -1,10 +1,10 @@
-import { Fragment } from 'react'
+import { Fragment, useMemo } from 'react'
 import { Button } from '../../components/ui/Button.jsx'
 import { Eyebrow } from '../../components/ui/Eyebrow.jsx'
 import { Icon } from '../../components/ui/Icon.jsx'
 import { cardProps } from '../../components/ui/Card.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
-import { Globe, useGlobeTheme } from '../../features/globe/index.js'
+import { Globe, useGlobeTheme, globeFromLocations } from '../../features/globe/index.js'
 import { useProductCatalogue } from '../../features/products/index.js'
 import { globeMarkers, globeArcs } from '../../data/globe.js'
 import { useNavigate } from '../../app/navigation.js'
@@ -36,6 +36,12 @@ export default function HomePage({ selectProduct, theme }) {
   // moment, which is the honest state.
   const homeProducts = [products[0], products[3], products[1]].filter(Boolean)
   const globeTheme = useGlobeTheme(theme)
+  // Same rule as About: the legend beside the globe is what plots it.
+  const legend = footprint.legend
+  const plot = useMemo(
+    () => globeFromLocations(legend, (row) => row.text, { markers: globeMarkers, arcs: globeArcs }),
+    [legend]
+  )
   return <>
     <section className="home-hero">
       <HeroMedia/>
@@ -109,7 +115,7 @@ export default function HomePage({ selectProduct, theme }) {
         </Reveal>
         <div className="globe-layout">
           <Reveal as="div" delay={100} className="globe-stage">
-            <Globe markers={globeMarkers} arcs={globeArcs} {...globeTheme}/>
+            <Globe markers={plot.markers} arcs={plot.arcs} phi={plot.phi} {...globeTheme}/>
           </Reveal>
           <Reveal as="div" delay={160} className="globe-legend">
             <ul>

@@ -1,6 +1,7 @@
 import { Eyebrow } from '../../../components/ui/Eyebrow.jsx'
 import { Reveal } from '../../../components/motion/Reveal.jsx'
-import { Globe, useGlobeTheme } from '../../../features/globe/index.js'
+import { useMemo } from 'react'
+import { Globe, useGlobeTheme, globeFromLocations } from '../../../features/globe/index.js'
 import { aboutOfficeMarkers, aboutOfficeArcs } from '../../../data/globe.js'
 import { useTheme } from '../../../app/ThemeProvider.jsx'
 
@@ -27,6 +28,20 @@ export function GlobalPresence({ data }) {
   const { theme } = useTheme()
   const globeTheme = useGlobeTheme(theme)
 
+  // The globe plots the SAME list the offices are rendered from, so editing a
+  // country in the admin moves the pin. data/globe.js is the fallback for a
+  // payload whose rows carry no coordinates yet - it is no longer the source.
+  // Memoised because Globe's effect depends on these arrays by identity.
+  const offices = globalPresence.offices
+  const plot = useMemo(
+    () => globeFromLocations(
+      offices,
+      (o) => [o.country, o.city].filter(Boolean).join(', ') || o.note || '',
+      { markers: aboutOfficeMarkers, arcs: aboutOfficeArcs }
+    ),
+    [offices]
+  )
+
   return (
     <section className="about-presence section">
       <div className="container">
@@ -41,7 +56,7 @@ export function GlobalPresence({ data }) {
             {/* aria-hidden: the canvas carries no text alternative that the
                 adjacent list does not already provide in full. */}
             <div aria-hidden="true">
-              <Globe markers={aboutOfficeMarkers} arcs={aboutOfficeArcs} {...globeTheme}/>
+              <Globe markers={plot.markers} arcs={plot.arcs} phi={plot.phi} {...globeTheme}/>
             </div>
           </Reveal>
 

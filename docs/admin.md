@@ -379,6 +379,31 @@ carried their own hardcoded page list, so a new page was three touchpoints. Serv
 that. It is the kind of gap that only shows up the first time somebody actually uses the
 generalization, which is the argument for adding the fourth page rather than assuming.
 
+### The globe plots from the page's own list
+
+Both globes — Home's "A truly global footprint" and About's "Our Global Presence" — read
+their markers from the same editable list the legend beside them renders. Adding a country
+in the admin moves the pin; `src/data/globe.js` is now only the pre-fetch fallback.
+
+Each location row carries `lat`, `lng` and an `hq` toggle. Arcs radiate from whichever row
+is flagged headquarters (the first plotted row stands in if none is). **A row with no
+coordinates is still listed, just not plotted** — an editor adding an office before anyone
+has looked up its latitude should not have the location silently vanish from the text, and
+inventing a coordinate to avoid a gap would be inventing a fact.
+
+The opening rotation is derived, not fixed. The globe used to open on the Americas with
+every Solstice office on the far side, which is a poor look for a section titled "Our
+Global Presence". `phiForMarkers()` centres the mean longitude of the plotted markers,
+averaged **on the unit circle** — a plain numeric mean of 170 and −170 gives 0, the exact
+opposite side of the planet. cobe's convention is `phi = −longitude − π/2`; that was
+measured by rendering a single marker at three known longitudes and reading back its pixel
+centroid, not guessed.
+
+Light theme was also rebalanced: a white sphere with `mapBrightness: 10` on a `#f8f7f1`
+page meant both the globe body and its dot map were invisible. The base now sits just below
+the page background and the dots are darker than the base, which is the way round a
+light-mode map has to be.
+
 ### Rich text is targeted by section type and path
 
 `RICH_PATHS` in `PagesService` names the exact `type` + dotted path of every rich-text

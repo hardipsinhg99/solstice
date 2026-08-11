@@ -52,7 +52,14 @@ const HOME: Section[] = [
   } },
   { key: 'footprint', type: 'home.footprint', data: {
     eyebrow: 'WHERE WE OPERATE', headingLine1: 'A truly global', headingAccent: 'footprint.',
-    legend: [{ text: 'India - Headquarters' }, { text: 'United Arab Emirates' }, { text: 'Vietnam' }, { text: 'China' }],
+    // Coordinates moved here from src/data/globe.js, so the globe plots from the
+    // same list the legend renders. Editing a country in the admin moves the pin.
+    legend: [
+      { text: 'India - Headquarters', lat: 19.076, lng: 72.8777, hq: true },
+      { text: 'United Arab Emirates', lat: 25.2048, lng: 55.2708 },
+      { text: 'Vietnam', lat: 10.8231, lng: 106.6297 },
+      { text: 'China', lat: 31.2304, lng: 121.4737 },
+    ],
     body: 'Sourcing, quality control and logistics are coordinated from our India headquarters, with operational footprints across the UAE, Vietnam and China.',
   } },
   { key: 'productsIntro', type: 'home.productsIntro', data: {
@@ -128,12 +135,18 @@ const ABOUT: Section[] = [
     heading: 'Our Global Presence',
     intro: 'Solstice operates through offices in five countries, serving customers across 20+ countries.',
     exportMarkets: '20+ countries',
+    // [CONFIRM] Only Dubai is named as a city in docs/about-us-content.md. The
+    // other four coordinates pin each country's principal commercial city so the
+    // globe has a real point to plot, and India follows the registered office in
+    // website-strategy.md 3.4 (Ahmedabad). These are plot coordinates, not
+    // published claims - the visible list still shows only what the content file
+    // states. Correct them in the admin once the real office cities are known.
     offices: [
-      { id: 'india', country: 'India', note: 'Headquarters' },
-      { id: 'uae', country: 'United Arab Emirates', city: 'Dubai' },
-      { id: 'uk', country: 'United Kingdom' },
-      { id: 'tanzania', country: 'Tanzania' },
-      { id: 'vietnam', country: 'Vietnam' },
+      { id: 'india', country: 'India', note: 'Headquarters', lat: 23.0225, lng: 72.5714, hq: true },
+      { id: 'uae', country: 'United Arab Emirates', city: 'Dubai', lat: 25.2048, lng: 55.2708 },
+      { id: 'uk', country: 'United Kingdom', lat: 51.5072, lng: -0.1276 },
+      { id: 'tanzania', country: 'Tanzania', lat: -6.7924, lng: 39.2083 },
+      { id: 'vietnam', country: 'Vietnam', lat: 10.8231, lng: 106.6297 },
     ],
   } },
   { key: 'journeyStats', type: 'about.journeyStats', data: {
@@ -294,12 +307,62 @@ async function seedPage(slug: string, title: string, sections: Section[]) {
   console.log(`  ${slug}: ${sections.length} sections`);
 }
 
+/**
+ * Adds the globe coordinates to location rows that predate them, without
+ * touching any other field. A plain reseed would be wrong here - these rows are
+ * editable content and may already carry somebody's edits.
+ *
+ * Only fills a gap: a row that already has `lat` is left exactly as it is.
+ */
+async function backfillCoordinates() {
+  const targets: { slug: string; key: string; field: string; seeded: Record<string, unknown>[] }[] = [
+    { slug: 'home', key: 'footprint', field: 'legend', seeded: HOME.find((s) => s.key === 'footprint')!.data.legend as Record<string, unknown>[] },
+    { slug: 'about', key: 'globalPresence', field: 'offices', seeded: ABOUT.find((s) => s.key === 'globalPresence')!.data.offices as Record<string, unknown>[] },
+  ];
+
+  for (const t of targets) {
+    const page = await prisma.page.findUnique({ where: { slug: t.slug } });
+    if (!page) continue;
+    const section = await prisma.pageSection.findUnique({
+      where: { pageId_key: { pageId: page.id, key: t.key } },
+    });
+    if (!section) continue;
+
+    const merge = (payload: unknown) => {
+      if (!payload || typeof payload !== 'object') return payload;
+      const data = payload as Record<string, unknown>;
+      const rows = data[t.field];
+      if (!Array.isArray(rows)) return payload;
+      let touched = false;
+      const next = rows.map((row: Record<string, unknown>) => {
+        if (row.lat !== undefined && row.lat !== null && row.lat !== '') return row;
+        // Match on the identifier each list actually has.
+        const match = t.seeded.find((sd) => (sd.id && sd.id === row.id) || (sd.text && sd.text === row.text));
+        if (!match) return row;
+        touched = true;
+        return { ...row, lat: match.lat, lng: match.lng, ...(match.hq ? { hq: true } : {}) };
+      });
+      return touched ? { ...data, [t.field]: next } : payload;
+    };
+
+    const draftData = merge(section.draftData) as Prisma.InputJsonValue;
+    const publishedData = section.publishedData ? (merge(section.publishedData) as Prisma.InputJsonValue) : undefined;
+    await prisma.pageSection.update({
+      where: { id: section.id },
+      data: { draftData, ...(publishedData ? { publishedData } : {}) },
+    });
+    console.log(`  backfilled coordinates on ${t.slug}.${t.key}.${t.field}`);
+  }
+}
+
 async function main() {
   console.log('Seeding pages from the copy that is live today…');
   await seedPage('home', 'Home', HOME);
   await seedPage('about', 'About us', ABOUT);
   await seedPage('services', 'Services', SERVICES);
   await seedPage('team', 'Team', TEAM);
+
+  await backfillCoordinates();
 
   if ((await prisma.teamMember.count()) === 0) {
     for (const [order, m] of TEAM_MEMBERS.entries()) {
