@@ -11,6 +11,8 @@ import { SettingsModule } from './settings/settings.module';
 import { EnquiriesModule } from './enquiries/enquiries.module';
 import { GalleryModule } from './gallery/gallery.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { PagesModule } from './pages/pages.module';
+import { TeamModule } from './team/team.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
     EnquiriesModule,
     GalleryModule,
     DashboardModule,
+    PagesModule,
+    TeamModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

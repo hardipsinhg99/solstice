@@ -53,6 +53,9 @@ model Admin {
   mediaAssets    MediaAsset[]
   settingsEdits  SiteSettings[]
   galleryEdits   GalleryImage[]
+  pageEdits      Page[]
+  sectionEdits   PageSection[]
+  teamEdits      TeamMember[]
 
   @@map("admins")
 }
@@ -95,6 +98,7 @@ model MediaAsset {
   primaryFor   Product[]      @relation("ProductPrimaryImage")
   productMedia ProductMedia[]
   galleryUse   GalleryImage[]
+  teamPhotoFor TeamMember[]
 
   @@map("media_assets")
 }
@@ -224,6 +228,105 @@ model ProductCertification {
 
   @@index([productId, order])
   @@map("product_certifications")
+}
+
+/// Editable marketing pages, keyed by the route slug the hash router already
+/// uses - 'home', 'about', 'team'. Slug-keyed and generic on purpose: adding
+/// Services, Privacy or Terms later is a seed row and a section config, not a
+/// schema change. Only the three this phase covers are seeded.
+///
+/// This is the FIXED TYPED SECTIONS model from docs/admin-cms-blueprint.md, not
+/// freeform blocks: a section's `type` selects a known field set that a real
+/// React component already consumes. An editor cannot invent a section the site
+/// has no component for, which is the whole argument the blueprint made against
+/// drag-and-drop page building.
+model Page {
+  id     String        @id @default(cuid())
+  slug   String        @unique
+  title  String
+  status ProductStatus @default(DRAFT)
+
+  /// Reusing ProductStatus rather than declaring an identical second enum. The
+  /// two states and their meaning are the same, and a PageStatus{DRAFT,PUBLISHED}
+  /// would be duplication for the sake of a nicer name.
+  publishedAt DateTime?
+
+  sections PageSection[]
+
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+  updatedBy   Admin?   @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@map("pages")
+}
+
+/// One section of one page.
+///
+/// draftData and publishedData are the reason this is not just a JSON blob on
+/// Page. Product's model - one status flag, edits to a published row go live
+/// instantly - cannot express "save this wording but do not ship it yet", and
+/// that is exactly what an editor needs on a marketing page. The public site
+/// reads publishedData and nothing else; the admin edits draftData; Publish
+/// copies one onto the other.
+///
+/// `data` is Json rather than columns because the shape genuinely differs per
+/// section type - a repeater of four differentiator cards and a two-CTA hero
+/// have nothing in common. The TYPE is the contract, enforced by the field
+/// config in src/features/pages/sectionTypes.js and by the component that
+/// renders it; the JSON is just its storage.
+model PageSection {
+  id     String @id @default(cuid())
+  page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  pageId String
+  /// Stable identifier used by the public component to find its own content.
+  /// Never reordered into meaning - `order` is presentation, `key` is identity.
+  key    String
+  type   String
+  order  Int    @default(0)
+
+  draftData     Json
+  publishedData Json?
+
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+  updatedBy   Admin?   @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@unique([pageId, key])
+  @@index([pageId, order])
+  @@map("page_sections")
+}
+
+/// A real person on the Team page.
+///
+/// Its own model, not section JSON, because it needs the same things
+/// GalleryImage needs: individual CRUD, ordering, and a photo through the media
+/// pipeline. Burying that in a JSON array would mean hand-rolling all three.
+///
+/// `name` did not exist before this phase. The live page renders three
+/// ANONYMOUS role cards - the array was [role, copy, image] - each illustrated
+/// with a stock photograph of a stranger. website-strategy.md 2.5 calls that a
+/// falsifiable trust claim, and it is the longest-standing flag in the audit.
+model TeamMember {
+  id   String @id @default(cuid())
+  name String
+  role String
+  /// Rich text (TipTap HTML), sanitized server-side against an explicit tag
+  /// allowlist before it is stored - see common/sanitize.ts.
+  bio  String? @db.Text
+
+  photoId String?
+  photo   MediaAsset? @relation(fields: [photoId], references: [id], onDelete: SetNull)
+
+  order     Int     @default(0)
+  published Boolean @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+  updatedBy   Admin?   @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([published, order])
+  @@map("team_members")
 }
 
 /// The public #gallery page, which until now was six Unsplash URLs hardcoded at

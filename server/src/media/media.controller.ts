@@ -74,6 +74,22 @@ export class MediaController {
     return this.productMedia.reorderGallery(productId, assetIds, admin.id);
   }
 
+  /**
+   * A media asset not attached to anything yet. Used by the page-section image
+   * fields and by TipTap's image insert, both of which need a URL before they
+   * have a row to hang it on. Same MediaService.createAsset as every other
+   * upload on this server - magic bytes, sharp, EXIF stripped, StorageService.
+   */
+  @Post('assets')
+  @UseInterceptors(UPLOAD)
+  createAsset(
+    @UploadedFile() file: Upload,
+    @Body('altText') altText: string,
+    @CurrentAdmin() admin: Admin,
+  ) {
+    return this.media.createAsset(this.require(file), altText ?? null, admin.id);
+  }
+
   /** Alt text is editable without re-uploading; it is content, not a file property. */
   @Patch('assets/:id/alt')
   updateAlt(@Param('id') id: string, @Body('altText') altText: string) {
