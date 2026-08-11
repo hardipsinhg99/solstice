@@ -23,6 +23,16 @@ ARG NODE_VERSION=22.14.0
 FROM node:${NODE_VERSION}-bookworm-slim AS builder
 WORKDIR /build
 
+# openssl BEFORE `prisma generate`, not just in the runtime stage. Prisma picks
+# its query-engine binary from the libssl it detects at generate time; on a slim
+# image with no openssl it silently emits the openssl-1.1.x engine, which then
+# cannot load on bookworm (libssl.so.1.1: cannot open shared object file). The
+# `seeder` stage below inherits this stage, so without it the seed dies on its
+# first query even when the runtime image is correct.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends openssl ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
 # The full dependency tree. @nestjs/cli, prisma and typescript are ALL
 # devDependencies, and all three are required to produce dist/.
 COPY server/package.json server/package-lock.json ./
