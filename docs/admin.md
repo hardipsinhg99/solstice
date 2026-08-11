@@ -369,10 +369,31 @@ one, so the safe direction is the default.
 
 1. A row in `PAGE_CONFIG` in `sectionTypes.js` with its section types and fields.
 2. A seed row in `prisma/seed-pages.ts` carrying the copy that is live today.
-3. One sidebar entry in `AdminSidebar.jsx`.
-4. The public component calls `usePage(slug, FALLBACK)`.
+3. The public component calls `usePage(slug, FALLBACK)`.
 
-No new admin file, no schema change.
+No new admin file, no schema change, **and no sidebar edit** — `AdminSidebar` and the
+top-bar titles are derived from `PAGE_CONFIG`.
+
+Phase 1e claimed this was already true and it was not: `AdminSidebar` and `AdminApp` each
+carried their own hardcoded page list, so a new page was three touchpoints. Services closed
+that. It is the kind of gap that only shows up the first time somebody actually uses the
+generalization, which is the argument for adding the fourth page rather than assuming.
+
+### Rich text is targeted by section type and path
+
+`RICH_PATHS` in `PagesService` names the exact `type` + dotted path of every rich-text
+field — `about.story → nodes.body`, `about.missionVision → items.body`.
+
+The first version keyed off the field NAME (`body`, `bio`) wherever it appeared, and
+Services disproved it immediately: its repeaters also use `body`, for plain textareas, and
+inherited About's allowlist. Nothing dangerous survived either way — `<script>`, `onerror`,
+`javascript:`, `<iframe>`, `<svg onload>`, `onclick` and `<style>` are stripped by both
+cleaners — but a plain textarea could store `<img>` and `<a>`, which the page then prints
+literally because it renders that field as a string.
+
+Adding a third rich field means an entry here **as well as** in `sectionTypes.js`. That
+duplication is deliberate: the server must not infer its security posture from a name it
+happens to share with the client.
 
 ---
 
@@ -698,7 +719,7 @@ The seed imports the 8 live products as `PUBLISHED`, everything else defaults to
 
 | Not built | Why |
 |---|---|
-| **Services, Privacy, Terms** | The last of the original IA blocker. Home, About, Team and Gallery are now settled and editable. Services exists and is hardcoded; Privacy and Terms are specified and do not exist. Adding Services is a config entry plus a seed row — no schema change |
+| **Privacy and Terms** | All that remains of the original IA blocker, and **not a technical gap**. They are specified and do not exist because nobody has written them. The site takes enquiries from EU and UK buyers, so what those pages must say is a decision for the client and likely for counsel. A stub page would make the gap harder to see, not easier — so there is deliberately no `privacy` or `terms` row, no sidebar entry and no placeholder copy anywhere in the codebase |
 | **Live / split-view preview** | Still deferred, for the reason the blueprint gave: a naively re-rendering preview iframe would fight the scroll-driven GSAP canvases on Home and Products |
 | **"Enquiry Quotes"** | Appeared in the reference mockup's sidebar. It implies a quoting subsystem — line items, pricing logic, PDF generation — that is not specified anywhere and that nothing in the schema supports. Not built, and not stubbed |
 | **Charts / analytics** | The dashboard is counts and a list. No chart library, no export or shipment tracking — there is no shipment data to track |

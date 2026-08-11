@@ -245,13 +245,103 @@ const TEAM = [
   }
 ]
 
+// ── Services ────────────────────────────────────────────────────────────────
+// Every field here is text, textarea or list. Services needed no new field kind,
+// no image field and no rich text - which is why this page cost a config entry
+// and a seed row rather than a phase.
+const SERVICES = [
+  {
+    key: 'intro', type: 'services.intro', label: 'Page heading',
+    fields: [
+      f('mark', 'Ghost numeral'), f('eyebrow', 'Eyebrow'),
+      f('title', 'Title'), f('accent', 'Italic accent'), f('copy', 'Intro', 'textarea')
+    ]
+  },
+  {
+    key: 'services', type: 'services.list', label: 'What we do',
+    help: 'Each row is numbered automatically and carries an enquiry arrow through to the contact page.',
+    fields: [
+      f('items', 'Services', 'list', {
+        itemLabel: 'Service',
+        fields: [f('icon', 'Icon', 'text', { help: 'A sprite name: box, globe, check, leaf, ship, chat, award.' }),
+                 f('title', 'Title'), f('body', 'Copy', 'textarea')]
+      }),
+      f('ctaRoute', 'The arrow on each row goes to')
+    ]
+  },
+  {
+    key: 'supply', type: 'services.supply', label: 'Custom supply programmes',
+    fields: [
+      f('eyebrow', 'Eyebrow'),
+      f('headingLine1', 'Heading, first line'), f('headingAccent', 'Heading, italic accent'),
+      f('body', 'Copy', 'textarea'),
+      f('ctaLabel', 'Button'), f('ctaRoute', 'Button goes to'),
+      f('points', 'Checklist', 'list', { itemLabel: 'Point', fields: [f('text', 'Text')] })
+    ]
+  },
+  {
+    key: 'process', type: 'services.process', label: 'Workflow',
+    fields: [
+      f('eyebrow', 'Eyebrow'),
+      f('headingLine1', 'Heading, first line'), f('headingAccent', 'Heading, italic accent'),
+      f('items', 'Steps', 'list', {
+        itemLabel: 'Step',
+        fields: [f('icon', 'Icon'), f('title', 'Title'), f('body', 'Copy', 'textarea')]
+      })
+    ]
+  },
+  {
+    key: 'trust', type: 'services.trust', label: 'Why buyers choose us',
+    help: 'The certifications strip is a public claim. Never list one the company cannot produce a certificate for.',
+    fields: [
+      f('eyebrow', 'Eyebrow'),
+      f('headingLine1', 'Heading, first line'), f('headingLine2', 'Heading, second line'),
+      f('headingAccent', 'Heading, italic accent'),
+      f('items', 'Cards', 'list', {
+        itemLabel: 'Card',
+        fields: [f('icon', 'Icon'), f('title', 'Title'), f('body', 'Copy', 'textarea')]
+      }),
+      f('certLabel', 'Certifications label'),
+      f('certifications', 'Certifications', 'list', {
+        itemLabel: 'Certification',
+        fields: [f('text', 'Name', 'text', { help: 'Only list what a certificate can be produced for.' })]
+      })
+    ]
+  },
+  {
+    key: 'callout', type: 'services.callout', label: 'Closing call to action',
+    fields: [
+      f('eyebrow', 'Eyebrow'),
+      f('headingLine1', 'Heading, first line'), f('headingLine2', 'Heading, second line'),
+      f('headingAccent', 'Heading, italic accent'),
+      f('ctaLabel', 'Button'), f('ctaRoute', 'Button goes to')
+    ]
+  }
+]
+
+/**
+ * `icon` and `title` live here so the sidebar and the top bar can be DERIVED
+ * from this object rather than repeating it. Phase 1e claimed a new page was
+ * "a config entry and a seed row"; it was actually three touchpoints, because
+ * AdminSidebar and AdminApp each carried their own hardcoded list. Services
+ * closed that - adding a page is now genuinely this object plus a seed row.
+ */
 export const PAGE_CONFIG = {
-  home: { slug: 'home', title: 'Home', route: 'home', sections: HOME },
-  about: { slug: 'about', title: 'About us', route: 'about', sections: ABOUT },
-  team: { slug: 'team', title: 'Team', route: 'team', sections: TEAM }
+  home: { slug: 'home', title: 'Home', route: 'home', icon: 'grid', sections: HOME },
+  about: { slug: 'about', title: 'About us', route: 'about', icon: 'layers', sections: ABOUT },
+  services: { slug: 'services', title: 'Services', route: 'services', icon: 'ship', sections: SERVICES },
+  team: { slug: 'team', title: 'Team', route: 'team', icon: 'user', sections: TEAM }
 }
 
 export const EDITABLE_PAGES = Object.values(PAGE_CONFIG)
 
 export const sectionConfig = (slug, key) =>
   PAGE_CONFIG[slug]?.sections.find((s) => s.key === key) ?? null
+
+/** The admin section id for a page, e.g. 'page-about'. One place, not three. */
+export const pageSection = (slug) => `page-${slug}`
+
+/** { 'page-home': 'Home', … } - what the top bar titles itself from. */
+export const PAGE_TITLES = Object.fromEntries(
+  EDITABLE_PAGES.map((p) => [pageSection(p.slug), p.title])
+)

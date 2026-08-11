@@ -1,4 +1,4 @@
-export { PAGE_CONFIG, EDITABLE_PAGES, sectionConfig } from './sectionTypes.js'
+export { PAGE_CONFIG, EDITABLE_PAGES, sectionConfig, pageSection, PAGE_TITLES } from './sectionTypes.js'
 export { useAdminPage, usePage, saveSection, publishPage, unpublishPage, discardDraft } from './usePagesApi.js'
 export {
   useAdminTeam, usePublicTeam, createMember, updateMember, removeMember,

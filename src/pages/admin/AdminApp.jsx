@@ -10,6 +10,7 @@ import AdminProductEditPage from './AdminProductEditPage.jsx'
 import AdminEnquiriesPage from './AdminEnquiriesPage.jsx'
 import AdminGalleryPage from './AdminGalleryPage.jsx'
 import AdminPageEditor from './AdminPageEditor.jsx'
+import { PAGE_TITLES } from '../../features/pages/index.js'
 import AdminSettingsPage from './AdminSettingsPage.jsx'
 
 // The <h1> lives in the top bar, so each page owns an <h2> and the document has
@@ -21,9 +22,8 @@ const TITLES = {
   enquiries: 'Enquiries',
   gallery: 'Gallery',
   settings: 'Site settings',
-  'page-home': 'Home',
-  'page-about': 'About us',
-  'page-team': 'Team'
+  // The editable pages come from PAGE_CONFIG rather than a second list here.
+  ...PAGE_TITLES
 }
 
 // The guard. Any #admin/* route except #admin/login requires a valid token; the

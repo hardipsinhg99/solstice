@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Icon } from '../ui/Icon.jsx'
 import { goTo } from '../../app/router.js'
+import { EDITABLE_PAGES, pageSection } from '../../features/pages/index.js'
 
 /**
  * Grouped, collapsible navigation.
@@ -34,9 +35,15 @@ const GROUPS = [
   {
     label: 'Content',
     items: [
-      { section: 'page-home', route: 'admin/page-home', label: 'Home', icon: 'grid' },
-      { section: 'page-about', route: 'admin/page-about', label: 'About us', icon: 'layers' },
-      { section: 'page-team', route: 'admin/page-team', label: 'Team', icon: 'user' },
+      // Derived from PAGE_CONFIG, not restated. A new editable page appears here
+      // the moment it has a config entry - which is what makes "a config entry
+      // and a seed row" a true statement rather than an aspiration.
+      ...EDITABLE_PAGES.map((page) => ({
+        section: pageSection(page.slug),
+        route: `admin/${pageSection(page.slug)}`,
+        label: page.title,
+        icon: page.icon
+      })),
       { section: 'gallery', route: 'admin/gallery', label: 'Gallery', icon: 'image' }
     ]
   },

@@ -5,22 +5,38 @@ import { sanitizePlainText, sanitizeRichOptional } from '../common/sanitize';
 
 /**
  * Section data is Json, so it is sanitized by walking it rather than field by
- * field. Every string is cleaned; which cleaner it gets is decided by the key,
- * because the shape is per-type and the server does not carry the field config.
+ * field. Every string is cleaned; which cleaner it gets depends on where the
+ * string sits.
  *
- * The rich-text keys are named explicitly. A default of "sanitize everything as
- * rich text" would let markup through into a plain field the day somebody adds
- * one, so the safe direction is the default and rich text is the exception.
+ * Rich text is named by SECTION TYPE AND PATH, not by field name. The first
+ * version of this keyed off the key alone - `body` and `bio` were treated as
+ * rich text wherever they appeared - and Services immediately proved that
+ * wrong: its repeaters also use `body`, for plain textareas, and inherited
+ * About's allowlist. Nothing dangerous survived either way (script, onerror,
+ * javascript:, iframe, svg onload, onclick and style are stripped by both
+ * cleaners), but a plain textarea could store <img> and <a> tags that the page
+ * then prints literally, because it renders that field as a string.
+ *
+ * Two entries, because exactly two section types carry rich text. Adding a
+ * third rich field means adding it here as well as in sectionTypes.js - which
+ * is deliberate: the server must not infer its security posture from a name it
+ * happens to share with the client.
  */
-const RICH_KEYS = new Set(['body', 'bio']);
+const RICH_PATHS: Record<string, Set<string>> = {
+  'about.story': new Set(['nodes.body']),
+  'about.missionVision': new Set(['items.body']),
+};
 
-function clean(value: unknown, key?: string): unknown {
-  if (Array.isArray(value)) return value.map((v) => clean(v));
+function clean(value: unknown, rich: Set<string>, path = ''): unknown {
+  // Array indices are not part of the path - `nodes.body` matches every row.
+  if (Array.isArray(value)) return value.map((v) => clean(v, rich, path));
   if (value && typeof value === 'object') {
-    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, clean(v, k)]));
+    return Object.fromEntries(
+      Object.entries(value).map(([k, v]) => [k, clean(v, rich, path ? `${path}.${k}` : k)]),
+    );
   }
   if (typeof value === 'string') {
-    return key && RICH_KEYS.has(key) ? (sanitizeRichOptional(value) ?? '') : sanitizePlainText(value);
+    return rich.has(path) ? (sanitizeRichOptional(value) ?? '') : sanitizePlainText(value);
   }
   // Numbers and booleans pass through - a toggle or a stat value is not markup.
   return value;
@@ -84,7 +100,10 @@ export class PagesService {
 
     const updated = await this.prisma.pageSection.update({
       where: { id: section.id },
-      data: { draftData: clean(data) as Prisma.InputJsonValue, updatedById: adminId },
+      data: {
+        draftData: clean(data, RICH_PATHS[section.type] ?? new Set()) as Prisma.InputJsonValue,
+        updatedById: adminId,
+      },
     });
     await this.audit(page.id, 'page.section.saved', adminId, `${page.title} — ${key}`);
     return updated;
