@@ -113,9 +113,13 @@ Check the `priority=100` label is present on the `api` service.
 ### 1.6 HTTP redirects to HTTPS
 
 ```bash
-curl -sI http://test.solsticellp.com | head -1        # expect 301
-curl -sI http://test-api.solsticellp.com | head -1    # expect 301
+curl -sI http://test.solsticellp.com | head -1        # expect 308
+curl -sI http://test-api.solsticellp.com | head -1    # expect 308
 ```
+
+**308, not 301** — Traefik's `redirectscheme` with `permanent=true` issues a
+308 Permanent Redirect, which preserves the method and body. Measured on the
+first real deploy.
 
 **If 404:** the `-http` routers or the `solstice-*-https` middleware definitions
 are missing.
@@ -170,7 +174,8 @@ are blank in `.env`. Fill them and re-run; nothing was written.
 
 ```bash
 # Table names are the @@map values from schema.prisma (snake_case plural),
-# not the Prisma model names.
+# not the Prisma model names. COLUMNS are the opposite - they keep Prisma's
+# camelCase, so they need double quotes in psql: "createdAt", not created_at.
 docker compose exec db psql -U solstice -d solstice -c '
 SELECT (SELECT count(*) FROM admins)        AS admins,
        (SELECT count(*) FROM products)      AS products,
@@ -231,6 +236,16 @@ Each of these writes through a different module. Do all six.
 | d | Add a team member | Appears on `#team` | — |
 | e | Change a setting (e.g. contact email) | Reflected in the footer | — |
 | f | Submit the public enquiry form | Row appears under Enquiries in the admin | See 3.3 — the row must land even if email fails |
+
+The enquiry DTO accepts exactly `name`, `email`, `phone`, `message` — `phone` is
+required, and the ValidationPipe's `forbidNonWhitelisted` rejects anything else
+(a `company` or `country` key returns 400, not a silent drop):
+
+```bash
+curl -s -X POST https://test.solsticellp.com/api/enquiries -H 'Content-Type: application/json' \
+  -d '{"name":"Probe","email":"p@example.com","phone":"+91 90000 00000","message":"test"}'
+# expect {"id":"...","received":true}
+```
 
 Item **f must succeed even with SMTP unconfigured.** Email is explicitly not
 allowed to fail a submission; if it does, that is a bug, not a config issue.

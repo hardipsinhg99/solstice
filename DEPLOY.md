@@ -82,8 +82,10 @@ chmod 600 .env
 
 ```bash
 cd /opt/solstice
-docker compose build          # ~4–6 min cold; sharp and Prisma engines dominate
-docker compose up -d
+# -p solstice on EVERY command: this box also hosts a live client project, and
+# an unscoped compose command run from the wrong directory can reach it.
+docker compose -p solstice build   # ~4-6 min cold; sharp and Prisma dominate
+docker compose -p solstice up -d
 ```
 
 The `seed` service will not start — it sits behind a profile. On start the API
@@ -91,8 +93,8 @@ container runs `prisma migrate deploy` and only then boots Nest, so the schema
 is always ahead of the code that queries it.
 
 ```bash
-docker compose ps             # db healthy, api healthy, web healthy
-docker compose logs -f api
+docker compose -p solstice ps      # db healthy, api healthy, web healthy
+docker compose -p solstice logs -f api
 ```
 
 Expect, in order:
@@ -114,8 +116,12 @@ and by design.
 **This is not automatic.** See finding 3 below for the reasoning.
 
 ```bash
-docker compose --profile seed run --rm seed
+docker compose -p solstice --profile seed run --rm seed
 ```
+
+Note the `--profile seed` is required to *build* it too — `docker compose build
+seed` alone reports "No services to build", because a profiled service is out
+of scope without its profile.
 
 This runs both seeds in order and creates:
 
