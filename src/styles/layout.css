@@ -24,11 +24,19 @@
    The lower bound is also the 14px-ish floor website-strategy.md 2.6 asks for on
    body-adjacent text - 12px was under it.
    .nav-cta is a direct child of .nav-links, so it scales with the rest. */
-.nav-links>button,.nav-dropdown-trigger{border:0;background:transparent;font-size:clamp(13px,1.15vw,15px);color:var(--muted);padding:8px 12px;margin:0 -12px;border-radius:20px;position:relative;transition:color .2s,background .25s}
-.nav-links>button:hover,.nav-dropdown-trigger:hover{background:color-mix(in srgb,var(--green-500) 10%,transparent);color:var(--ink)}
-.nav-links>button.active,.nav-dropdown-trigger.active{color:var(--ink);font-weight:600}
-.nav-links>button:after,.nav-dropdown-trigger:after{content:'';position:absolute;bottom:1px;left:12px;right:12px;height:1px;background:var(--green-500);transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
-.nav-links>button.active:after,.nav-links>button:hover:after,.nav-dropdown-trigger.active:after,.nav-dropdown-trigger:hover:after{transform:scaleX(1)}
+.nav-links>button,.nav-dropdown-label{border:0;background:transparent;font-size:clamp(13px,1.15vw,15px);color:var(--muted);padding:8px 12px;margin:0 -12px;border-radius:20px;position:relative;transition:color .2s,background .25s}
+.nav-links>button:hover,.nav-dropdown-label:hover{background:color-mix(in srgb,var(--green-500) 10%,transparent);color:var(--ink)}
+.nav-links>button.active,.nav-dropdown-label.active{color:var(--ink);font-weight:600}
+.nav-links>button:after,.nav-dropdown-label:after{content:'';position:absolute;bottom:1px;left:12px;right:12px;height:1px;background:var(--green-500);transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
+.nav-links>button.active:after,.nav-links>button:hover:after,.nav-dropdown-label.active:after,.nav-dropdown-label:hover:after{transform:scaleX(1)}
+/* The caret is a second control beside the label, not part of it: the label
+   navigates to the whole catalogue, the caret opens the two directions. It sits
+   tight against the label so the pair still reads as one nav item, and it keeps
+   a 24px hit area of its own. */
+.nav-dropdown-caret{border:0;background:transparent;color:var(--muted);padding:8px 6px;margin-left:-8px;border-radius:20px;display:grid;place-items:center;transition:color .2s,background .25s,transform .25s var(--ease)}
+.nav-dropdown-caret:hover{background:color-mix(in srgb,var(--green-500) 10%,transparent);color:var(--ink)}
+.nav-dropdown-caret.active{color:var(--ink)}
+.nav-dropdown-caret[aria-expanded=true]{transform:rotate(180deg)}
 .nav-cta{background:var(--deep)!important;color:#fff!important;padding:11px 14px!important;display:flex;align-items:center;gap:7px;margin-left:19px;position:relative;transition:background .25s}
 .nav-cta:before{content:'';position:absolute;left:-16px;top:50%;transform:translateY(-50%);width:1px;height:18px;background:var(--line)}
 .nav-cta:hover{background:var(--green-600)!important;color:var(--on-green)!important}
@@ -38,10 +46,7 @@
    NavDropdown.jsx), so there is no hidden-but-focusable state to defend against
    and the entrance can be a plain animation with nothing to reverse. */
 .nav-dropdown{position:relative;display:flex;align-items:center}
-.nav-dropdown-trigger{display:inline-flex;align-items:center;gap:6px}
-.nav-dropdown-trigger svg{transition:transform .25s var(--ease)}
-.nav-dropdown-trigger[aria-expanded='true'] svg{transform:rotate(180deg)}
-.nav-dropdown-trigger[aria-expanded='true']{color:var(--ink)}
+.nav-dropdown-label{display:inline-flex;align-items:center}
 
 .nav-dropdown-panel{position:absolute;top:calc(100% + 14px);left:-14px;z-index:110;min-width:290px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);animation:navMenuIn .18s var(--ease) both}
 @keyframes navMenuIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}

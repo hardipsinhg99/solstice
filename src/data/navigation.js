@@ -5,9 +5,10 @@
 //
 // Products opens onto the two directions the business runs, and each is a real
 // route - '#products/export' and '#products/import' - so the choice is in the
-// URL, is shareable and survives a reload. The trigger itself only opens the
-// menu: a control that both navigates and expands leaves the user unable to
-// predict which it will do.
+// URL, is shareable and survives a reload. The header control is split: the
+// label navigates to '#products', which shows BOTH directions with a badge on
+// each card, and the caret beside it opens the two filtered views. One job per
+// control, so neither is ambiguous.
 export const navItems = [
   { route: 'home', label: 'Home' },
   { route: 'about', label: 'About us' },

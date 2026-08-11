@@ -22,17 +22,26 @@ export function useGlobeTheme(theme) {
       }
     : {
         dark: 0,
-        // Just below --bg (#f8f7f1), so the sphere has an edge without becoming
-        // a grey disc on a warm page.
-        baseColor: [0.90, 0.90, 0.87],
-        // The site green, so a plotted office reads as one of ours.
-        markerColor: [0.04, 0.42, 0.26],
-        arcColor: [0.04, 0.42, 0.26],
-        glowColor: [0.86, 0.87, 0.83],
-        // Below 1 darkens the dot map relative to the base. At 10 the dots were
-        // brighter than a near-white sphere, which is why the continents
-        // disappeared entirely.
-        mapBrightness: 0.62
+        // Light mode is a pale sphere with a darker dot map. Two attempts got
+        // this wrong in opposite directions and both are worth recording:
+        //
+        //   base 1.00 / mb 10    the dots were BRIGHTER than a white sphere, so
+        //                        the continents vanished and so did the globe
+        //   base 0.52 / mb 0.08  the sphere was clearly visible but the dots had
+        //                        converged with it - a plain sage disc, no land
+        //
+        // cobe derives the dot colour from baseColor scaled by mapBrightness, so
+        // the land/sea separation is bounded however far the base is pushed -
+        // there is no palette that makes both the sphere and its continents
+        // strongly contrasty in light mode. Legible land wins: the continents
+        // are the information, the sphere is the frame. A CSS ring was tried and
+        // removed - cobe draws the globe inset from its canvas, so the ring
+        // traced the element box and floated well outside the sphere.
+        baseColor: [0.90, 0.90, 0.88],
+        markerColor: [0.05, 0.55, 0.33],
+        arcColor: [0.05, 0.55, 0.33],
+        glowColor: [0.85, 0.87, 0.82],
+        mapBrightness: 0.45
       },
   [theme])
 }

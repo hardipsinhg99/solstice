@@ -23,12 +23,13 @@ const SPECS = [
 // it is a plain <article>, so it takes no tab stop and cannot lead to a detail
 // page that has nothing to show. The point is that it can never be mistaken for
 // something Solstice actually trades.
-function PlaceholderCard({ product, delay }) {
+function PlaceholderCard({ product, delay, showTrade = false }) {
   return (
     <Reveal as="article" delay={delay} className="product-list-card is-placeholder" data-unresolved="product">
       <div className="product-list-image is-placeholder">
         <Icon name="box" size={26}/>
         <span className="product-list-tag">Awaiting details</span>
+        {showTrade && <TradeBadge trade={product.trade}/>}
       </div>
       <div className="product-list-info">
         <h3>{product.name}</h3>
@@ -46,8 +47,26 @@ function PlaceholderCard({ product, delay }) {
   )
 }
 
-export function ProductCard({ product, delay = 0, onSelect }) {
-  if (product.placeholder) return <PlaceholderCard product={product} delay={delay}/>
+/**
+ * The trade direction, top-right of the image.
+ *
+ * Shown only on the combined '#products' view, where the grid holds both
+ * directions and the badge is the only thing telling them apart. On a filtered
+ * '#products/export' page every card would read "Export", which is six
+ * repetitions of what the page title already says - decoration competing with
+ * the specification, which the house rules rule out.
+ */
+function TradeBadge({ trade }) {
+  const isImport = trade === 'import'
+  return (
+    <span className={isImport ? 'product-trade-badge is-import' : 'product-trade-badge'}>
+      {isImport ? 'Import' : 'Export'}
+    </span>
+  )
+}
+
+export function ProductCard({ product, delay = 0, onSelect, showTrade = false }) {
+  if (product.placeholder) return <PlaceholderCard product={product} delay={delay} showTrade={showTrade}/>
 
   return (
     <Reveal as="article" delay={delay} className="product-list-card" {...cardProps(() => onSelect(product.slug), `View ${product.name} specification`)}>
@@ -76,6 +95,7 @@ export function ProductCard({ product, delay = 0, onSelect }) {
         {/* Category chip sits on the image so the card's body is left entirely
             to specification. */}
         <span className="product-list-tag">{product.type}</span>
+        {showTrade && <TradeBadge trade={product.trade}/>}
       </div>
 
       <div className="product-list-info">

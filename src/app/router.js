@@ -18,9 +18,14 @@ export const isProductRoute = (route) => route.startsWith('product/')
 // 'products', 'products/export', 'products/import'. No collision with the
 // detail route above: 'products/...' does not start with 'product/'.
 export const isProductsRoute = (route) => route === 'products' || route.startsWith('products/')
-// Export is the default, so a bare '#products' and an unrecognised suffix both
-// land somewhere real rather than on an empty page.
-export const productsTrade = (route) => (route.split('/')[1] === 'import' ? 'import' : 'export')
+// null means the route names NO direction - the bare '#products', which shows
+// both directions together with a badge on each card. Only the two real
+// suffixes select a direction; anything else falls back to the combined view
+// rather than silently showing half the catalogue.
+export const productsTrade = (route) => {
+  const segment = route.split('/')[1]
+  return segment === 'import' || segment === 'export' ? segment : null
+}
 export const productSlug = (route) => route.split('/')[1]
 
 // Admin lives under the same hash router rather than a second deployable, which

@@ -75,7 +75,7 @@ export function App() {
           // key remounts on a direction change, which resets the category chips.
           // Carrying "Fresh fruit" from one direction into another that has no
           // fruit would strand the grid empty for a reason nobody chose.
-          ? <ProductsPage key={trade} trade={trade} selectProduct={selectProduct}/>
+          ? <ProductsPage key={trade ?? 'all'} trade={trade} selectProduct={selectProduct}/>
           : (pages[route] || pages.home)}
     </main>
     <Footer/>

@@ -13,6 +13,13 @@ import { Icon } from '../ui/Icon.jsx'
 // Click, never hover: a hover menu is unusable on touch and hostile on a
 // trackpad, and the brief asked for click explicitly.
 //
+// The trigger is SPLIT: the label navigates to the parent route, a separate
+// caret expands the panel. The earlier single control only expanded, on the
+// reasoning that a control doing both leaves the user unable to predict which
+// it will do - which is right, and this is the resolution of it rather than a
+// reversal. Two controls, one job each: "Products" goes to the whole
+// catalogue, the caret offers the two directions.
+//
 // The panel is conditionally rendered rather than hidden with CSS, so a closed
 // menu cannot leave seven invisible items in the tab order - the failure the
 // mobile drawer had to be fixed for.
@@ -74,15 +81,24 @@ export function NavDropdown({ item, route, onNavigate }) {
   return (
     <div className="nav-dropdown" ref={rootRef}>
       <button
-        ref={triggerRef}
         type="button"
-        className={parentActive ? 'nav-dropdown-trigger active' : 'nav-dropdown-trigger'}
-        aria-expanded={open}
-        aria-controls={panelId}
+        className={parentActive ? 'nav-dropdown-label active' : 'nav-dropdown-label'}
         aria-current={parentActive ? 'page' : undefined}
-        onClick={() => setOpen(value => !value)}
+        onClick={() => go(item.route)}
       >
         {item.label}
+      </button>
+      <button
+        ref={triggerRef}
+        type="button"
+        className={parentActive ? 'nav-dropdown-caret active' : 'nav-dropdown-caret'}
+        aria-expanded={open}
+        aria-controls={panelId}
+        // The caret has no text, so it needs a name of its own - and one that
+        // says what it reveals, not "toggle".
+        aria-label={open ? `Hide ${item.label.toLowerCase()} directions` : `Show ${item.label.toLowerCase()} directions`}
+        onClick={() => setOpen(value => !value)}
+      >
         <Icon name="chevron" size={13}/>
       </button>
 
