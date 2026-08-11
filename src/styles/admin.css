@@ -313,3 +313,57 @@ td.admin-row-actions>*+*{margin-left:8px}
    would not be perceivable. */
 .admin-table tr.is-highlighted td{background:var(--green-050)}
 .admin-table tr.is-highlighted td:first-child{box-shadow:inset 3px 0 0 var(--green-600)}
+
+/* ── Page editor ────────────────────────────────────────────────────────────
+   One editor, many pages. No new tokens - a section card is the fieldset
+   treatment already used for product specs, at page scale. */
+.admin-section-card{border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:20px 22px;display:grid;gap:2px}
+.admin-section-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.admin-section-head h3{margin:0;font-size:15px;letter-spacing:-.2px;color:var(--ink)}
+.admin-section-head .admin-hint{flex-basis:100%;margin:0}
+
+.admin-repeater-set{margin:0 0 14px;background:var(--bg)}
+.admin-repeater-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.admin-repeater-head strong{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.admin-repeater-actions{display:flex;gap:6px;flex-wrap:wrap}
+.admin-repeater-actions .admin-btn{padding:5px 9px;font-size:12px}
+.admin-toggle-field{margin:0 0 14px}
+.admin-toggle-field .admin-hint{flex-basis:100%}
+
+.admin-image-field input[type=file]{background:var(--bg)}
+.admin-image-preview{margin:0 0 10px;display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:start;border:1px solid var(--border);border-radius:10px;padding:12px;background:var(--bg)}
+.admin-image-preview img{width:100%;height:auto;border-radius:8px;display:block;background:var(--soft)}
+.admin-image-preview figcaption{display:grid;gap:8px;justify-items:start}
+.admin-image-preview input{background:var(--bg);border:1px solid var(--line-strong);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:12.5px;width:100%}
+.admin-optional{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)}
+
+/* ── TipTap ─────────────────────────────────────────────────────────────────
+   The editor surface is a form control, so it takes the same border, radius and
+   focus treatment every other one does - including the global :focus-visible
+   ring, which is why there is still no outline reset anywhere in this file. */
+.admin-rte{border:1px solid var(--line-strong);border-radius:8px;background:var(--bg);overflow:hidden}
+.admin-rte:focus-within{border-color:var(--green-600)}
+.admin-rte-bar{display:flex;gap:4px;flex-wrap:wrap;padding:6px;border-bottom:1px solid var(--border);background:var(--surface)}
+.admin-rte-btn{border:1px solid transparent;background:none;color:var(--body);border-radius:6px;min-width:30px;height:28px;padding:0 8px;font-size:12px;font-weight:700;display:grid;place-items:center;transition:background .2s,color .2s}
+.admin-rte-btn:hover{background:var(--green-050);color:var(--ink)}
+.admin-rte-btn.is-on{background:var(--green-600);color:var(--on-green)}
+.admin-rte-surface{min-height:110px;padding:12px 14px;font-size:13px;line-height:1.65;color:var(--ink)}
+.admin-rte-surface>*+*{margin-top:.7em}
+.admin-rte-surface p{margin:0}
+.admin-rte-surface h2,.admin-rte-surface h3,.admin-rte-surface h4{margin:0;font-size:15px;color:var(--ink)}
+.admin-rte-surface ul,.admin-rte-surface ol{margin:0;padding-left:1.3em}
+.admin-rte-surface blockquote{margin:0;padding-left:12px;border-left:2px solid var(--green-600);color:var(--body)}
+.admin-rte-surface img{max-width:100%;height:auto;border-radius:6px}
+.admin-rte-surface a{color:var(--green-600)}
+
+/* ── Team members ───────────────────────────────────────────────────────────
+   No stock fallback anywhere in here: with no photograph the card shows a
+   monogram, which is self-evidently not a photograph. */
+.admin-team-manager{display:grid;gap:14px}
+.admin-member-card{background:var(--bg)}
+.admin-member-body{display:grid;grid-template-columns:190px 1fr;gap:18px;align-items:start}
+.admin-member-photo{display:grid;gap:10px}
+.admin-member-photo img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:10px;display:block;background:var(--soft)}
+.admin-member-monogram{width:100%;aspect-ratio:4/5;border:1px dashed var(--line-strong);border-radius:10px;display:grid;place-items:center;font-size:30px;font-weight:700;letter-spacing:1px;color:var(--muted);background:var(--surface)}
+.admin-member-fields{display:grid;gap:0}
+@media(max-width:760px){ .admin-member-body{grid-template-columns:1fr} }

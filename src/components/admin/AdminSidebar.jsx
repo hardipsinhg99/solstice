@@ -31,7 +31,15 @@ const GROUPS = [
       CATALOGUE
     ]
   },
-  { label: 'Content', items: [{ section: 'gallery', route: 'admin/gallery', label: 'Gallery', icon: 'image' }] },
+  {
+    label: 'Content',
+    items: [
+      { section: 'page-home', route: 'admin/page-home', label: 'Home', icon: 'grid' },
+      { section: 'page-about', route: 'admin/page-about', label: 'About us', icon: 'layers' },
+      { section: 'page-team', route: 'admin/page-team', label: 'Team', icon: 'user' },
+      { section: 'gallery', route: 'admin/gallery', label: 'Gallery', icon: 'image' }
+    ]
+  },
   { label: 'Settings', items: [{ section: 'settings', route: 'admin/settings', label: 'Settings', icon: 'sliders' }] }
 ]
 

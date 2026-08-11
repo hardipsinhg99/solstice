@@ -15,7 +15,11 @@ const ACTIONS = {
   'image.gallery.added': 'added an image to', 'image.gallery.removed': 'removed an image from',
   'image.gallery.reordered': 'reordered the images on',
   'gallery.added': 'added a gallery image', 'gallery.updated': 'edited a gallery image',
-  'gallery.deleted': 'deleted a gallery image', 'gallery.reordered': 'reordered the gallery'
+  'gallery.deleted': 'deleted a gallery image', 'gallery.reordered': 'reordered the gallery',
+  'page.section.saved': 'saved a draft section on', 'page.draft.discarded': 'discarded the draft of',
+  'team.added': 'added to the team', 'team.updated': 'edited', 'team.removed': 'removed from the team',
+  'team.reordered': 'reordered the team', 'team.photo.set': 'added a photograph of',
+  'team.photo.cleared': 'removed the photograph of'
 }
 
 /**

@@ -9,6 +9,7 @@ import AdminProductsPage from './AdminProductsPage.jsx'
 import AdminProductEditPage from './AdminProductEditPage.jsx'
 import AdminEnquiriesPage from './AdminEnquiriesPage.jsx'
 import AdminGalleryPage from './AdminGalleryPage.jsx'
+import AdminPageEditor from './AdminPageEditor.jsx'
 import AdminSettingsPage from './AdminSettingsPage.jsx'
 
 // The <h1> lives in the top bar, so each page owns an <h2> and the document has
@@ -19,7 +20,10 @@ const TITLES = {
   product: 'Product',
   enquiries: 'Enquiries',
   gallery: 'Gallery',
-  settings: 'Site settings'
+  settings: 'Site settings',
+  'page-home': 'Home',
+  'page-about': 'About us',
+  'page-team': 'Team'
 }
 
 // The guard. Any #admin/* route except #admin/login requires a valid token; the
@@ -76,8 +80,9 @@ export default function AdminApp({ route }) {
             : section === 'products' ? <AdminProductsPage/>
               : section === 'enquiries' ? <AdminEnquiriesPage highlightId={param}/>
                 : section === 'gallery' ? <AdminGalleryPage/>
-                  : section === 'settings' ? <AdminSettingsPage/>
-                    : <AdminDashboardPage dashboard={dashboard}/>}
+                  : section.startsWith('page-') ? <AdminPageEditor slug={section.slice(5)}/>
+                    : section === 'settings' ? <AdminSettingsPage/>
+                      : <AdminDashboardPage dashboard={dashboard}/>}
         </main>
       </div>
     </div>
