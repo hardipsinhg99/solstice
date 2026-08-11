@@ -1,5 +1,6 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import createGlobe from 'cobe'
+import { GlobeFallback } from './GlobeFallback.jsx'
 
 export function Globe({
   markers = [],
@@ -33,6 +34,10 @@ export function Globe({
   const phiOffsetRef = useRef(0)
   const thetaOffsetRef = useRef(0)
   const isPausedRef = useRef(false)
+  // Set when this browser cannot give us a working WebGL globe. Rendering an
+  // empty canvas at full opacity is indistinguishable from a broken page, so the
+  // SVG fallback takes over instead of leaving a blank square.
+  const [webglFailed, setWebglFailed] = useState(false)
 
   const handlePointerDown = useCallback((event) => {
     pointerInteracting.current = { x: event.clientX, y: event.clientY }
@@ -141,7 +146,21 @@ export function Globe({
       const width = canvas.offsetWidth
       if (width === 0 || globe) return
 
+      // Ask for the context ourselves first. A browser can refuse one - a
+      // blocklisted driver, hardware acceleration off, or too many live contexts
+      // across tabs - and cobe's failure mode is a correctly sized, fully opaque,
+      // completely empty canvas, which reads as a missing globe rather than as
+      // an error.
+      const probe = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
+      if (!probe) {
+        // eslint-disable-next-line no-console
+        console.warn('[Globe] WebGL is unavailable in this browser; using the SVG globe.')
+        setWebglFailed(true)
+        return
+      }
+
       const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      try {
       globe = createGlobe(canvas, {
         devicePixelRatio: dpr,
         width,
@@ -165,6 +184,14 @@ export function Globe({
       })
       animate()
       revealTimer = setTimeout(() => { canvas.style.opacity = '1' })
+      } catch (error) {
+        // A driver that accepts a context and then rejects the program still
+        // leaves a blank square. Same answer.
+        // eslint-disable-next-line no-console
+        console.warn('[Globe] WebGL globe failed to start; using the SVG globe.', error)
+        globe = null
+        setWebglFailed(true)
+      }
     }
 
     // Visibility gates. Both are attached up front so they apply whether init()
@@ -202,6 +229,10 @@ export function Globe({
       if (globe) globe.destroy()
     }
   }, [markers, arcs, markerColor, baseColor, arcColor, glowColor, dark, mapBrightness, markerSize, markerElevation, arcWidth, arcHeight, speed, initialPhi, theta, diffuse, mapSamples])
+
+  if (webglFailed) {
+    return <GlobeFallback markers={markers} arcs={arcs} phi={initialPhi}/>
+  }
 
   return (
     <div className={`globe-wrap ${className}`}>
