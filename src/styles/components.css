@@ -35,9 +35,17 @@
 /* Explicit z-index on both, rather than relying on document order: the overlay
    must paint above the mask, and "it happens to come second" is not a guarantee
    worth depending on once anything else in here grows a stacking context. */
+/* Two masks composited: the dot shapes, intersected with a vertical fade so the
+   landmass dissolves at the top and bottom edges instead of ending on a hard
+   rectangle. The reference gets this with a Tailwind mask-image utility on its
+   <img>; here it is the second layer of the same mask property. */
 .worldmap-dots{position:absolute;inset:0;z-index:0;background-color:var(--map-dots);
-  -webkit-mask:url('/world-dots.svg') center/100% 100% no-repeat;
-  mask:url('/world-dots.svg') center/100% 100% no-repeat}
+  -webkit-mask:url('/world-dots.svg') center/100% 100% no-repeat,
+    linear-gradient(to bottom,transparent 0,#000 12%,#000 88%,transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask:url('/world-dots.svg') center/100% 100% no-repeat,
+    linear-gradient(to bottom,transparent 0,#000 12%,#000 88%,transparent 100%);
+  mask-composite:intersect}
 .worldmap-overlay{position:absolute;inset:0;z-index:1;width:100%;height:100%;overflow:visible}
 
 /* Stroke comes from the gradient in <defs>, so only the weight lives here. The

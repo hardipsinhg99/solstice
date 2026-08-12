@@ -57,10 +57,14 @@ export function WorldMap({ markers = [], arcs = [], className = '' }) {
         // A path measured before layout reports 0. Animating from 0 would blank
         // it, so it is left in its finished state instead.
         if (!len) return
+        // Loops like the reference: draw, hold, redraw. clearProps is dropped
+        // because a repeating tween owns the property for its lifetime - and
+        // mm.revert() restores it on unmount, so the CSS default still wins the
+        // moment the animation stops existing.
         gsap.fromTo(path,
           { strokeDasharray: len, strokeDashoffset: len },
-          { strokeDashoffset: 0, duration: 1.5, ease: 'power2.inOut', delay: i * 0.18,
-            clearProps: 'strokeDasharray,strokeDashoffset' })
+          { strokeDashoffset: 0, duration: 1.5, ease: 'power2.inOut',
+            delay: i * 0.18, repeat: -1, repeatDelay: 3.4 })
       })
 
       // The travelling pulse. offset-path is native CSS, so GSAP drives one
