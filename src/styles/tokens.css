@@ -108,6 +108,14 @@
      twice. #199B4C holds the hue and measures white glyph 3.60:1, circle edge
      3.35:1 on light --bg and 4.88:1 on dark --bg. */
   --whatsapp:#199B4C;
+  /* The modal scrim behind the open mobile drawer. Built from a literal rather
+     than from --deep: a scrim's job is to DARKEN what is behind it, and
+     darkening is not a theme-relative operation. Derived from --deep it
+     measured 1.04:1 against the dark page - the theme token flips toward the
+     page colour, so the scrim disappeared exactly where it was needed. Both
+     values are near-black; the dark theme carries more alpha because it starts
+     from an already-dark page. Light measures 3.32:1 against --bg. */
+  --scrim:rgba(9,20,14,.5);
   /* The FAB stacks directly above the chat launcher, so its inset is derived
      from that launcher's geometry rather than guessed. These mirror .chat-button
      in footer.css and are restated at the same breakpoints in responsive.css -
@@ -171,6 +179,7 @@ html[data-theme='dark']{
   --shadow:0 24px 60px rgba(0,0,0,.4);
   --elev-1:0 2px 6px rgba(0,0,0,.3),0 12px 28px rgba(0,0,0,.34);
   --elev-2:0 6px 14px rgba(0,0,0,.42),0 30px 60px rgba(0,0,0,.5);
+  --scrim:rgba(0,0,0,.66);
 }
 /* Hero treatment. The image itself no longer swaps with the theme - one
    branded composite serves both, and inverting a photograph of the company's

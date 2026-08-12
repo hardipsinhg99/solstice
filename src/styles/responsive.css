@@ -113,7 +113,7 @@
      dvh with a vh fallback: on mobile browsers vh is the LARGEST viewport, so
      a 100vh backdrop sits under the retracted URL bar and leaves an undimmed
      strip. Declaration order is the fallback - engines without dvh keep vh. */
-  .nav-backdrop{display:block;position:fixed;top:0;left:0;right:0;height:100vh;height:100dvh;background:color-mix(in srgb,var(--deep) 55%,transparent);z-index:90}
+  .nav-backdrop{display:block;position:fixed;top:0;left:0;right:0;height:100vh;height:100dvh;background:var(--scrim);z-index:90}
 }
 
 @media(max-width:780px){
