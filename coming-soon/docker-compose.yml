@@ -1,0 +1,53 @@
+# Temporary holding page for solsticellp.com, until the 15 Aug 2026 launch.
+#
+# Deployed to /opt/solstice-comingsoon on the Hostinger VPS and always operated
+# as `docker compose -p solstice-cs`. That project name is the isolation
+# boundary: this box also runs a2ztrading.cloud and the Solstice staging stack,
+# and an unscoped compose command from the wrong directory can reach them.
+#
+# Publishes NO host ports. Traefik (running as coolify-proxy) already owns
+# 80/443; this container joins its network as a guest. Nothing here modifies
+# Traefik's configuration or the coolify network itself.
+#
+# Router names carry the cs- prefix so they cannot collide with the routers
+# a2ztrading and Solstice staging have already registered with Traefik.
+# Entrypoint names (http/https) and the letsencrypt resolver were verified
+# against the running a2ztrading containers - do not change them.
+#
+# Deliberately NO noindex and no robots.txt Disallow: this is the real
+# production domain and must stay indexable. Only the staging host carries
+# those.
+
+services:
+  web:
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      # Read-only: nginx never needs to write to the site, and the page is
+      # updated by editing the file on the host, which needs no restart.
+      - ./html:/usr/share/nginx/html:ro
+    networks: [coolify]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=coolify
+      - traefik.http.middlewares.cs-https.redirectscheme.scheme=https
+      - traefik.http.routers.cs-http.rule=Host(`solsticellp.com`) || Host(`www.solsticellp.com`)
+      - traefik.http.routers.cs-http.entrypoints=http
+      - traefik.http.routers.cs-http.middlewares=cs-https
+      - traefik.http.routers.cs-https.rule=Host(`solsticellp.com`) || Host(`www.solsticellp.com`)
+      - traefik.http.routers.cs-https.entrypoints=https
+      - traefik.http.routers.cs-https.tls=true
+      - traefik.http.routers.cs-https.tls.certresolver=letsencrypt
+      - traefik.http.services.cs.loadbalancer.server.port=80
+    deploy:
+      resources:
+        limits:
+          # A static nginx serving one page. The ceiling exists because an OOM
+          # on this box would be a client-facing outage on someone else's site.
+          memory: 64m
+
+networks:
+  coolify:
+    # Joining Traefik's existing network. `external` means compose fails loudly
+    # if it is missing rather than creating a second, unrouted network.
+    external: true
