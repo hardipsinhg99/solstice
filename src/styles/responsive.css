@@ -3,8 +3,10 @@
 
    Breakpoints, widest first:
      781-1024px  tablet / small laptop
-     <=780px     phone (also the gate for the hero video and the explode
-                 sequence - see features/explode/config.js)
+     <=960px     NAV ONLY - the drawer breakpoint. Separate from 780 on purpose;
+                 see the block's own comment.
+     <=780px     phone (also the gate for the explode sequence and the journey
+                 scroll - see features/explode/config.js, JourneyScroll.jsx)
      <=480px     small phone
      <=390px     narrow phone
 
@@ -60,8 +62,17 @@
   .about-founder-grid{gap:18px}
 }
 
-@media(max-width:780px){
-  .container{width:min(100% - 40px,560px)}
+/* Nav switches to the drawer at 960px, NOT 780px. The bar carries the logo,
+ * seven items, the CTA, the language slot and the theme toggle; it does not
+ * fit until roughly 960px, so between 820 and 960 - iPad portrait - the row
+ * wrapped onto two lines.
+ *
+ * This is deliberately NOT harmonised with the 780px media queries below.
+ * Those gate the explode sequence and the journey scroll for measured
+ * performance reasons; this one is about how much text fits on a line. They
+ * answer different questions and are only coincidentally near each other.
+ */
+@media(max-width:960px){
   .site-header{height:70px}
   .nav{gap:10px}
   .nav-tools{margin-left:auto}
@@ -95,8 +106,19 @@
   .nav-cta:before{display:none}
   .menu-toggle{display:grid}
   .brand-logo img{width:125px}
+  /* inset:0 rather than inset:70px…: the backdrop is now a SIBLING of the
+     header (see Header.jsx), so `fixed` resolves against the viewport again
+     and it covers the full height. The header paints above it on z-index, so
+     the close button stays reachable without carving a hole here.
+     dvh with a vh fallback: on mobile browsers vh is the LARGEST viewport, so
+     a 100vh backdrop sits under the retracted URL bar and leaves an undimmed
+     strip. Declaration order is the fallback - engines without dvh keep vh. */
+  .nav-backdrop{display:block;position:fixed;top:0;left:0;right:0;height:100vh;height:100dvh;background:color-mix(in srgb,var(--deep) 55%,transparent);z-index:90}
+}
+
+@media(max-width:780px){
+  .container{width:min(100% - 40px,560px)}
   .footer-logo img{width:180px}
-  .nav-backdrop{display:block;position:fixed;inset:70px 0 0 0;background:rgba(6,14,10,.4);z-index:90}
 
   .home-hero{height:auto;min-height:790px}
   .home-hero-inner{height:717px;padding-top:61px}

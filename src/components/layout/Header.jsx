@@ -41,6 +41,14 @@ export function Header({ route, theme, setTheme }) {
   const onNavigate = (target) => { navigate(target); setMenuOpen(false) }
 
   return (
+    // Fragment, not a lone <header>, so the backdrop can be a SIBLING of the
+    // header rather than a child of it. That placement is the whole fix, not a
+    // tidy-up: .site-header carries backdrop-filter, and a filtered element
+    // becomes the containing block for its position:fixed descendants. Inside
+    // the header the backdrop's `inset` resolved against an 82px box (68px once
+    // scrolled), so it computed to ~12px tall - or zero - instead of covering
+    // the viewport. Outside it, `fixed` means fixed to the viewport again.
+    <>
     <header className={scrolled ? 'site-header scrolled' : 'site-header'}>
       <div className="container nav">
         <button className="brand brand-logo notranslate" translate="no" onClick={() => onNavigate('home')} aria-label="Solstice home">
@@ -81,7 +89,8 @@ export function Header({ route, theme, setTheme }) {
           </button>
         </div>
       </div>
-      {menuOpen && <div className="nav-backdrop" onClick={() => setMenuOpen(false)} aria-hidden="true"/>}
     </header>
+    {menuOpen && <div className="nav-backdrop" onClick={() => setMenuOpen(false)} aria-hidden="true"/>}
+    </>
   )
 }
