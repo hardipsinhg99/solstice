@@ -378,3 +378,26 @@
   .about-stat{min-height:0}
   .about-industry-grid{grid-template-columns:1fr}
 }
+
+/* ── Hero in landscape ───────────────────────────────────────────────────────
+   .home-hero is a fixed 730px and .home-hero-inner a fixed 620px. On a phone
+   held sideways - 844x390 - that is 1.87x the viewport height, so the buttons
+   and the meta strip sit entirely below the fold and the page opens on a
+   cropped headline with no visible call to action.
+
+   Scoped by ORIENTATION rather than by height alone, and to <=960px so a short
+   desktop window is unaffected: the >=1024px composition must stay
+   pixel-identical, and a 1280x720 browser would otherwise have been recomputed.
+
+   svh, not vh: the small viewport is the one with the browser chrome SHOWING,
+   which is the state a landscape phone opens in. 100vh would size the hero to
+   the retracted-chrome height and put the CTA back under the fold on load -
+   the exact bug being fixed.
+
+   height:auto with a min-height floor rather than a hard cap, so the type scale
+   is untouched: if the copy genuinely needs more than one screen at 390px tall
+   it is allowed to have it and scroll, instead of being crushed to fit. */
+@media(max-width:960px) and (orientation:landscape){
+  .home-hero{height:auto;min-height:100svh}
+  .home-hero-inner{height:auto;min-height:100svh;padding-top:88px;padding-bottom:36px}
+}
