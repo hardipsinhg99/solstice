@@ -43,9 +43,18 @@ export class PagesController {
     @Param('slug') slug: string,
     @Param('key') key: string,
     @Body('data') data: unknown,
+    // Optional: a save that omits it leaves visibility exactly as it was, so
+    // an older client cannot silently un-hide a section by not knowing about
+    // the field. The global ValidationPipe runs with forbidNonWhitelisted, but
+    // @Body(key) reads a property rather than validating a DTO, so the value is
+    // coerced here instead of trusted.
+    @Body('visible') visible: unknown,
     @CurrentAdmin() admin: { id: string },
   ) {
-    return this.pages.saveSection(slug, key, data, admin.id);
+    return this.pages.saveSection(
+      slug, key, data, admin.id,
+      visible === undefined ? undefined : Boolean(visible),
+    );
   }
 
   @UseGuards(JwtAuthGuard)

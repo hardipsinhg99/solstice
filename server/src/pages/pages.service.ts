@@ -68,6 +68,11 @@ export class PagesService {
         // A section that has never been published has nothing to show. It is
         // omitted rather than rendered empty.
         .filter((s) => s.publishedData !== null)
+        // Hidden sections are omitted from the payload, not flagged in it. The
+        // public bundle never learns they exist, so there is nothing for a
+        // component to conditionally render around - and no way for a CSS
+        // mistake to bring one back.
+        .filter((s) => s.publishedVisible)
         .map((s) => ({ key: s.key, type: s.type, data: s.publishedData })),
     };
   }
@@ -84,8 +89,13 @@ export class PagesService {
         ...s,
         // Computed, not stored: a stored flag is one more thing that can drift
         // out of step with the two payloads it is supposed to describe.
+        // Visibility counts as a change. Without this term, toggling a section
+        // off and saving would leave the editor claiming everything was live
+        // while draft and published disagreed.
         hasUnpublishedChanges:
-          s.publishedData === null || JSON.stringify(s.draftData) !== JSON.stringify(s.publishedData),
+          s.publishedData === null ||
+          s.draftVisible !== s.publishedVisible ||
+          JSON.stringify(s.draftData) !== JSON.stringify(s.publishedData),
       })),
     };
   }
@@ -95,7 +105,7 @@ export class PagesService {
   }
 
   /** Saves a draft. Never touches publishedData - that is what Publish is for. */
-  async saveSection(slug: string, key: string, data: unknown, adminId: string) {
+  async saveSection(slug: string, key: string, data: unknown, adminId: string, visible?: boolean) {
     const page = await this.requirePage(slug);
     const section = await this.prisma.pageSection.findUnique({
       where: { pageId_key: { pageId: page.id, key } },
@@ -106,6 +116,9 @@ export class PagesService {
       where: { id: section.id },
       data: {
         draftData: clean(data, RICH_PATHS[section.type] ?? new Set()) as Prisma.InputJsonValue,
+        // Draft side only. publishedVisible moves when Publish runs, exactly
+        // like publishedData - that is what keeps the toggle honest.
+        ...(visible === undefined ? {} : { draftVisible: visible }),
         updatedById: adminId,
       },
     });
@@ -126,7 +139,10 @@ export class PagesService {
       ...sections.map((s) =>
         this.prisma.pageSection.update({
           where: { id: s.id },
-          data: { publishedData: s.draftData as Prisma.InputJsonValue },
+          data: {
+            publishedData: s.draftData as Prisma.InputJsonValue,
+            publishedVisible: s.draftVisible,
+          },
         }),
       ),
       this.prisma.page.update({
@@ -159,7 +175,10 @@ export class PagesService {
         .map((s) =>
           this.prisma.pageSection.update({
             where: { id: s.id },
-            data: { draftData: s.publishedData as Prisma.InputJsonValue },
+            data: {
+              draftData: s.publishedData as Prisma.InputJsonValue,
+              draftVisible: s.publishedVisible,
+            },
           }),
         ),
     );
