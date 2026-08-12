@@ -150,3 +150,29 @@ body:has(.lightbox) .whatsapp-fab{opacity:0;visibility:hidden;transform:scale(.9
 body:has(.chat-panel.visible) .back-to-top,
 body:has(.nav-links.open) .back-to-top,
 body:has(.lightbox) .back-to-top{opacity:0;visibility:hidden;transform:scale(.9);pointer-events:none;transition:opacity .25s var(--ease),transform .25s var(--ease),visibility 0s linear .25s}
+
+/* ── Corner stack: stand aside while scrolling down ──────────────────────────
+   The three fixed buttons overlap real content at phone and small-tablet
+   widths - About's timeline h2, Services' "Global Sourcing & Procurement",
+   Contact's intro - and because they are fixed, the collision travels with the
+   scroll position rather than sitting at one place in the document. Padding a
+   container only relocates it; a global inset on #root would make the
+   full-bleed hero asymmetric and push anything sized in vw into the horizontal
+   overflow the audit just certified at zero. So the stack moves instead.
+   See components/motion/useScrollAway.js.
+
+   `translate`, not `transform`, precisely because these elements already
+   animate transform: .whatsapp-fab and .back-to-top carry scale() in their
+   hidden states and all three scale on hover. Writing `transform` here would
+   overwrite those; `translate` is its own property and composes with them.
+
+   Desktop is untouched - there is room beside a 1180px container, and a control
+   that moves out from under the pointer is worse than one that sits still. */
+@media(max-width:960px){
+  .chat-button,.whatsapp-fab,.back-to-top{transition:translate .28s var(--ease),opacity .25s var(--ease),transform .25s var(--ease),background-color .25s var(--ease),box-shadow .25s var(--ease)}
+  /* calc(100% + inset) clears the button's own width AND the gutter it sits in,
+     so no edge peeks back over the side. */
+  body[data-corner-stack='away'] .chat-button,
+  body[data-corner-stack='away'] .whatsapp-fab,
+  body[data-corner-stack='away'] .back-to-top{translate:calc(100% + var(--chat-launcher-inset)) 0}
+}

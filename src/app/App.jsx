@@ -3,6 +3,7 @@ import { Header } from '../components/layout/Header.jsx'
 import { Footer } from '../components/layout/Footer.jsx'
 import { WhatsAppFab } from '../components/layout/WhatsAppFab.jsx'
 import { BackToTop } from '../components/layout/BackToTop.jsx'
+import { useScrollAway } from '../components/motion/useScrollAway.js'
 import { ChatWidget } from '../features/chat/index.js'
 import { useProductCatalogue } from '../features/products/index.js'
 import HomePage from '../pages/home/HomePage.jsx'
@@ -19,6 +20,10 @@ import { goTo, useHashRoute, isProductRoute, productSlug, isProductsRoute, produ
 import AdminApp from '../pages/admin/AdminApp.jsx'
 
 export function App() {
+  // Keeps the fixed corner stack from sitting on headings mid-scroll. See the
+  // hook for why this is behaviour rather than a layout inset.
+  useScrollAway()
+
   const { theme, setTheme } = useTheme()
   const route = useHashRoute()
   const [products] = useProductCatalogue()
