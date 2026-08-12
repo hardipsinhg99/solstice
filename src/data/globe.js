@@ -1,7 +1,7 @@
-// FALLBACK globe plot data.
+// FALLBACK map plot data.
 //
 // As of the admin-driven globe work, this file is no longer the source. Both
-// globes plot from the page's own location list - Home's footprint legend and
+// maps plot from the page's own location list - Home's footprint legend and
 // About's office list - so changing a country in the admin moves the pin. These
 // arrays are what renders while /api/pages/<slug> is in flight, and if a payload
 // arrives whose rows carry no coordinates yet.
@@ -13,44 +13,24 @@
 // different five-office set, and mutating these in place would silently change
 // Home - a page explicitly out of scope for that work. Two datasets, one Globe
 // component, no fork.
-export const globeMarkers = [
-  { id: 'india', location: [19.0760, 72.8777], label: 'Mumbai, India - HQ' },
-  { id: 'uae', location: [25.2048, 55.2708], label: 'Dubai, UAE' },
-  { id: 'vietnam', location: [10.8231, 106.6297], label: 'Ho Chi Minh City, Vietnam' },
-  { id: 'china', location: [31.2304, 121.4737], label: 'Shanghai, China' }
-]
-export const globeArcs = [
-  { id: 'india-uae', from: [19.0760, 72.8777], to: [25.2048, 55.2708] },
-  { id: 'india-vietnam', from: [19.0760, 72.8777], to: [10.8231, 106.6297] },
-  { id: 'india-china', from: [19.0760, 72.8777], to: [31.2304, 121.4737] }
-]
 
-// --- About page: the five operational offices --------------------------------
-//
-// [CONFIRM] docs/about-us-content.md names a city for exactly one office -
-// Dubai. The other four are pinned to each country's principal commercial city
-// so the globe has a real point to plot, and the India pin follows the
-// registered office recorded in docs/website-strategy.md §3.4 (Ahmedabad).
-// These are plot coordinates, not published claims: the visible office list in
-// the About page renders only the country names the content file actually
-// states. Confirm the real office cities and correct the four marked below.
-const OFFICE_COORDS = {
-  india: [23.0225, 72.5714],      // [CONFIRM] Ahmedabad, per the registered office
-  uae: [25.2048, 55.2708],        // Dubai - stated in the content file
-  uk: [51.5072, -0.1276],         // [CONFIRM] London
-  tanzania: [-6.7924, 39.2083],   // [CONFIRM] Dar es Salaam
-  vietnam: [10.8231, 106.6297]    // [CONFIRM] Ho Chi Minh City
-}
-
-export const aboutOfficeMarkers = [
-  { id: 'india', location: OFFICE_COORDS.india, label: 'India — Headquarters' },
-  { id: 'uae', location: OFFICE_COORDS.uae, label: 'Dubai, United Arab Emirates' },
-  { id: 'uk', location: OFFICE_COORDS.uk, label: 'United Kingdom' },
-  { id: 'tanzania', location: OFFICE_COORDS.tanzania, label: 'Tanzania' },
-  { id: 'vietnam', location: OFFICE_COORDS.vietnam, label: 'Vietnam' }
+// ── Map fallbacks ────────────────────────────────────────────────────────────
+// The world map takes rows in the same shape the CMS stores, so the fallbacks
+// are expressed that way rather than as pre-projected markers. Ahmedabad is the
+// India coordinate on BOTH pages now: Home previously carried Mumbai, which put
+// the same headquarters ~530km apart between two pages - unnoticeable on a
+// rotating globe, obvious on a flat labelled map.
+export const HOME_MAP_FALLBACK = [
+  { text: 'India - Headquarters', lat: 23.0225, lng: 72.5714, hq: true },
+  { text: 'United Arab Emirates', lat: 25.2048, lng: 55.2708 },
+  { text: 'Vietnam', lat: 10.8231, lng: 106.6297 },
+  { text: 'China', lat: 31.2304, lng: 121.4737 }
 ]
 
-// Arcs radiate from the India headquarters to each other office.
-export const aboutOfficeArcs = aboutOfficeMarkers
-  .filter(marker => marker.id !== 'india')
-  .map(marker => ({ id: `india-${marker.id}`, from: OFFICE_COORDS.india, to: marker.location }))
+export const ABOUT_MAP_FALLBACK = [
+  { country: 'India', lat: 23.0225, lng: 72.5714, hq: true },
+  { country: 'United Arab Emirates', lat: 25.2048, lng: 55.2708 },
+  { country: 'United Kingdom', lat: 51.5072, lng: -0.1276 },
+  { country: 'Tanzania', lat: -6.7924, lng: 39.2083 },
+  { country: 'Vietnam', lat: 10.8231, lng: 106.6297 }
+]

@@ -1,32 +1,19 @@
 import { Eyebrow } from '../../../components/ui/Eyebrow.jsx'
 import { Reveal } from '../../../components/motion/Reveal.jsx'
 import { useMemo } from 'react'
-import { Globe, useGlobeTheme, globeFromLocations } from '../../../features/globe/index.js'
-import { aboutOfficeMarkers, aboutOfficeArcs } from '../../../data/globe.js'
-import { useTheme } from '../../../app/ThemeProvider.jsx'
+import { WorldMap, mapFromLocations } from '../../../features/worldmap/index.js'
+import { ABOUT_MAP_FALLBACK } from '../../../data/globe.js'
 
-// Wraps the existing WebGL globe with the About page's office data. It does not
-// fork the component - same features/globe module the Home page uses, different
-// dataset from data/globe.js.
+// Wraps the dotted world map with the About page's office data. It does not
+// fork the component - the same features/worldmap module the Home page uses,
+// a different dataset.
 //
-// On the second-mount question: the router renders exactly one page at a time,
-// so the Home instance and this one can never be alive together and cannot
-// contend for a WebGL context. useGlobeTheme is still what keeps this instance
-// stable on its own - its memo gives the colour arrays a fixed identity across
-// re-renders, and the marker/arc arrays are module constants, so every value in
-// Globe's effect dependency list is referentially stable and the context is
-// created once per mount.
-//
-// theme comes from useTheme() rather than a prop: App.jsx renders <AboutPage/>
-// with no props, and reaching for the context here avoids editing the shell.
-//
-// The office list is real DOM, not canvas labels. The globe is a decorative
-// supplement - every office it plots is readable, and screen-reader accessible,
-// in the list beside it.
+// The office list is real DOM, not map labels. The map is aria-hidden and
+// decorative: every office it plots is readable, and screen-reader accessible,
+// in the list beside it. That list is the accessible source of truth, which is
+// why the map itself takes no tab stop.
 export function GlobalPresence({ data }) {
   const globalPresence = data ?? {}
-  const { theme } = useTheme()
-  const globeTheme = useGlobeTheme(theme)
 
   // The globe plots the SAME list the offices are rendered from, so editing a
   // country in the admin moves the pin. data/globe.js is the fallback for a
@@ -34,12 +21,12 @@ export function GlobalPresence({ data }) {
   // Memoised because Globe's effect depends on these arrays by identity.
   const offices = globalPresence.offices
   const plot = useMemo(
-    () => globeFromLocations(
-      offices,
-      (o) => [o.country, o.city].filter(Boolean).join(', ') || o.note || '',
-      { markers: aboutOfficeMarkers, arcs: aboutOfficeArcs }
+    () => mapFromLocations(
+      globalPresence.offices,
+      (row) => row.country ?? row.text ?? '',
+      ABOUT_MAP_FALLBACK
     ),
-    [offices]
+    [globalPresence.offices]
   )
 
   return (
@@ -56,7 +43,7 @@ export function GlobalPresence({ data }) {
             {/* aria-hidden: the canvas carries no text alternative that the
                 adjacent list does not already provide in full. */}
             <div aria-hidden="true">
-              <Globe markers={plot.markers} arcs={plot.arcs} phi={plot.phi} {...globeTheme}/>
+              <WorldMap markers={plot.markers} arcs={plot.arcs}/>
             </div>
           </Reveal>
 

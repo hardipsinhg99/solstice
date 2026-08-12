@@ -19,3 +19,41 @@
 .quiet-link svg{transition:transform .3s var(--ease)}
 .quiet-link:hover{color:var(--green-600)}
 .quiet-link:hover svg{transform:translateX(3px)}
+
+/* ── World map ───────────────────────────────────────────────────────────────
+   Replaced the cobe WebGL globe on Home and About. Land is a CSS mask over a
+   token colour rather than markup: /world-dots.svg is 5,947 dots, and inlining
+   it would put 5,947 nodes in the DOM on two pages for something that never
+   changes. As a mask it costs no DOM, no JS and no bundle, and one custom
+   property recolours it for both themes. */
+.worldmap{position:relative;width:100%;aspect-ratio:2/1}
+.worldmap-dots{position:absolute;inset:0;background-color:var(--line-strong);
+  -webkit-mask:url('/world-dots.svg') center/100% 100% no-repeat;
+  mask:url('/world-dots.svg') center/100% 100% no-repeat}
+.worldmap-overlay{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+
+/* --green-500 is the identity green and reads on both themes' map ground; the
+   ramp is not used here because the dots behind it do not invert the way a
+   surface does. */
+.worldmap-arc{stroke:var(--green-500);stroke-width:1.1;stroke-linecap:round;opacity:.85}
+.worldmap-pin{fill:var(--green-500)}
+.worldmap-pin.is-hq{fill:var(--green-600);r:4}
+.worldmap-pulse{fill:var(--green-500)}
+
+.worldmap-labels{position:absolute;inset:0;pointer-events:none}
+/* Labels sit ON the map, so they carry their own surface rather than relying on
+   the dot field behind them - measured 13.6:1 light (--ink on --surface) and
+   13.2:1 dark, well clear of 4.5:1, and independent of which dots fall behind. */
+.worldmap-label{position:absolute;transform:translate(-50%,-160%);white-space:nowrap;
+  background:var(--surface);color:var(--ink);border:1px solid var(--line);
+  border-radius:999px;padding:3px 9px;font:600 11px/1 'DM Sans',sans-serif;
+  letter-spacing:-.1px;box-shadow:var(--elev-1)}
+
+/* prefers-reduced-motion needs no rule here, and that is deliberate rather than
+   an omission. The pulses are not rendered at all (see WorldMap.jsx - a media
+   query cannot reach inside SVG SMIL, so the elements are omitted instead), and
+   the arc draw lives inside gsap.matchMedia('(prefers-reduced-motion:
+   no-preference)'), which never runs under reduce - so GSAP never writes the
+   inline strokeDasharray there would be anything to override. An !important
+   here would only have been fighting a declaration that is never set.
+   The map renders complete and still. */

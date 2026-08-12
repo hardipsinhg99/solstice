@@ -4,9 +4,9 @@ import { Eyebrow } from '../../components/ui/Eyebrow.jsx'
 import { Icon } from '../../components/ui/Icon.jsx'
 import { cardProps } from '../../components/ui/Card.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
-import { Globe, useGlobeTheme, globeFromLocations } from '../../features/globe/index.js'
+import { WorldMap, mapFromLocations } from '../../features/worldmap/index.js'
 import { useProductCatalogue } from '../../features/products/index.js'
-import { globeMarkers, globeArcs } from '../../data/globe.js'
+import { HOME_MAP_FALLBACK } from '../../data/globe.js'
 import { useNavigate } from '../../app/navigation.js'
 import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
 import { usePage } from '../../features/pages/index.js'
@@ -35,11 +35,10 @@ export default function HomePage({ selectProduct, theme }) {
   // undefined into ProductCard - the section simply has nothing in it for a
   // moment, which is the honest state.
   const homeProducts = [products[0], products[3], products[1]].filter(Boolean)
-  const globeTheme = useGlobeTheme(theme)
   // Same rule as About: the legend beside the globe is what plots it.
   const legend = footprint.legend
   const plot = useMemo(
-    () => globeFromLocations(legend, (row) => row.text, { markers: globeMarkers, arcs: globeArcs }),
+    () => mapFromLocations(legend, (row) => row.text, HOME_MAP_FALLBACK),
     [legend]
   )
   return <>
@@ -115,7 +114,7 @@ export default function HomePage({ selectProduct, theme }) {
         </Reveal>
         <div className="globe-layout">
           <Reveal as="div" delay={100} className="globe-stage">
-            <Globe markers={plot.markers} arcs={plot.arcs} phi={plot.phi} {...globeTheme}/>
+            <WorldMap markers={plot.markers} arcs={plot.arcs}/>
           </Reveal>
           <Reveal as="div" delay={160} className="globe-legend">
             <ul>
