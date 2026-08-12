@@ -72,5 +72,17 @@ export function usePage(slug, fallback = {}) {
   // Until the fetch lands - and if it fails - the caller's own copy is used, so
   // the page renders its existing wording instead of a blank frame.
   const section = (key) => map[key] ?? fallback[key] ?? {}
-  return { section, status, loaded: Boolean(data) }
+
+  // Presence, which is NOT the same question as content. findPublic omits a
+  // hidden section entirely, so absence from `map` is how the server says
+  // "hidden" - but `section()` would quietly substitute the fallback and render
+  // it anyway. Callers that must not mount a hidden section ask this instead.
+  //
+  // Before the fetch lands it answers from the fallback rather than defaulting
+  // to true: a section with no fallback entry stays unmounted until the server
+  // has actually confirmed it, which is what keeps a hidden section from
+  // mounting for one frame and firing off its image requests.
+  const shows = (key) => (data ? key in map : key in fallback)
+
+  return { section, shows, status, loaded: Boolean(data) }
 }

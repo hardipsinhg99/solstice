@@ -119,6 +119,11 @@ const HOME = [
     ]
   },
   {
+    key: 'journey', type: 'home.journey', label: 'Logistics journey animation',
+    help: 'The scroll-driven crane, truck and ship sequence. It has no editable copy yet - this entry exists so the sequence can be shown or hidden. Hidden means it is not rendered at all: none of its fourteen images are downloaded.',
+    fields: []
+  },
+  {
     key: 'manifesto', type: 'home.manifesto', label: 'The Solstice approach',
     fields: [
       f('image', 'Image', 'image'),

@@ -75,6 +75,9 @@ const HOME: Section[] = [
       { number: '03', title: 'Discuss the fit', body: 'We will discuss seasonal availability and the practical next steps for your requirement.' },
     ],
   } },
+  // No editable copy yet - the row exists so the sequence has a section to be
+  // shown or hidden by. Seeded visible, like everything else.
+  { key: 'journey', type: 'home.journey', data: {} },
   { key: 'manifesto', type: 'home.manifesto', data: {
     image: null,
     stats: [

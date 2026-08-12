@@ -261,7 +261,21 @@ export function JourneyScroll({ assets = {} }) {
       })
     })
 
-    return () => mm.revert()
+    // mm.revert() is the existing cleanup and it is already correct: every tween
+    // and ScrollTrigger created inside the matchMedia scope is killed with it, so
+    // nothing is orphaned when this section unmounts. Reused rather than replaced
+    // with a second hand-rolled teardown, for exactly that reason.
+    //
+    // The refresh is the new part. This section owns a 420vh runway, so mounting
+    // or unmounting it moves the document height by several viewports. Any other
+    // trigger measured against the old height would then fire at the wrong scroll
+    // position - and the symptom would surface on a different section from the
+    // one that was toggled, which is a miserable thing to debug later.
+    ScrollTrigger.refresh()
+    return () => {
+      mm.revert()
+      ScrollTrigger.refresh()
+    }
   }, [])
 
   return (

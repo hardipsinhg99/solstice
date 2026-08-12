@@ -20,7 +20,7 @@ export default function HomePage({ selectProduct, theme }) {
   // Published section data, edited at #admin/page-home. HOME_FALLBACK is the
   // wording that was hardcoded here before, kept as the pre-fetch and
   // API-unreachable render so the page is never a blank frame.
-  const { section } = usePage('home', HOME_FALLBACK)
+  const { section, shows } = usePage('home', HOME_FALLBACK)
   const hero = section('hero')
   const intro = section('intro')
   const cards = section('differentiators')
@@ -157,7 +157,10 @@ export default function HomePage({ selectProduct, theme }) {
       </div>
     </section>
 
-    <JourneyScroll/>
+    {/* Not display:none. A hidden section is absent from the API payload, so
+        the component never mounts, no ScrollTrigger is created and none of the
+        fourteen /journey/*.webp files are requested. */}
+    {shows('journey') && <JourneyScroll/>}
 
     <section className="buyer-path">
       <div className="container">
