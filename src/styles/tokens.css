@@ -116,6 +116,23 @@
      values are near-black; the dark theme carries more alpha because it starts
      from an already-dark page. Light measures 3.32:1 against --bg. */
   --scrim:rgba(9,20,14,.5);
+  /* WORLD MAP.
+     The map's routes were painted with --green-500 over a --line-strong dot
+     field and measured 1.17:1 against it - not a low-contrast choice, an
+     invisible one. Two different token NAMES with nearly identical luminance,
+     which is exactly the trap of checking names instead of measuring.
+     The dot field is texture, so it goes light and stays deliberately low
+     against the page (1.32:1); the routes are content, so they carry their own
+     accent measured against the dots, not against the page:
+       light  --map-accent #06795A on --map-dots #D3DBD5 = 3.82:1
+       dark   --map-accent #2FE3C0 on --map-dots #22402F = 6.99:1
+     Both clear the 3:1 that SC 1.4.11 asks of a meaningful graphic. Retuning
+     the route colour - to the reference's blue, if the client prefers it - is a
+     one-line change here; the luminous quality comes from the gradient and the
+     glow filter, not the hue. */
+  --map-dots:#D3DBD5;
+  --map-accent:#06795A;
+  --map-accent-glow:#0FA87C;
   /* The FAB stacks directly above the chat launcher, so its inset is derived
      from that launcher's geometry rather than guessed. These mirror .chat-button
      in footer.css and are restated at the same breakpoints in responsive.css -
@@ -180,6 +197,9 @@ html[data-theme='dark']{
   --elev-1:0 2px 6px rgba(0,0,0,.3),0 12px 28px rgba(0,0,0,.34);
   --elev-2:0 6px 14px rgba(0,0,0,.42),0 30px 60px rgba(0,0,0,.5);
   --scrim:rgba(0,0,0,.66);
+  --map-dots:#22402F;
+  --map-accent:#2FE3C0;
+  --map-accent-glow:#5CF0D4;
 }
 /* Hero treatment. The image itself no longer swaps with the theme - one
    branded composite serves both, and inverting a photograph of the company's

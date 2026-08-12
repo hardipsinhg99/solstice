@@ -21,39 +21,56 @@
 .quiet-link:hover svg{transform:translateX(3px)}
 
 /* ── World map ───────────────────────────────────────────────────────────────
-   Replaced the cobe WebGL globe on Home and About. Land is a CSS mask over a
-   token colour rather than markup: /world-dots.svg is 5,947 dots, and inlining
-   it would put 5,947 nodes in the DOM on two pages for something that never
-   changes. As a mask it costs no DOM, no JS and no bundle, and one custom
-   property recolours it for both themes. */
-.worldmap{position:relative;width:100%;aspect-ratio:2/1}
-.worldmap-dots{position:absolute;inset:0;background-color:var(--line-strong);
+   Land is a CSS mask over a token colour rather than markup: /world-dots.svg is
+   5,947 dots, and inlining it would put 5,947 nodes in the DOM on two pages for
+   something that never changes. As a mask it costs no DOM, no JS and no bundle,
+   and one custom property recolours it for both themes.
+
+   The routes carry their OWN accent, not the brand ramp. Painted with
+   --green-500 over a --line-strong dot field they measured 1.17:1 against it -
+   two different token names at nearly the same luminance, which is invisible by
+   construction rather than merely low contrast. --map-accent is measured against
+   --map-dots: 3.82:1 light, 6.99:1 dark. See tokens.css. */
+.worldmap{position:relative;width:100%;aspect-ratio:2/1;isolation:isolate}
+/* Explicit z-index on both, rather than relying on document order: the overlay
+   must paint above the mask, and "it happens to come second" is not a guarantee
+   worth depending on once anything else in here grows a stacking context. */
+.worldmap-dots{position:absolute;inset:0;z-index:0;background-color:var(--map-dots);
   -webkit-mask:url('/world-dots.svg') center/100% 100% no-repeat;
   mask:url('/world-dots.svg') center/100% 100% no-repeat}
-.worldmap-overlay{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.worldmap-overlay{position:absolute;inset:0;z-index:1;width:100%;height:100%;overflow:visible}
 
-/* --green-500 is the identity green and reads on both themes' map ground; the
-   ramp is not used here because the dots behind it do not invert the way a
-   surface does. */
-.worldmap-arc{stroke:var(--green-500);stroke-width:1.1;stroke-linecap:round;opacity:.85}
-.worldmap-pin{fill:var(--green-500)}
-.worldmap-pin.is-hq{fill:var(--green-600);r:4}
-.worldmap-pulse{fill:var(--green-500)}
+/* Stroke comes from the gradient in <defs>, so only the weight lives here. The
+   finished, drawn state IS the default - no dash offset in CSS - so the map is
+   complete before any JavaScript runs. */
+.worldmap-arc{stroke-width:1.4;stroke-linecap:round;fill:none}
+.worldmap-pin{fill:var(--map-accent)}
+.worldmap-pin.is-hq{fill:var(--map-accent-glow);r:4.2}
+.worldmap-pulse{fill:var(--map-accent-glow)}
+/* offset-distance is driven from --wm-travel so GSAP animates one custom
+   property and the browser does the path geometry. offset-rotate:0 keeps the
+   dot round rather than rotating it along the tangent. */
+.worldmap-spark{fill:var(--map-accent-glow);opacity:0;
+  offset-distance:calc(var(--wm-travel,0) * 100%);offset-rotate:0deg}
 
-.worldmap-labels{position:absolute;inset:0;pointer-events:none}
-/* Labels sit ON the map, so they carry their own surface rather than relying on
-   the dot field behind them - measured 13.6:1 light (--ink on --surface) and
-   13.2:1 dark, well clear of 4.5:1, and independent of which dots fall behind. */
+.worldmap-labels{position:absolute;inset:0;z-index:2;pointer-events:none}
+/* The pill carries its own surface, so legibility never depends on which dots
+   happen to fall behind it: --ink on --surface measures 13.6:1 light and 13.2:1
+   dark, both far clear of 4.5:1. */
 .worldmap-label{position:absolute;transform:translate(-50%,-160%);white-space:nowrap;
   background:var(--surface);color:var(--ink);border:1px solid var(--line);
   border-radius:999px;padding:3px 9px;font:600 11px/1 'DM Sans',sans-serif;
   letter-spacing:-.1px;box-shadow:var(--elev-1)}
 
+/* ?mapdebug=1 only - see WorldMap.jsx. Deliberately loud. */
+.worldmap-debug{position:absolute;inset:auto 0 0 0;z-index:3;margin:0;padding:8px 10px;
+  background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger);
+  font:500 10px/1.5 'DM Mono',monospace;white-space:pre-wrap;overflow:auto;max-height:60%}
+
 /* prefers-reduced-motion needs no rule here, and that is deliberate rather than
-   an omission. The pulses are not rendered at all (see WorldMap.jsx - a media
-   query cannot reach inside SVG SMIL, so the elements are omitted instead), and
-   the arc draw lives inside gsap.matchMedia('(prefers-reduced-motion:
+   an omission. The pulses and sparks are not rendered at all (a media query
+   cannot reach inside SVG SMIL, so the elements are omitted instead), and the
+   arc draw lives inside gsap.matchMedia('(prefers-reduced-motion:
    no-preference)'), which never runs under reduce - so GSAP never writes the
-   inline strokeDasharray there would be anything to override. An !important
-   here would only have been fighting a declaration that is never set.
-   The map renders complete and still. */
+   inline strokeDashoffset there would be anything to override. The map renders
+   complete, glowing and still. */
