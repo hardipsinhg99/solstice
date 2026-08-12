@@ -43,17 +43,32 @@ export function WorldMap({ markers = [], arcs = [], className = '' }) {
     // inside, so nothing is orphaned when the section unmounts.
     const mm = gsap.matchMedia(scope)
 
+    // PROGRESSIVE ENHANCEMENT, and this is the correction to the previous
+    // version rather than a tweak.
+    //
+    // Before, `gsap.set` hid the arcs (dashoffset = full length) and the tween
+    // brought them back. That makes the drawn state depend on JavaScript
+    // completing: if GSAP fails to load, if matchMedia does not match, if the
+    // element is measured at zero length before layout, or if the effect is
+    // torn down mid-tween, the arcs stay at full offset and are invisible
+    // forever. The content was hostage to the animation.
+    //
+    // Now CSS renders the finished state - solid arcs, solid pins, labels - and
+    // JS only ever hides-then-redraws inside the no-preference branch, undoing
+    // itself on revert. Nothing here is required for the map to be complete.
     mm.add('(prefers-reduced-motion: no-preference)', () => {
       const paths = gsap.utils.selector(scope)('.worldmap-arc')
       paths.forEach((path) => {
         const len = path.getTotalLength()
-        gsap.set(path, { strokeDasharray: len, strokeDashoffset: len })
-      })
-      gsap.to(paths, {
-        strokeDashoffset: 0,
-        duration: 1.4,
-        ease: 'power2.inOut',
-        stagger: 0.18
+        // A path measured before layout reports 0. Animating from 0 would blank
+        // it, so it is left alone and simply renders in its finished state.
+        if (!len) return
+        gsap.fromTo(
+          path,
+          { strokeDasharray: len, strokeDashoffset: len },
+          { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut',
+            delay: paths.indexOf(path) * 0.18, clearProps: 'strokeDasharray,strokeDashoffset' }
+        )
       })
     })
 
@@ -69,10 +84,17 @@ export function WorldMap({ markers = [], arcs = [], className = '' }) {
   return (
     <div className={`worldmap ${className}`.trim()} ref={root} aria-hidden="true">
       <div className="worldmap-dots"/>
+      {/* preserveAspectRatio is "none", not "xMidYMid meet". The land is a CSS
+          mask sized `100% 100%`, which STRETCHES to the box; "meet" would FIT
+          instead, letterboxing the overlay inside a box the mask had already
+          filled. Two different sizing mechanisms agree only while the container
+          is exactly 2:1, and any later change to that ratio would slide every
+          marker off the coastline. "none" stretches identically to the mask, so
+          they now agree by construction at any container shape. */}
       <svg
         className="worldmap-overlay"
         viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
-        preserveAspectRatio="xMidYMid meet"
+        preserveAspectRatio="none"
         focusable="false"
       >
         {arcs.map((a) => (
@@ -83,8 +105,11 @@ export function WorldMap({ markers = [], arcs = [], className = '' }) {
           const { x, y } = project(m.lng, m.lat)
           return (
             <g key={m.id ?? m.label}>
-              {/* The halo pulses; the core stays put so the position always
-                  reads exactly, even mid-animation. */}
+              {/* Only the HALO is conditional. The pin below is always
+                  rendered, so reduced motion removes the movement and never the
+                  content - the marker, its position and its label all survive.
+                  SVG <animate> cannot be reached by a media query, so omitting
+                  the element is the only way to honour the preference. */}
               {!still && (
                 <circle className="worldmap-pulse" cx={x} cy={y} r="3">
                   <animate attributeName="r" from="3" to="9" dur="2.4s" repeatCount="indefinite"/>

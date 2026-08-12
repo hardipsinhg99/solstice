@@ -401,3 +401,16 @@
   .home-hero{height:auto;min-height:100svh}
   .home-hero-inner{height:auto;min-height:100svh;padding-top:88px;padding-bottom:36px}
 }
+
+/* World map labels are dropped on phones. At 390px the map is ~310x155 and five
+   pill labels cannot sit on it without overlapping each other and the
+   coastlines. The names are not lost: both pages render the same locations as a
+   real list beside the map, and that list is already the accessible source of
+   truth - so this removes a duplicate, not information. Arcs and pins stay,
+   which is what makes the shape of the network readable at that size. */
+@media(max-width:780px){
+  .worldmap-labels{display:none}
+  /* Slightly larger pins to stay legible once the labels are gone. */
+  .worldmap-pin{r:4}
+  .worldmap-pin.is-hq{r:5}
+}
