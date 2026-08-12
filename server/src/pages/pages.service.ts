@@ -17,14 +17,18 @@ import { sanitizePlainText, sanitizeRichOptional } from '../common/sanitize';
  * cleaners), but a plain textarea could store <img> and <a> tags that the page
  * then prints literally, because it renders that field as a string.
  *
- * Two entries, because exactly two section types carry rich text. Adding a
- * third rich field means adding it here as well as in sectionTypes.js - which
- * is deliberate: the server must not infer its security posture from a name it
- * happens to share with the client.
+ * Adding a rich field means adding it here as well as in sectionTypes.js -
+ * which is deliberate: the server must not infer its security posture from a
+ * name it happens to share with the client. Miss this step and the field is
+ * still safe (it falls through to the plain-text cleaner), it just silently
+ * loses its formatting - which is the failure direction we want.
  */
 const RICH_PATHS: Record<string, Set<string>> = {
   'about.story': new Set(['nodes.body']),
   'about.missionVision': new Set(['items.body']),
+  // Per-founder bio, added with the N-founder repeater. Array indices are not
+  // part of the path, so this one entry covers every row.
+  'about.founders': new Set(['people.bio']),
 };
 
 function clean(value: unknown, rich: Set<string>, path = ''): unknown {

@@ -11,13 +11,17 @@
 // When real photography arrives, pass `photo` and the same slot renders it at
 // the same dimensions - no layout change, no CLS.
 
+// Defensive on the argument: this used to assume a non-empty string, and a row
+// saved from the admin with the name left blank threw on .split before the
+// section could render. Founders.jsx now filters those out, so this is the
+// second line of defence rather than the only one.
 const initials = (name) =>
-  name
+  (name ?? '')
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
     .map(part => part[0].toUpperCase())
-    .join('')
+    .join('') || '·'
 
 export function FounderPhoto({ name, photo }) {
   // Phase 1e: `photo` became a media object rather than a bare URL, because it

@@ -110,7 +110,10 @@ const ABOUT: Section[] = [
   { key: 'founders', type: 'about.founders', data: {
     heading: 'Two Founders. One Global Vision.',
     intro: 'Founded by Zeel Patel and Yash Vaghela, Solstice combines technology-driven thinking with engineering expertise.',
-    principle: 'Execution over promises.',
+    // Deliberately blank. `principle` remains a field on the section, so the
+    // client can reword or restore this pull-quote from the admin at any time
+    // without a code change - blank simply does not render.
+    principle: '',
     mission: 'Their mission is to simplify international trade by providing reliable sourcing, transparent communication, and dependable logistics for buyers around the world.',
     // photo stays null: the card renders an initials monogram, never a stock
     // photograph of a stranger. website-strategy.md 2.5 option (c).

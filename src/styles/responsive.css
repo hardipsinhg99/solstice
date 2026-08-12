@@ -320,9 +320,17 @@
   .about-timeline-node{padding-left:32px;padding-bottom:28px}
   .about-timeline-body p{font-size:14px}
 
-  /* Quote moves below the two founders rather than dividing them. */
+  /* One column below 780px. The intrinsic rule would land here anyway - the
+     container is ~350px at 390px wide, so only one minmax(240px,1fr) track
+     fits - but it is stated explicitly so a future change to the minimum
+     cannot accidentally put two cramped cards side by side on a phone.
+     The old `.about-principle{order:3}` went with this: the quote used to be a
+     grid child that needed reordering out from between the cards. It now
+     renders after the grid entirely, so there is no order to correct. */
   .about-founder-grid{grid-template-columns:1fr;gap:18px}
-  .about-principle{order:3;padding:8px 0}
+  .about-founder-grid[data-count="1"],
+  .about-founder-grid[data-count="2"]{max-width:none}
+  .about-principle{padding:8px 0}
   .about-founder-mission{margin-top:30px;text-align:left}
 
   .about-industry-grid{grid-template-columns:1fr 1fr;gap:10px}

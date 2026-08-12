@@ -53,7 +53,7 @@ export const ABOUT_FALLBACK = {
     ],
     "heading": "Two Founders. One Global Vision.",
     "mission": "Their mission is to simplify international trade by providing reliable sourcing, transparent communication, and dependable logistics for buyers around the world.",
-    "principle": "Execution over promises."
+    "principle": ""
   },
   "whatWeDo": {
     "intro": "We specialize in sourcing and exporting products from India across multiple industries.",

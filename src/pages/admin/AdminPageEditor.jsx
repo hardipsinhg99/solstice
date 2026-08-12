@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { PAGE_CONFIG, useAdminPage, saveSection, publishPage, unpublishPage, discardDraft } from '../../features/pages/index.js'
+import { PAGE_CONFIG, useAdminPage, saveSection, publishPage, unpublishPage, discardDraft, validateSection } from '../../features/pages/index.js'
 import { Field } from '../../components/admin/SectionFields.jsx'
 import { DangerConfirm } from '../../components/admin/DangerConfirm.jsx'
 import { TeamMembersManager } from './sections/TeamMembersManager.jsx'
@@ -55,6 +55,19 @@ export default function AdminPageEditor({ slug }) {
 
   const save = async (key) => {
     setSavingKey(key); setActionError(''); setSavedKey('')
+
+    // Required fields are checked before the request, not after. A repeater row
+    // is the one place an editor creates an entity rather than edits a value -
+    // "Add founder" makes a card - and a nameless card renders as an empty box
+    // the public component then filters away. Refusing the save and naming the
+    // row is far kinder than accepting it and showing nothing.
+    const problems = validateSection(config.sections.find((s) => s.key === key), drafts[key])
+    if (problems.length) {
+      setActionError(problems.join(' '))
+      setSavingKey('')
+      return
+    }
+
     try {
       await saveSection(slug, key, drafts[key])
       await reload()

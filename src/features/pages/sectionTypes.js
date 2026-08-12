@@ -166,13 +166,24 @@ const ABOUT = [
   },
   {
     key: 'founders', type: 'about.founders', label: 'Founders',
-    help: 'Leave a photo empty and the card renders an initials monogram. It never falls back to a stock photograph of a stranger.',
+    help: 'Add, remove and reorder as many founders as you need - the row reflows to fit. Leave a photo empty and the card renders an initials monogram. It never falls back to a stock photograph of a stranger.',
     fields: [
       f('heading', 'Heading'), f('intro', 'Intro', 'textarea'),
-      f('principle', 'Principle'), f('mission', 'Mission', 'textarea'),
+      f('principle', 'Principle', 'text', {
+        help: 'Optional pull-quote shown under the founders. Leave blank and it is not rendered at all.'
+      }),
+      f('mission', 'Mission', 'textarea'),
       f('people', 'Founders', 'list', {
         itemLabel: 'Founder',
-        fields: [f('name', 'Name'), f('role', 'Role'), f('photo', 'Photograph', 'image')]
+        fields: [
+          // required: the monogram is built from the name and the card heading
+          // IS the name, so a nameless founder renders an empty box. The public
+          // component filters those out; this stops one being saved at all.
+          f('name', 'Name', 'text', { required: true }),
+          f('role', 'Role'),
+          f('bio', 'Short bio', 'rich'),
+          f('photo', 'Photograph', 'image')
+        ]
       })
     ]
   },
@@ -360,3 +371,38 @@ export const pageSection = (slug) => `page-${slug}`
 export const PAGE_TITLES = Object.fromEntries(
   EDITABLE_PAGES.map((p) => [pageSection(p.slug), p.title])
 )
+
+/**
+ * Required-field check for one section's draft, walking `list` repeaters into
+ * their items so a blank name inside a founder row is caught rather than saved.
+ *
+ * Exists because a repeater row is the one place an editor can create an
+ * *entity* rather than edit a value: pressing "Add founder" makes a card, and a
+ * card with no name renders an empty box with a blank monogram plate. The
+ * public component filters those out defensively, but silently dropping a row
+ * the editor just created is worse than refusing to save it - they would see no
+ * error and no card, and have no way to tell which.
+ *
+ * Returns an array of human-readable messages; empty means valid.
+ */
+export function validateSection(section, data) {
+  const errors = []
+
+  const walk = (fields, value, path) => {
+    for (const field of fields ?? []) {
+      if (field.kind === 'list') {
+        const items = Array.isArray(value?.[field.name]) ? value[field.name] : []
+        const label = field.itemLabel ?? 'Item'
+        items.forEach((item, i) => walk(field.fields, item, `${label} ${i + 1}`))
+        continue
+      }
+      if (!field.required) continue
+      const v = value?.[field.name]
+      const blank = v == null || (typeof v === 'string' && v.trim() === '')
+      if (blank) errors.push(`${path ? `${path}: ` : ''}${field.label} is required.`)
+    }
+  }
+
+  walk(section?.fields, data ?? {}, '')
+  return errors
+}
