@@ -287,6 +287,18 @@ model PageSection {
   draftData     Json
   publishedData Json?
 
+  /// Section-level visibility, split into a draft and a published value for
+  /// exactly the same reason the payload is: hiding a section is content, so it
+  /// has to travel through save -> publish like every other edit. A single
+  /// `visible` column would have been the one control in the CMS that changed
+  /// the live site the instant it was clicked, and Phase 1e's rule is that an
+  /// editor can always answer "is this live?".
+  ///
+  /// Both default to true. A migration defaulting to false would have hidden
+  /// every section of every page the moment it ran.
+  draftVisible     Boolean @default(true)
+  publishedVisible Boolean @default(true)
+
   updatedAt   DateTime @updatedAt
   updatedById String?
   updatedBy   Admin?   @relation(fields: [updatedById], references: [id], onDelete: SetNull)
