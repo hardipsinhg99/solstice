@@ -28,12 +28,17 @@ export default function AdminPageEditor({ slug }) {
   const [actionError, setActionError] = useState('')
   const [busy, setBusy] = useState(false)
   const [confirming, setConfirming] = useState(null)
+  // Section visibility, held alongside the field drafts and saved by the same
+  // button. Kept out of `drafts` because it is not a field - it never appears
+  // in the section's data payload and must not be sanitized as content.
+  const [visible, setVisible] = useState({})
 
   // Seed the local editing copy from the server's draft. Keyed by section, so
   // saving one section never discards unsaved work in another.
   useEffect(() => {
     if (!page) return
     setDrafts(Object.fromEntries(page.sections.map((s) => [s.key, s.draftData ?? {}])))
+    setVisible(Object.fromEntries(page.sections.map((s) => [s.key, s.draftVisible !== false])))
   }, [page])
 
   if (!config) return <p className="admin-error" role="alert">No editor is configured for “{slug}”.</p>
@@ -49,7 +54,11 @@ export default function AdminPageEditor({ slug }) {
   }
 
   const sectionRow = (key) => page.sections.find((s) => s.key === key)
-  const isDirty = (key) => JSON.stringify(drafts[key]) !== JSON.stringify(sectionRow(key)?.draftData ?? {})
+  const isDirty = (key) =>
+    JSON.stringify(drafts[key]) !== JSON.stringify(sectionRow(key)?.draftData ?? {}) ||
+    // Without this the Save button stays disabled after toggling visibility and
+    // nothing the editor did could be persisted.
+    (visible[key] ?? true) !== (sectionRow(key)?.draftVisible !== false)
   const pendingPublish = page.sections.filter((s) => s.hasUnpublishedChanges).length
   const unsaved = config.sections.filter((s) => !s.managed && isDirty(s.key)).length
 
@@ -69,7 +78,7 @@ export default function AdminPageEditor({ slug }) {
     }
 
     try {
-      await saveSection(slug, key, drafts[key])
+      await saveSection(slug, key, drafts[key], visible[key] ?? true)
       await reload()
       setSavedKey(key)
     } catch (err) {
@@ -142,13 +151,34 @@ export default function AdminPageEditor({ slug }) {
 
         const dirty = isDirty(section.key)
         return (
-          <section className="admin-section-card" key={section.key} aria-labelledby={`sec-${section.key}`}>
+          <section
+            className={(visible[section.key] ?? true)
+              ? 'admin-section-card'
+              : 'admin-section-card is-hidden-section'}
+            key={section.key} aria-labelledby={`sec-${section.key}`}
+          >
             <div className="admin-section-head">
               <h3 id={`sec-${section.key}`}>{section.label}</h3>
               {row.hasUnpublishedChanges && !dirty && (
                 <span className="admin-chip is-draft">Saved, not published</span>
               )}
               {dirty && <span className="admin-chip is-unverified">Unsaved</span>}
+              {!(visible[section.key] ?? true) && (
+                <span className="admin-chip is-hidden-section">Hidden</span>
+              )}
+              {/* A real checkbox, not a div with a click handler: it is
+                  focusable, space-toggleable and announced as a checkbox for
+                  free. Hiding is not archiving, so the fields below stay
+                  rendered and saveable either way. */}
+              <label className="admin-visible-toggle">
+                <input
+                  type="checkbox"
+                  checked={visible[section.key] ?? true}
+                  onChange={(e) =>
+                    setVisible((v) => ({ ...v, [section.key]: e.target.checked }))}
+                />
+                <span>Show on the site</span>
+              </label>
               {section.help && <p className="admin-hint">{section.help}</p>}
             </div>
 

@@ -26,9 +26,12 @@ export function useAdminPage(slug) {
   return { page, status, error, reload: load, setPage }
 }
 
-export const saveSection = async (slug, key, data) => {
+export const saveSection = async (slug, key, data, visible) => {
   const row = await apiFetch(`/pages/admin/${slug}/section/${key}`, {
-    method: 'PATCH', body: JSON.stringify({ data })
+    // `visible` is omitted rather than sent as undefined when it is not being
+    // changed: the server treats an absent field as "leave it alone".
+    method: 'PATCH',
+    body: JSON.stringify(visible === undefined ? { data } : { data, visible })
   })
   // The draft moved, not the published copy - so the public cache is still
   // correct and is deliberately NOT dropped here. Publish drops it.

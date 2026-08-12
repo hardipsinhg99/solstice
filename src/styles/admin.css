@@ -367,3 +367,17 @@ td.admin-row-actions>*+*{margin-left:8px}
 .admin-member-monogram{width:100%;aspect-ratio:4/5;border:1px dashed var(--line-strong);border-radius:10px;display:grid;place-items:center;font-size:30px;font-weight:700;letter-spacing:1px;color:var(--muted);background:var(--surface)}
 .admin-member-fields{display:grid;gap:0}
 @media(max-width:760px){ .admin-member-body{grid-template-columns:1fr} }
+
+/* ── Section visibility ──────────────────────────────────────────────────────
+   A hidden section has to be unmistakable while scanning the editor, without
+   looking broken - it is a deliberate state, not an error. So: the warning
+   colour on the chip and the left edge, and the card body dimmed rather than
+   greyed out. It stays fully editable, because hiding is not archiving. */
+.admin-visible-toggle{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);cursor:pointer;user-select:none}
+.admin-visible-toggle input{width:16px;height:16px;accent-color:var(--green-600);cursor:pointer}
+.admin-visible-toggle:hover{color:var(--ink)}
+.admin-chip.is-hidden-section{background:var(--danger-bg);color:var(--danger);border-color:var(--danger)}
+/* The tint alone is only ~1.1:1 against the card, so the state is carried by a
+   border as well - the same rule the --danger tokens were introduced under. */
+.admin-section-card.is-hidden-section{border-left:3px solid var(--danger)}
+.admin-section-card.is-hidden-section .admin-section-head h3{color:var(--muted)}
