@@ -22,7 +22,7 @@ export function HeroQuote({ data }) {
 
   return (
     <section
-      className={heroQuote.image?.url ? 'about-hero has-banner' : 'about-hero'}
+      className="about-hero has-banner"
       /* Custom properties on the SECTION, not object-fit/position inline on the
          image. An inline style beats the stylesheet, so per-breakpoint framing
          would have needed !important to override it - which the house rules
@@ -31,7 +31,7 @@ export function HeroQuote({ data }) {
          rule and simply wins. No !important anywhere. */
       style={{
         '--hero-fit': heroQuote.imageFit === 'contain' ? 'contain' : 'cover',
-        '--hero-focus': heroQuote.imageFocus || '50% 50%'
+        '--hero-focus': heroQuote.imageFocus || '66% 50%'
       }}
     >
       {/* A real <img>, not a background-image: it gets the browser's own
@@ -39,16 +39,17 @@ export function HeroQuote({ data }) {
           per-breakpoint framing that background-size cannot express as
           precisely. Sits behind the copy via CSS, not via DOM order, so the
           text stays first in the reading order. */}
-      {heroQuote.image?.url && (
-        <img
-          className="about-hero-banner"
-          src={heroQuote.image.url}
-          alt={heroQuote.image.alt || ''}
-          data-fit={heroQuote.imageFit === 'contain' ? 'contain' : 'cover'}
-          fetchPriority="high"
-          decoding="async"
-        />
-      )}
+      {/* Two sources, so a phone never downloads the 1672px file. The artwork
+          carries no headline text - only the wordmark, which the site header
+          already shows - so the framing below deliberately crops past it and
+          every word here stays real HTML. */}
+      <picture className="about-hero-banner">
+        <source media="(max-width: 780px)" srcSet="/about-hero-960.webp"/>
+        <img src={heroQuote.image?.url || '/about-hero.webp'}
+             alt="" aria-hidden="true" fetchPriority="high" decoding="async"
+             data-fit={heroQuote.imageFit === 'contain' ? 'contain' : 'cover'}/>
+      </picture>
+
       <span className="title-mark" aria-hidden="true">02</span>
       <div className="container">
         <div className="about-hero-stage" ref={ref}>

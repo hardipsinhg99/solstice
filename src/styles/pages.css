@@ -873,8 +873,9 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
    than something decided here - cover is the default because a hero that
    letterboxes on a phone reads as a mistake. */
 .about-hero.has-banner{padding:clamp(110px,18vh,190px) 0 clamp(90px,14vh,140px)}
-.about-hero-banner{position:absolute;inset:0;width:100%;height:100%;z-index:-2;display:block;
-  object-fit:var(--hero-fit,cover);object-position:var(--hero-focus,50% 50%)}
+.about-hero-banner{position:absolute;inset:0;z-index:-2;display:block}
+.about-hero-banner img{width:100%;height:100%;display:block;
+  object-fit:var(--hero-fit,cover);object-position:var(--hero-focus,66% 50%)}
 
 /* The scrim is what makes the text legible over ANY image, rather than hoping
    the artwork happens to be dark where the words fall. Weighted to the left,
@@ -890,14 +891,14 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 
 /* contain mode: the bands must be the brand colour, not black bars, or the
    "empty space" the brief warns about becomes very visible. */
-.about-hero-banner[data-fit="contain"]{background:var(--deep)}
+.about-hero-banner img[data-fit="contain"]{background:var(--deep)}
 
 @media(max-width:960px){
   /* As the viewport narrows a 1.9:1 banner loses its edges first. Holding the
      frame at 68% keeps the right-hand visual - the globe, ship and freighter -
      rather than drifting into whichever half happens to be centred. Overridden
      per-image by imageFocus in the admin. */
-  .about-hero-banner{--hero-focus:68% 50%}
+  .about-hero-banner img{--hero-focus:72% 50%}
 }
 @media(max-width:780px){
   /* Phone: the scrim goes near-solid top-to-bottom. A left-weighted gradient
