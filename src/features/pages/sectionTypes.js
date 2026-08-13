@@ -426,6 +426,18 @@ const NETWORK = [
              f('linkLabel', 'Tile link text')]
   },
   {
+    key: 'voices', type: 'network.voices', label: 'Client voices',
+    help: 'A continuous marquee. SEEDED EMPTY ON PURPOSE - the section does not render until real, consented client quotes are added. Do not add a quote you cannot attribute to a real person who agreed to it.',
+    fields: [
+      f('eyebrow', 'Eyebrow'), f('heading', 'Heading'),
+      f('items', 'Quotes', 'list', {
+        itemLabel: 'Quote',
+        fields: [f('quote', 'What they said', 'textarea'), f('name', 'Name'),
+                 f('role', 'Role & company'), f('photo', 'Photograph', 'image')]
+      })
+    ]
+  },
+  {
     key: 'why', type: 'network.why', label: 'Why work with us',
     fields: [
       f('heading', 'Heading'), f('intro', 'Intro', 'textarea'),

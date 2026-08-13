@@ -783,3 +783,82 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .page-unavailable h1 em{font-style:normal;color:var(--green-500)}
 .page-unavailable p{max-width:52ch;margin:0 auto 28px;color:var(--muted);line-height:1.75}
 .page-unavailable-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ── Global Trade Network: motion ────────────────────────────────────────────
+   Specs from the ui-ux-pro-max motion DB (Hover Micro-interaction, Standard
+   tier): y -4px, scale 1.02, 200-300ms, power2.out - approximated here with
+   cubic-bezier(.2,.7,.3,1), the same curve --ease already uses. Transform and
+   opacity only, per the DB's "don't animate layout-affecting props on hover".
+   Every hover has its reverse built in, because these are transitions rather
+   than one-way tweens - the DB's "don't leave the hover state stuck" cannot
+   happen with a transition.
+
+   The DB had NO entry for a marquee/ticker, so that one is reasoned from first
+   principles below rather than borrowed from a preset. */
+
+/* Cards: the lift is the feedback, the border is the affordance. */
+.network-stat,.network-step,.network-service,.network-category,.network-voice{
+  transition:transform .25s var(--ease),border-color .25s var(--ease),box-shadow .25s var(--ease)}
+.network-stat:hover,.network-step:hover{transform:translateY(-4px);border-color:var(--green-600);box-shadow:var(--elev-2)}
+.network-service:hover{transform:translateY(-4px);border-color:var(--green-on-dark);background:rgba(255,255,255,.09)}
+
+/* Category tiles: the image zooms INSIDE a clipped frame, so the card's own
+   box never changes size and nothing below it reflows. overflow:hidden on the
+   button is what makes the scale read as a push-in rather than a grow. */
+.network-category{overflow:hidden}
+.network-category img{transition:transform .45s var(--ease)}
+.network-category:hover{transform:translateY(-4px);border-color:var(--green-600);box-shadow:var(--elev-2)}
+.network-category:hover img{transform:scale(1.06)}
+.network-category:focus-visible{transform:translateY(-4px);border-color:var(--green-600)}
+.network-category:focus-visible img{transform:scale(1.06)}
+
+/* Step numerals: a quiet accent that only resolves on approach, so the grid
+   reads calm at rest and responsive under a pointer. */
+.network-step-index{transition:color .25s var(--ease)}
+.network-step:hover .network-step-index{color:var(--green-700)}
+
+/* Hero: a slow drift on the DECORATIVE image layer only. The DB is explicit
+   that parallax belongs to background layers and never to text - the copy
+   above it does not move at all. 6% over 22s is below the threshold where the
+   eye reads it as motion; it reads as depth. */
+@media(prefers-reduced-motion:no-preference){
+  .network-hero-image{animation:network-drift 22s ease-in-out infinite alternate;will-change:transform}
+}
+@keyframes network-drift{from{transform:scale(1.04) translate3d(0,0,0)}to{transform:scale(1.1) translate3d(0,-3%,0)}}
+
+/* ── Marquee ─────────────────────────────────────────────────────────────────
+   Two identical runs inside one track, translated by exactly -50%. At the end
+   of the cycle the second run sits precisely where the first started, so the
+   restart is invisible - that exactness is why it is -50% and not a pixel
+   value, which would drift as the content width changes.
+   The second run is aria-hidden: it is a visual duplicate, and a screen reader
+   should hear each quote once. */
+.network-voices{overflow:hidden}
+.network-marquee{margin-top:34px;-webkit-mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+  mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.network-marquee-track{display:flex;width:max-content}
+.network-marquee-run{display:flex;gap:20px;padding-right:20px}
+@media(prefers-reduced-motion:no-preference){
+  .network-marquee-track{animation:network-marquee 42s linear infinite}
+  /* Pause on hover AND on focus-within, so a keyboard user tabbing into a
+     quote is not chasing a moving target. */
+  .network-marquee:hover .network-marquee-track,
+  .network-marquee:focus-within .network-marquee-track{animation-play-state:paused}
+}
+@keyframes network-marquee{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+
+.network-voice{flex:0 0 clamp(280px,32vw,380px);margin:0;padding:24px 22px;background:var(--surface);border:1px solid var(--line)}
+.network-voice:hover{border-color:var(--green-600);box-shadow:var(--elev-1)}
+.network-voice blockquote{margin:0 0 16px;font-size:15px;line-height:1.7;color:var(--body)}
+.network-voice figcaption{display:flex;align-items:center;gap:12px}
+.network-voice figcaption img{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.network-voice figcaption strong{display:block;font-size:14px;color:var(--ink)}
+.network-voice figcaption em{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:2px}
+
+/* Reduced motion: the drift and the marquee are inside no-preference queries,
+   so neither exists under reduce - the hero sits still and the quotes become a
+   plain horizontally-scrollable row the reader controls. Nothing is hidden. */
+@media(prefers-reduced-motion:reduce){
+  .network-marquee{overflow-x:auto}
+  .network-marquee-run[aria-hidden]{display:none}
+}

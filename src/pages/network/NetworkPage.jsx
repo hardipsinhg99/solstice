@@ -29,6 +29,7 @@ export default function NetworkPage() {
   const process = section('process')
   const services = section('services')
   const categories = section('categories')
+  const voices = section('voices')
   const why = section('why')
   const cta = section('cta')
 
@@ -161,6 +162,37 @@ export default function NetworkPage() {
                   </span>
                 </button>
               </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    {/* Marquee. Duplicated track, translated by exactly -50% so the second
+        copy lands where the first began and the loop has no seam. The copy is
+        aria-hidden so a screen reader hears each quote once, not twice. */}
+    {(voices.items ?? []).length > 0 && (
+      <section className="section network-voices">
+        <div className="container">
+          <Reveal as="div" className="section-head">
+            <Eyebrow>{voices.eyebrow}</Eyebrow>
+            <h2>{voices.heading}</h2>
+          </Reveal>
+        </div>
+        <div className="network-marquee" data-count={voices.items.length}>
+          <div className="network-marquee-track">
+            {[0, 1].map((copy) => (
+              <div className="network-marquee-run" key={copy} aria-hidden={copy === 1 || undefined}>
+                {voices.items.map((v, i) => (
+                  <figure className="network-voice" key={`${copy}-${i}`}>
+                    <blockquote>{v.quote}</blockquote>
+                    <figcaption>
+                      {v.photo?.url && <img src={v.photo.url} alt="" loading="lazy" decoding="async"/>}
+                      <span><strong>{v.name}</strong>{v.role && <em>{v.role}</em>}</span>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
             ))}
           </div>
         </div>

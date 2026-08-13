@@ -447,6 +447,15 @@ const NETWORK: Section[] = [
     linkLabel: 'View products',
   } },
   // Reused verbatim from About's whyChooseUs rather than written a fourth time.
+  // items: [] DELIBERATELY. The reference page fills this band with invented
+  // names and stock portraits; Solstice has no consented client quotes, so the
+  // section is built, wired and empty. It renders nothing until real ones are
+  // added, which is the same treatment the testimonials gap already has.
+  { key: 'voices', type: 'network.voices', data: {
+    eyebrow: 'CLIENT VOICES',
+    heading: 'What buyers say',
+    items: [],
+  } },
   { key: 'why', type: 'network.why', data: {
     heading: 'Why businesses choose Solstice',
     intro: 'The same commitments that apply to every consignment we move.',
