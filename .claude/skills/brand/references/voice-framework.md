@@ -11,25 +11,25 @@ Example: A friendly brand (voice) might be celebratory in a win announcement but
 
 ### Tone Spectrum
 ```
-Formal ←――――――――――――――→ Casual
+Formal 🠔――――――――――――――🠖 Casual
 [Legal docs]     [Social media]
 ```
 
 ### Language Spectrum
 ```
-Simple ←――――――――――――――→ Complex
+Simple 🠔――――――――――――――🠖 Complex
 [Consumer]       [Technical B2B]
 ```
 
 ### Character Spectrum
 ```
-Serious ←――――――――――――――→ Playful
+Serious 🠔――――――――――――――🠖 Playful
 [Finance]        [Entertainment]
 ```
 
 ### Emotion Spectrum
 ```
-Reserved ←――――――――――――――→ Expressive
+Reserved 🠔――――――――――――――🠖 Expressive
 [Corporate]      [Lifestyle brand]
 ```
 

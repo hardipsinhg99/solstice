@@ -133,5 +133,5 @@ python .claude/skills/design-system/scripts/search-slides.py "traction slide" \
    └─> Search typography.csv
 
 4. Should it break pattern?
-   └─> Check position (1/3, 2/3) → Use full-bleed
+   └─> Check position (1/3, 2/3) 🠖 Use full-bleed
 ```

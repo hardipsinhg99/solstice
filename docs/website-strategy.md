@@ -186,7 +186,7 @@ What changes: the *sequencing* of what the design system is asked to display. Ri
 
 ## Pillar 2 — The 90-Second Trust Stack
 
-**Rationale.** Attention decays monotonically; the order of the first three viewports determines the RFQ rate more than anything below them. An importer's implicit checklist runs: *legitimate entity → relevant commodity → can they ship to me → what do I do next.* The current homepage answers commodity first and legitimacy never.
+**Rationale.** Attention decays monotonically; the order of the first three viewports determines the RFQ rate more than anything below them. An importer's implicit checklist runs: *legitimate entity 🠖 relevant commodity 🠖 can they ship to me 🠖 what do I do next.* The current homepage answers commodity first and legitimacy never.
 
 **Application here.** Restructure the first three viewports:
 
@@ -200,7 +200,7 @@ The globe currently occupies prime homepage real estate to communicate four offi
 
 **Rationale.** A sourcing manager does not read a product page; they scan it against an internal checklist and then forward it to a colleague. The layout must therefore behave like a **document**, not like a marketing page: stable field order across all SKUs, scannable label-value pairs, and no information that appears on one product but is silently absent on another. Consistency of *structure* across SKUs is itself a competence signal — it says these people work from specifications.
 
-**Application here.** The current detail page renders four `meta-card`s (seasonality, origin, packaging, certifications) in a decorative grid. Rebuild as four fixed blocks in the order the buyer's checklist runs: **Specification → Packing & Loadability → Cold Chain & Transit → Compliance & Documentation**, each a dense definition list rather than cards. Add a loadability table with 20ft and 40ft columns, and a 12-month availability strip. Add "Download spec sheet (PDF)" and ensure `@media print` produces a clean single-page document, because these get printed and attached to internal approval requests. Keep the editorial `<h1>` and the Playfair italic accent — the personality lives in the header, the discipline lives in the body.
+**Application here.** The current detail page renders four `meta-card`s (seasonality, origin, packaging, certifications) in a decorative grid. Rebuild as four fixed blocks in the order the buyer's checklist runs: **Specification 🠖 Packing & Loadability 🠖 Cold Chain & Transit 🠖 Compliance & Documentation**, each a dense definition list rather than cards. Add a loadability table with 20ft and 40ft columns, and a 12-month availability strip. Add "Download spec sheet (PDF)" and ensure `@media print` produces a clean single-page document, because these get printed and attached to internal approval requests. Keep the editorial `<h1>` and the Playfair italic accent — the personality lives in the header, the discipline lives in the body.
 
 ## Pillar 4 — Restraint as a Competence Signal
 
@@ -275,7 +275,7 @@ JSON-LD, one block per page type.
 | Type | Where | Key properties |
 |---|---|---|
 | `Organization` | Sitewide | `legalName`, `foundingDate` (2025-03), `address` (Odhav Industrial Estate, Ahmedabad, Gujarat, IN), `taxID` (GSTIN), `identifier` (LLPIN, IEC), `numberOfEmployees`, `areaServed` (per confirmed [PRIMARY_MARKET_REGION]), `knowsAbout`, `sameAs`, `contactPoint` with `contactType: "sales"` and `availableLanguage` |
-| `WebSite` | Homepage | `name`, `url`, `publisher` → `Organization` |
+| `WebSite` | Homepage | `name`, `url`, `publisher` 🠖 `Organization` |
 | `Product` | Each spec sheet | `name`, `description`, `image[]`, `brand`, `category`, `additionalProperty[]` as `PropertyValue` for **HS code, calibre, grade, storage temperature, shelf life, cartons per 40ft** — this is the correct vehicle for spec data and it is what makes these pages semantically distinguishable from every other exporter's product page |
 | `Offer` | Nested in `Product` | `availability`, `priceCurrency`, `businessFunction: "Sell"`, `eligibleRegion`, `deliveryLeadTime`, `advanceBookingRequirement`, `eligibleQuantity` as `QuantitativeValue` (MOQ). Use `PriceSpecification` only if you publish prices — see Open Question 5 |
 | `ItemList` | `/products/` and category hubs | Ordered `Product` references |
@@ -541,7 +541,7 @@ Ordered by how hard they block work. Items 1–6 block Phase 1 and need answers 
 
 9. **Volume figures we can actually publish.** Containers shipped in the last 12 months, destination markets served, tonnage by commodity — anything true and specific that can replace the current `50+ / 10+ / 2410` tiles (main.jsx:191). If nothing can be published, say so and we design that section without numbers rather than with soft ones.
 
-10. **Adjacent product lines.** Spices, dried fruit and fruit pastes are stated as business lines but absent from the catalogue. Are these live and sellable now (→ Phase 1 SKUs) or aspirational (→ Phase 2)? This affects whether `/products/category/` ships earlier than planned.
+10. **Adjacent product lines.** Spices, dried fruit and fruit pastes are stated as business lines but absent from the catalogue. Are these live and sellable now (🠖 Phase 1 SKUs) or aspirational (🠖 Phase 2)? This affects whether `/products/category/` ships earlier than planned.
 
 11. **Sales capacity and response SLA.** What response time can be committed to in the autoresponse (§4.6), and how many RFQs per week can the team absorb? A conversion strategy that outruns fulfilment capacity damages the brand it was built to establish.
 

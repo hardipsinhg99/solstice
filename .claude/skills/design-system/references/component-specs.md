@@ -99,7 +99,7 @@ Helper text or error message
 | default | sm | 1px | Standard card |
 | elevated | lg | none | Prominent content |
 | outline | none | 1px | Subtle container |
-| interactive | sm→md | 1px | Clickable card |
+| interactive | sm🠖md | 1px | Clickable card |
 
 ### Anatomy
 

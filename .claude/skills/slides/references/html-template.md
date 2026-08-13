@@ -162,9 +162,9 @@ Complete HTML structure with navigation, tokens, and Chart.js integration.
 
     <!-- Navigation -->
     <div class="nav-controls">
-        <button class="nav-btn" onclick="prevSlide()">←</button>
+        <button class="nav-btn" onclick="prevSlide()">🠔</button>
         <span class="slide-counter"><span id="current">1</span> / <span id="total">9</span></span>
-        <button class="nav-btn" onclick="nextSlide()">→</button>
+        <button class="nav-btn" onclick="nextSlide()">🠖</button>
     </div>
 
     <script>

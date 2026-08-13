@@ -357,11 +357,97 @@ const SERVICES = [
  * AdminSidebar and AdminApp each carried their own hardcoded list. Services
  * closed that - adding a page is now genuinely this object plus a seed row.
  */
+
+// ── Global Trade Network ─────────────────────────────────────────────────────
+// Added exactly as Services was: a config entry and a seed row, no new
+// mechanism. Every string a buyer reads on this page is a field below - nothing
+// lives in the component's JSX.
+const NETWORK = [
+  {
+    key: 'hero', type: 'network.hero', label: 'Hero',
+    help: 'Opening statement. The background image is editable - upload through the picker, same pipeline as product photography.',
+    fields: [
+      f('eyebrow', 'Eyebrow'),
+      f('headingLine1', 'Heading, first line'),
+      f('headingAccent', 'Heading, accent line'),
+      f('lede', 'Opening paragraph', 'textarea'),
+      f('primaryCtaLabel', 'Primary button'),
+      f('primaryCtaRoute', 'Primary button goes to'),
+      f('secondaryCtaLabel', 'Secondary button'),
+      f('secondaryCtaRoute', 'Secondary button goes to'),
+      f('image', 'Background image', 'image')
+    ]
+  },
+  {
+    key: 'stats', type: 'network.stats', label: 'Trade footprint',
+    help: 'Every figure here is a public claim. Only enter one you can evidence - and leave the section empty rather than filling it with a number you cannot.',
+    fields: [
+      f('heading', 'Heading'),
+      f('items', 'Figures', 'list', {
+        itemLabel: 'Figure',
+        fields: [f('value', 'Figure'), f('label', 'Label'),
+                 f('unresolvedScope', 'Flag as unverified', 'toggle',
+                   { help: 'Marks the figure as not yet confirmed. It renders with a visible marker.' })]
+      })
+    ]
+  },
+  {
+    key: 'process', type: 'network.process', label: 'How it works',
+    help: 'The end-to-end sequence. A repeater - add, remove and reorder steps freely; the layout renumbers and reflows to fit.',
+    fields: [
+      f('eyebrow', 'Eyebrow'), f('heading', 'Heading'),
+      f('intro', 'Intro', 'textarea'),
+      f('steps', 'Steps', 'list', {
+        itemLabel: 'Step',
+        fields: [f('title', 'Step title'), f('body', 'What happens at this stage', 'rich'),
+                 f('icon', 'Icon', 'text', { help: 'A sprite name: globe, check, chat, ship, leaf, box, award.' })]
+      })
+    ]
+  },
+  {
+    key: 'services', type: 'network.services', label: 'Services',
+    help: 'Freight forwarding, customs brokerage and warehousing. SEEDED WITH PLACEHOLDERS - replace every description with what Solstice actually does before publishing this page.',
+    fields: [
+      f('eyebrow', 'Eyebrow'), f('heading', 'Heading'),
+      f('intro', 'Intro', 'textarea'),
+      f('items', 'Services', 'list', {
+        itemLabel: 'Service',
+        fields: [f('title', 'Service'), f('body', 'What it covers', 'rich'),
+                 f('icon', 'Icon'),
+                 f('unresolvedCopy', 'Flag as draft copy', 'toggle',
+                   { help: 'Marks the description as not yet written by the client. Renders with a visible marker.' })]
+      })
+    ]
+  },
+  {
+    key: 'categories', type: 'network.categories', label: 'What we trade',
+    help: 'The tiles are generated from the live product catalogue - add or rename a product type under Products and it appears here with no code change. Only the heading and intro are editable.',
+    fields: [f('eyebrow', 'Eyebrow'), f('heading', 'Heading'), f('intro', 'Intro', 'textarea'),
+             f('linkLabel', 'Tile link text')]
+  },
+  {
+    key: 'why', type: 'network.why', label: 'Why work with us',
+    fields: [
+      f('heading', 'Heading'), f('intro', 'Intro', 'textarea'),
+      f('points', 'Points', 'list', { itemLabel: 'Point', fields: [f('text', 'Text')] })
+    ]
+  },
+  {
+    key: 'cta', type: 'network.cta', label: 'Closing call to action',
+    fields: [
+      f('eyebrow', 'Eyebrow'), f('headingLine1', 'Heading, first line'),
+      f('headingAccent', 'Heading, accent'), f('body', 'Copy', 'textarea'),
+      f('ctaLabel', 'Button'), f('ctaRoute', 'Button goes to')
+    ]
+  }
+]
+
 export const PAGE_CONFIG = {
   home: { slug: 'home', title: 'Home', route: 'home', icon: 'grid', sections: HOME },
   about: { slug: 'about', title: 'About us', route: 'about', icon: 'layers', sections: ABOUT },
   services: { slug: 'services', title: 'Services', route: 'services', icon: 'ship', sections: SERVICES },
-  team: { slug: 'team', title: 'Team', route: 'team', icon: 'user', sections: TEAM }
+  team: { slug: 'team', title: 'Team', route: 'team', icon: 'user', sections: TEAM },
+  network: { slug: 'network', title: 'Global Trade Network', route: 'network', icon: 'globe', sections: NETWORK }
 }
 
 export const EDITABLE_PAGES = Object.values(PAGE_CONFIG)

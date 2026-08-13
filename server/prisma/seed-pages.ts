@@ -361,12 +361,104 @@ async function backfillCoordinates() {
   }
 }
 
+
+// ── Global Trade Network ─────────────────────────────────────────────────────
+// Every figure here traces to something already published on About. The two
+// facts About flags `unresolvedScope` - founded 2023 and seven group companies -
+// are deliberately NOT repeated here; a page that explains how to trade with
+// Solstice should not be where an unresolved claim first goes public.
+const NETWORK: Section[] = [
+  { key: 'hero', type: 'network.hero', data: {
+    eyebrow: 'GLOBAL TRADE NETWORK',
+    headingLine1: 'From our growers',
+    headingAccent: 'to your warehouse.',
+    lede: 'Every consignment moves through the same five stages - sourcing, quality control, documentation, shipping and delivery. This is what each of them involves, so you know what to expect before you send an enquiry.',
+    primaryCtaLabel: 'Browse products', primaryCtaRoute: 'products',
+    secondaryCtaLabel: 'Send enquiry', secondaryCtaRoute: 'contact',
+    image: null,
+  } },
+  // Source for all three: the About page's published globalPresence and
+  // journeyStats sections. Nothing invented, nothing rounded up.
+  { key: 'stats', type: 'network.stats', data: {
+    heading: 'Our trade footprint',
+    items: [
+      { value: '5', label: 'Operational countries' },
+      { value: '20+', label: 'Export markets served' },
+      { value: '350+', label: 'Containers handled' },
+    ],
+  } },
+  { key: 'process', type: 'network.process', data: {
+    eyebrow: 'HOW IT WORKS',
+    heading: 'Supplier to shipment, end to end',
+    intro: 'Five stages, the same on every order.',
+    steps: [
+      { icon: 'leaf', title: 'Sourcing & supplier verification',
+        body: '<p>We buy through a verified supplier network rather than open-market intermediaries, and the grower or processor behind a consignment is identified before it is offered to you.</p>' },
+      { icon: 'check', title: 'Quality control',
+        body: '<p>Produce is checked against the grade, size and packing specification agreed in the quote before it leaves the packhouse.</p>' },
+      { icon: 'box', title: 'Export documentation',
+        body: '<p>Export paperwork is prepared per consignment, including the phytosanitary certificate that accompanies each shipment.</p>' },
+      { icon: 'ship', title: 'Shipping & logistics',
+        body: '<p>Bookings are made against the agreed Incoterm and the route is coordinated from our operational base in India.</p>' },
+      { icon: 'globe', title: 'Delivery & handover',
+        body: '<p>You are kept informed through to arrival, with a single point of contact from enquiry to delivery.</p>' },
+    ],
+  } },
+  // PLACEHOLDERS BY DESIGN. The client confirmed Solstice offers these, but no
+  // description of any of them exists in the content set, the About page or the
+  // blueprint. Rather than invent one, each is flagged `unresolvedCopy` and
+  // renders with a visible marker - the same convention About's
+  // industryRecognition section already uses. The page ships UNPUBLISHED until
+  // these are written.
+  { key: 'services', type: 'network.services', data: {
+    eyebrow: 'SERVICES',
+    heading: 'What we handle for you',
+    intro: '[CONFIRM] Intro copy for the services block - to be written by the client.',
+    items: [
+      { icon: 'ship', title: 'Freight forwarding', unresolvedCopy: true,
+        body: '<p>[CONFIRM] Describe what Solstice actually does here - lanes covered, modes, whether this is offered to third parties or only alongside our own consignments.</p>' },
+      { icon: 'check', title: 'Customs brokerage & compliance', unresolvedCopy: true,
+        body: '<p>[CONFIRM] Describe the actual service - which jurisdictions, which filings, and who holds the licence.</p>' },
+      { icon: 'box', title: 'Warehousing & distribution', unresolvedCopy: true,
+        body: '<p>[CONFIRM] Describe real facilities - locations, cold-chain capability if any, and whether storage is owned or partner-operated.</p>' },
+    ],
+  } },
+  { key: 'categories', type: 'network.categories', data: {
+    eyebrow: 'WHAT WE TRADE',
+    heading: 'Our product range',
+    intro: 'The tiles below are generated from the live catalogue, so they always match what is actually listed.',
+    linkLabel: 'View products',
+  } },
+  // Reused verbatim from About's whyChooseUs rather than written a fourth time.
+  { key: 'why', type: 'network.why', data: {
+    heading: 'Why businesses choose Solstice',
+    intro: 'The same commitments that apply to every consignment we move.',
+    points: [
+      { text: 'Verified supplier network' },
+      { text: 'End-to-end export management' },
+      { text: 'International market experience' },
+      { text: 'Multi-country operational presence' },
+      { text: 'Transparent communication' },
+      { text: 'Reliable execution and on-time delivery' },
+      { text: 'Long-term business partnerships' },
+    ],
+  } },
+  { key: 'cta', type: 'network.cta', data: {
+    eyebrow: 'START HERE',
+    headingLine1: 'Tell us what you need',
+    headingAccent: 'and we will quote it.',
+    body: 'Send the product, volume and destination port. We will come back with availability, specification and an indicative price.',
+    ctaLabel: 'Send enquiry', ctaRoute: 'contact',
+  } },
+];
+
 async function main() {
   console.log('Seeding pages from the copy that is live today…');
   await seedPage('home', 'Home', HOME);
   await seedPage('about', 'About us', ABOUT);
   await seedPage('services', 'Services', SERVICES);
   await seedPage('team', 'Team', TEAM);
+  await seedPage('network', 'Global Trade Network', NETWORK);
 
   await backfillCoordinates();
 

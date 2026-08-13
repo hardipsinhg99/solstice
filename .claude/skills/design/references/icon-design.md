@@ -108,11 +108,11 @@ python3 ~/.claude/skills/design/scripts/icon/generate.py --list-categories
 
 ## Workflow
 
-1. Describe icon → `--prompt "settings gear"`
-2. Choose style → `--style outlined`
-3. Generate → script outputs .svg file
-4. Optionally batch → `--batch 4` for variations
-5. Multi-size export → `--sizes "16,24,32,48"`
+1. Describe icon 🠖 `--prompt "settings gear"`
+2. Choose style 🠖 `--style outlined`
+3. Generate 🠖 script outputs .svg file
+4. Optionally batch 🠖 `--batch 4` for variations
+5. Multi-size export 🠖 `--sizes "16,24,32,48"`
 
 ## Setup
 

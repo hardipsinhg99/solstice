@@ -46,7 +46,7 @@ Comprehensive design guide for web, mobile, and desktop applications. Contains 6
 
 ## Rule Categories by Priority
 
-*供人工/AI 查阅：按 1→10 决定先关注哪类规则；需要细则时用 `--domain <Domain>` 查询。脚本不读取本表。*
+*供人工/AI 查阅：按 1🠖10 决定先关注哪类规则；需要细则时用 `--domain <Domain>` 查询。脚本不读取本表。*
 
 | Priority | Category | Impact | Domain | Key Checks (Must Have) | Anti-Patterns (Avoid) |
 |----------|----------|--------|--------|------------------------|------------------------|
@@ -72,7 +72,7 @@ Comprehensive design guide for web, mobile, and desktop applications. Contains 6
 - `keyboard-nav` - Tab order matches visual order; full keyboard support (Apple HIG)
 - `form-labels` - Use label with for attribute
 - `skip-links` - Skip to main content for keyboard users
-- `heading-hierarchy` - Sequential h1→h6, no level skip
+- `heading-hierarchy` - Sequential h1🠖h6, no level skip
 - `color-not-only` - Don't convey info by color alone (add icon/text)
 - `dynamic-type` - Support system text scaling; avoid truncation as text grows (Apple Dynamic Type, MD)
 - `reduced-motion` - Respect prefers-reduced-motion; reduce/disable animations when requested (Apple Reduced Motion API, MD)
@@ -267,7 +267,7 @@ Comprehensive design guide for web, mobile, and desktop applications. Contains 6
 
 ### 10. Charts & Data (LOW)
 
-- `chart-type` - Match chart type to data type (trend → line, comparison → bar, proportion → pie/donut)
+- `chart-type` - Match chart type to data type (trend 🠖 line, comparison 🠖 bar, proportion 🠖 pie/donut)
 - `color-guidance` - Use accessible color palettes; avoid red/green only pairs for colorblind users (WCAG, MD)
 - `data-table` - Provide table alternative for accessibility; charts alone are not screen-reader friendly (WCAG)
 - `pattern-texture` - Supplement color with patterns, textures, or shapes so data is distinguishable without color (WCAG, MD)
@@ -325,11 +325,11 @@ Use this skill when the user requests any of the following:
 
 | Scenario | Trigger Examples | Start From |
 |----------|-----------------|------------|
-| **New project / page** | "做一个 landing page"、"Build a dashboard" | Step 1 → Step 2 (design system) |
+| **New project / page** | "做一个 landing page"、"Build a dashboard" | Step 1 🠖 Step 2 (design system) |
 | **New component** | "Create a pricing card"、"Add a modal" | Step 3 (domain search: style, ux) |
 | **Choose style / color / font** | "What style fits a fintech app?"、"推荐配色" | Step 2 (design system) |
 | **Review existing UI** | "Review this page for UX issues"、"检查无障碍" | Quick Reference checklist above |
-| **Fix a UI bug** | "Button hover is broken"、"Layout shifts on load" | Quick Reference → relevant section |
+| **Fix a UI bug** | "Button hover is broken"、"Layout shifts on load" | Quick Reference 🠖 relevant section |
 | **Improve / optimize** | "Make this faster"、"Improve mobile experience" | Step 3 (domain search: ux, react) |
 | **Implement dark mode** | "Add dark mode support" | Step 3 (domain: style "dark mode") |
 | **Add charts / data viz** | "Add an analytics dashboard chart" | Step 3 (domain: chart) |
@@ -550,7 +550,7 @@ python3 skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system 
 ### Query Strategy
 
 - Use **multi-dimensional keywords** — combine product + industry + tone + density: `"entertainment social vibrant content-dense"` not just `"app"`
-- Try different keywords for the same need: `"playful neon"` → `"vibrant dark"` → `"content-first minimal"`
+- Try different keywords for the same need: `"playful neon"` 🠖 `"vibrant dark"` 🠖 `"content-first minimal"`
 - Use `--design-system` first for full recommendations, then `--domain` to deep-dive any dimension you're unsure about
 - Add `--stack <stack>` for implementation-specific guidance when the target stack is known
 

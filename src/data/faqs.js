@@ -11,5 +11,5 @@ export const chatFaq = [
   { q: 'What products do you export?', a: 'Fresh Indian fruits such as mangoes, pomegranates and table grapes, plus vegetables like onions and okra.', cta: ['Browse products', 'products'] },
   { q: 'How do I start an enquiry?', a: 'Share your product, destination and preferred pack - we will get back to you with seasonal availability.', cta: ['Start an enquiry', 'contact'] },
   { q: 'Is produce available year-round?', a: 'Availability is seasonal and varies by product. Each product page lists its current window.', cta: ['See seasonality', 'products'] },
-  { q: 'Where do you source from?', a: 'We source across growing regions in India and work with buyers, distributors and foodservice teams worldwide.', cta: ['Meet the team', 'team'] }
+  { q: 'Where do you source from?', a: 'We source across growing regions in India and work with buyers, distributors and foodservice teams worldwide.', cta: ['See our products', 'products'] }
 ]

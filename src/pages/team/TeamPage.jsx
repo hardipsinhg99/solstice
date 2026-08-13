@@ -3,6 +3,7 @@ import { Reveal } from '../../components/motion/Reveal.jsx'
 import { PageTitle } from '../../components/layout/PageTitle.jsx'
 import { useNavigate } from '../../app/navigation.js'
 import { usePage, usePublicTeam } from '../../features/pages/index.js'
+import { PageUnavailable } from '../../components/layout/PageUnavailable.jsx'
 import { TEAM_FALLBACK } from './teamFallback.js'
 
 /**
@@ -22,8 +23,12 @@ const initials = (name) =>
 
 export default function TeamPage() {
   const navigate = useNavigate()
-  const { section } = usePage('team', TEAM_FALLBACK)
+  const { section, missing } = usePage('team', TEAM_FALLBACK)
   const [members] = usePublicTeam()
+
+  // Unpublished in the admin: render the shared not-available state rather than
+  // the static fallback. Two lines, and any other page can adopt the same pair.
+  if (missing) return <PageUnavailable/>
   const intro = section('intro')
   const cta = section('cta')
 

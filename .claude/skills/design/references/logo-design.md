@@ -73,9 +73,9 @@ Options: `--style`, `--industry`, `--prompt`
 
 ## Workflow
 
-1. Generate design brief → `scripts/logo/search.py --design-brief`
-2. Generate logo variations → `scripts/logo/generate.py --brand --style --industry`
-3. Ask user about HTML preview → `AskUserQuestion` tool
+1. Generate design brief 🠖 `scripts/logo/search.py --design-brief`
+2. Generate logo variations 🠖 `scripts/logo/generate.py --brand --style --industry`
+3. Ask user about HTML preview 🠖 `AskUserQuestion` tool
 4. If yes, invoke `/ui-ux-pro-max` for HTML gallery
 
 ## Detailed References

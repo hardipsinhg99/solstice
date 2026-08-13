@@ -39,7 +39,7 @@ export default function ProductDetailPage({ product, selectProduct }) {
       <div className="container detail-grid">
         <div className="detail-copy">
           <div className="detail-top">
-            <button className="back-link" onClick={() => navigate('products')}>← All products</button>
+            <button className="back-link" onClick={() => navigate('products')}>🠔 All products</button>
             <span className="detail-index notranslate" translate="no">0{index + 1} / 0{products.length}</span>
           </div>
           <span className="detail-type notranslate" translate="no">{product.type.toUpperCase()}</span>

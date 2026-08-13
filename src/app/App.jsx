@@ -12,6 +12,7 @@ import ServicesPage from '../pages/services/ServicesPage.jsx'
 import ProductsPage from '../pages/products/ProductsPage.jsx'
 import ProductDetailPage from '../pages/products/ProductDetailPage.jsx'
 import TeamPage from '../pages/team/TeamPage.jsx'
+import NetworkPage from '../pages/network/NetworkPage.jsx'
 import GalleryPage from '../pages/gallery/GalleryPage.jsx'
 import ContactPage from '../pages/contact/ContactPage.jsx'
 import { NavigationProvider } from './navigation.js'
@@ -58,6 +59,7 @@ export function App() {
     about: <AboutPage/>,
     services: <ServicesPage/>,
     team: <TeamPage/>,
+    network: <NetworkPage/>,
     gallery: <GalleryPage/>,
     contact: <ContactPage/>
   }

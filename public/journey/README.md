@@ -11,7 +11,7 @@ in `JOURNEY_ASSETS` in the component.
 
 ## Golden rule
 
-**Everything travels LEFT → RIGHT.** A subject facing the wrong way reads as a return
+**Everything travels LEFT 🠖 RIGHT.** A subject facing the wrong way reads as a return
 leg, not an export route. `ship` and `plane` must have bow/nose pointing **right**.
 
 ## Geometry contracts (these drive the animation — do not break them)
@@ -20,7 +20,7 @@ Real renders must respect three measured anchors; each has a single place to upd
 your art differs:
 
 1. **Truck bed** — the flatbed's load surface in `truck-body.webp`. Placeholder: bed
-   span x `0.03 → 0.60` of image width, bed top edge at `0.60` of image height. The
+   span x `0.03 🠖 0.60` of image width, bed top edge at `0.60` of image height. The
    container is animated onto exactly this rectangle. If your render's bed sits
    elsewhere, update `--journey-bed-left/right/top` on `.journey-truck` in
    `src/styles/pages.css` — nothing in the JS. Keep `aspect-ratio` there equal to your

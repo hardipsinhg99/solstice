@@ -87,7 +87,7 @@ export class MediaService {
     };
   }
 
-  /** Validate → process → store → record. The only path that creates an asset. */
+  /** Validate 🠖 process 🠖 store 🠖 record. The only path that creates an asset. */
   async createAsset(
     file: { buffer: Buffer; originalname: string; size: number },
     altText: string | null,

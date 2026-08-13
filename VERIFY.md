@@ -213,7 +213,7 @@ the container entrypoint.
 
 ### 2.5 Admin login over HTTPS
 
-Browser → `https://test.solsticellp.com/#admin`, log in with
+Browser 🠖 `https://test.solsticellp.com/#admin`, log in with
 `ADMIN_SEED_EMAIL` / `ADMIN_SEED_PASSWORD`.
 
 **Expect** the dashboard.
@@ -230,8 +230,8 @@ Each of these writes through a different module. Do all six.
 
 | # | Action | Expect | Most likely failure |
 |---|---|---|---|
-| a | Edit a product's name, save | Persists after reload; visible on `#products` | 401 → token expired (`JWT_EXPIRES_IN`, default 12h) |
-| b | Upload a product image | Renders immediately; URL is `/api/uploads/xx/<uuid>.<ext>` | 500 → `sharp` failed; check `docker compose logs api` |
+| a | Edit a product's name, save | Persists after reload; visible on `#products` | 401 🠖 token expired (`JWT_EXPIRES_IN`, default 12h) |
+| b | Upload a product image | Renders immediately; URL is `/api/uploads/xx/<uuid>.<ext>` | 500 🠖 `sharp` failed; check `docker compose logs api` |
 | c | Edit a page section, save **and publish** | Change appears on the public page | Published vs draft confusion — reload the public page, not the editor |
 | d | Add a team member | Appears on `#team` | — |
 | e | Change a setting (e.g. contact email) | Reflected in the footer | — |

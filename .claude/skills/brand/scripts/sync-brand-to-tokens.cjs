@@ -2,7 +2,7 @@
 /**
  * sync-brand-to-tokens.cjs
  *
- * Syncs brand-guidelines.md colors → design-tokens.json → design-tokens.css
+ * Syncs brand-guidelines.md colors 🠖 design-tokens.json 🠖 design-tokens.css
  *
  * Usage:
  *   node sync-brand-to-tokens.cjs
@@ -190,7 +190,7 @@ function updateDesignTokens(tokens, colors) {
 function main() {
   const dryRun = process.argv.includes('--dry-run');
 
-  console.log('🔄 Syncing brand guidelines → design tokens\n');
+  console.log('🔄 Syncing brand guidelines 🠖 design tokens\n');
 
   // Read brand guidelines
   const guidelinesPath = path.resolve(process.cwd(), BRAND_GUIDELINES);

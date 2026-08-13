@@ -36,7 +36,7 @@
 9. Financials
 10. The Ask
 
-**Emotion arc:** curiosity→frustration→hope→confidence→trust→urgency
+**Emotion arc:** curiosity🠖frustration🠖hope🠖confidence🠖trust🠖urgency
 
 ### Sales Pitch (9 slides)
 1. Personalized Hook
@@ -49,7 +49,7 @@
 8. Objection Handling
 9. CTA + Next Steps
 
-**Emotion arc:** connection→frustration→fear→hope→trust→confidence→urgency
+**Emotion arc:** connection🠖frustration🠖fear🠖hope🠖trust🠖confidence🠖urgency
 
 ### Product Demo (6 slides)
 1. Hook/Problem
@@ -59,14 +59,14 @@
 5. Benefits/Pricing
 6. CTA
 
-**Emotion arc:** curiosity→frustration→hope→confidence→urgency
+**Emotion arc:** curiosity🠖frustration🠖hope🠖confidence🠖urgency
 
 ## Duarte Sparkline Pattern
 
 Alternate between "What Is" (current pain) and "What Could Be" (better future):
 
 ```
-What Is → What Could Be → What Is → What Could Be → New Bliss
+What Is 🠖 What Could Be 🠖 What Is 🠖 What Could Be 🠖 New Bliss
 (pain)     (hope)         (pain)     (hope)         (resolution)
 ```
 

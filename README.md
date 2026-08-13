@@ -104,7 +104,7 @@ npm run start:dev                                  # :3001
 npm run dev                                        # repo root, :5173
 ```
 
-Admin at `http://localhost:5173/#admin`. `vite.config.js` proxies `/api` → `:3001`, so the
+Admin at `http://localhost:5173/#admin`. `vite.config.js` proxies `/api` 🠖 `:3001`, so the
 two are same-origin locally and CORS never applies in development.
 
 > **`src/data/products.js` is no longer the live source.** It is kept only so `npm run seed` can
@@ -122,7 +122,7 @@ Browser
        └─ src/main.jsx               mount only (10 lines)
             └─ ThemeProvider         data-theme + localStorage
                  └─ App              route switch, scroll reset
-                      ├─ Header      sticky, shrinks 82→68px on scroll
+                      ├─ Header      sticky, shrinks 82🠖68px on scroll
                       ├─ <main>      the current page
                       ├─ Footer
                       └─ ChatWidget
@@ -164,7 +164,7 @@ src/
 │   ├── products/            ProductsPage · ProductDetailPage
 │   └── contact/             ContactPage + sections/Faq
 │
-├── data/                    products · navigation · faqs · globe   ← the seam a CMS plugs into
+├── data/                    products · navigation · faqs · globe   🠔 the seam a CMS plugs into
 ├── lib/                     constants.js
 ├── styles/                  see "Styling and theming"
 └── main.jsx                 createRoot only
@@ -173,7 +173,7 @@ src/
 ### Import direction is one-way
 
 ```
-pages → features → components → lib
+pages 🠖 features 🠖 components 🠖 lib
                         ↘  data  ↙        (leaf: imported by anything, imports nothing)
 ```
 
@@ -205,10 +205,10 @@ tree-shaking for no ergonomic gain at this size.
 Routing is hash-based, about eight lines, in `src/app/router.js`.
 
 ```
-#            → home            #team              → team
-#about       → about           #gallery           → gallery
-#services    → services        #contact           → contact
-#products    → products        #product/<slug>    → product detail
+#            🠖 home            #team              🠖 team
+#about       🠖 about           #gallery           🠖 gallery
+#services    🠖 services        #contact           🠖 contact
+#products    🠖 products        #product/<slug>    🠖 product detail
 ```
 
 Product slugs: `mangoes`, `pomegranates`, `grapes`, `onions`, `okra`, `mixed-vegetables`.
@@ -252,7 +252,7 @@ database, but **editing it no longer changes the site**.
 | `faqs.js` | `contactFaq` (contact page accordion) and `chatFaq` (chat widget), exported separately |
 | `globe.js` | Globe markers and arcs (lat/lng) |
 
-**To add a product**, use the admin panel (`#admin/products` → New product). Everything downstream -
+**To add a product**, use the admin panel (`#admin/products` 🠖 New product). Everything downstream -
 catalogue, filter, detail page, related products and home feature cards - derives from the API
 response, mapped to the historical flat shape at the fetch boundary.
 
@@ -271,7 +271,7 @@ tokens.css        :root + html[data-theme] custom properties
 base.css          reset, typography, scroll reveal, film-grain overlay
 layout.css        brand + header
 components.css    buttons and links
-pages.css         hero → FAQ
+pages.css         hero 🠖 FAQ
 footer.css        footer + chat
 responsive.css    all media queries (780 / 480 / 390px)
 index.css         imports the above, in cascade order
@@ -338,12 +338,12 @@ Also load-bearing:
 A decorative video is layered **over** the existing hero poster image, never replacing it.
 
 ```
-.hero-media::before   the CSS background image  ← the poster, and the universal fallback
-.hero-media > video   the hero video            ← fades in only on `canplay`
-.hero-media::after    the scrim gradient        ← keeps the copy legible
+.hero-media::before   the CSS background image  🠔 the poster, and the universal fallback
+.hero-media > video   the hero video            🠔 fades in only on `canplay`
+.hero-media::after    the scrim gradient        🠔 keeps the copy legible
 ```
 
-Paint order inside `.hero-media` is `::before` → children → `::after`, so this works with **no
+Paint order inside `.hero-media` is `::before` 🠖 children 🠖 `::after`, so this works with **no
 `z-index`**. The video starts at `opacity: 0` and transitions to `1` over `--hero-video-fade` (600ms)
 only once `canplay` fires.
 
@@ -409,7 +409,7 @@ If you add state to `HomePage`, verify the globe still initialises **once** per 
 ## Build and deploy
 
 ```bash
-npm run build     # → dist/
+npm run build     # 🠖 dist/
 npm run preview   # serve dist/ locally
 ```
 
@@ -446,7 +446,7 @@ When changing anything in the hero, the globe, the form or the tokens, verify:
 3. Globe effect initialises once per mount
 4. Form submits, **and fails correctly** with the endpoint unreachable
 5. Every card reachable and activatable by keyboard; focus ring visible in both themes
-6. `prefers-reduced-motion: reduce` → zero video requests, `heroZoom` and `scrollDot` static
+6. `prefers-reduced-motion: reduce` 🠖 zero video requests, `heroZoom` and `scrollDot` static
 7. Theme persists across reload
 
 Lighthouse numbers move a lot run-to-run under software rendering - **take a median of 3**, not a
@@ -517,7 +517,7 @@ Things that have already cost someone an hour:
 - **`VITE_*` variables are baked in at build time.** Changing one on the host without rebuilding does
   nothing.
 - **`.env.local` changes require a dev-server restart.**
-- **Navigating `/` → `/#products` is a same-document navigation.** The page does not reload, so
+- **Navigating `/` 🠖 `/#products` is a same-document navigation.** The page does not reload, so
   `localStorage` is not re-read. Force a real reload when testing theme persistence.
 - **`prefers-reduced-motion` overrides must sit *after* the base rule they override.** At equal
   specificity the later declaration wins - an override placed earlier in the file silently does nothing.

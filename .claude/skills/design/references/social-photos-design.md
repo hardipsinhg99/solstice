@@ -215,7 +215,7 @@ Use Chrome MCP or `chrome-devtools` skill to visually inspect each exported PNG:
 1. Open exported screenshots and check for layout/styling issues
 2. Verify: fonts rendered correctly, colors match brand, text readable at thumbnail size
 3. Check: no overflow, no cut-off content, safe zones respected, visual hierarchy clear
-4. If issues found → fix HTML source → re-export screenshot → verify again
+4. If issues found 🠖 fix HTML source 🠖 re-export screenshot 🠖 verify again
 5. Repeat until all designs pass visual QA
 
 **Common issues to check:**

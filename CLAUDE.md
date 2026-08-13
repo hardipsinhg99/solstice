@@ -59,12 +59,12 @@ server/          separate app, TypeScript, never ships to a buyer's browser
 `<AdminApp/>` early on `isAdminRoute(route)`, so the admin inherits no header, footer, chat widget
 or corner column. `#admin/*` cannot collide with `product/` or `products/`.
 
-**Import direction is one-way: `pages → features → components → lib`.** A `features/` module must
+**Import direction is one-way: `pages 🠖 features 🠖 components 🠖 lib`.** A `features/` module must
 never import from `pages/`. A `components/ui` primitive must never import domain data. If you need
 to break this, stop and raise it - it's a design smell, not something to route around.
 
-**Where new code goes.** Zero domain knowledge → `components/ui`. Site chrome → `components/layout`.
-Domain logic used by more than one page → `features/<domain>`. Used by exactly one page →
+**Where new code goes.** Zero domain knowledge 🠖 `components/ui`. Site chrome 🠖 `components/layout`.
+Domain logic used by more than one page 🠖 `features/<domain>`. Used by exactly one page 🠖
 `pages/<page>/sections/`. **Promote to `features/` only when a second page actually consumes it**,
 never speculatively.
 

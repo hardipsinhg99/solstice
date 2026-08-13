@@ -11,7 +11,7 @@ Senior front-end engineer implementing a scroll-driven canvas sequence. Scroll-l
 
 ## CONTEXT
 
-Read `docs/website-strategy.md` and the architecture section of `CLAUDE.md`. Follow the existing folder structure and the one-way import rule (`pages → features → components → lib`).
+Read `docs/website-strategy.md` and the architecture section of `CLAUDE.md`. Follow the existing folder structure and the one-way import rule (`pages 🠖 features 🠖 components 🠖 lib`).
 
 This goes on the **Products page** (`#products`), between the page header ("Our seasonal selection") and the filter chips + product grid.
 
@@ -28,7 +28,7 @@ Total ~3.5MB. **Derive the frame count from a constant you define once, do not s
 
 ## THE EFFECT — two coupled motions
 
-As the visitor scrolls through the section, **progress `p` runs 0 → 1** and drives both of these simultaneously:
+As the visitor scrolls through the section, **progress `p` runs 0 🠖 1** and drives both of these simultaneously:
 
 1. **Frame scrub.** `frameIndex = round(p * (FRAME_COUNT - 1))`. Whole fruits slice apart as you scroll.
 2. **Descent under the page.** The canvas stage translates downward and the product grid below slides up over it, so the fruit appears to **sink beneath the product container** rather than scrolling past it.
@@ -54,9 +54,9 @@ The read should be: fruits come apart, then slide down and disappear under the p
 
 **Never mount below 780px.** Gate in React — `display: none` still downloads all 60 frames. Mobile gets a single static `<img src="poster.webp">` and nothing else. That is the better mobile experience regardless.
 
-**`prefers-reduced-motion: reduce` → never mount.** Static poster. Verify **zero** requests to `/explode/` in the Network tab.
+**`prefers-reduced-motion: reduce` 🠖 never mount.** Static poster. Verify **zero** requests to `/explode/` in the Network tab.
 
-**`navigator.connection.saveData`, or `effectiveType` of `2g`/`slow-2g` → never mount.** Same static fallback.
+**`navigator.connection.saveData`, or `effectiveType` of `2g`/`slow-2g` 🠖 never mount.** Same static fallback.
 
 **Accessibility.** Canvas is `aria-hidden="true"`, `role="presentation"`, not keyboard reachable. The section must not trap scroll or focus — Tab must reach the filter chips and the product grid normally, and the page must reach the footer by keyboard alone. No content lives only inside this section.
 
@@ -72,7 +72,7 @@ The read should be: fruits come apart, then slide down and disappear under the p
 
 ```
 src/pages/products/sections/ExplodeSequence.jsx
-src/features/explode/useFrameSequence.js     # preload, progress → index, rAF loop
+src/features/explode/useFrameSequence.js     # preload, progress 🠖 index, rAF loop
 src/features/explode/config.js               # FRAME_COUNT, path pattern, thresholds
 src/styles/pages.css                         # appended in existing cascade order
 ```

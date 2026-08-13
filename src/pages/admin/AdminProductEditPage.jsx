@@ -249,7 +249,7 @@ export default function AdminProductEditPage({ productId }) {
     <form className="admin-page" onSubmit={onSubmit}>
       <header className="admin-page-head">
         <div>
-          <button type="button" className="admin-link" onClick={() => goTo('admin/products')}>← Products</button>
+          <button type="button" className="admin-link" onClick={() => goTo('admin/products')}>🠔 Products</button>
           <h2 className="admin-page-h2">{isNew ? 'New product' : form.name || 'Edit product'}</h2>
         </div>
         <div className="admin-head-actions">

@@ -84,5 +84,15 @@ export function usePage(slug, fallback = {}) {
   // mounting for one frame and firing off its image requests.
   const shows = (key) => (data ? key in map : key in fallback)
 
-  return { section, shows, status, loaded: Boolean(data) }
+  // Page-level availability, as opposed to section-level presence.
+  //
+  // findPublic returns null for a page whose status is not PUBLISHED, but
+  // section() would then quietly substitute the caller's static fallback and
+  // render the page anyway - so unpublishing a page in the admin changed
+  // nothing on the public site. `missing` is true only once the fetch has
+  // COMPLETED and produced no page, so a slow network never flashes a
+  // not-found state at someone.
+  const missing = status !== 'loading' && !data
+
+  return { section, shows, status, loaded: Boolean(data), missing }
 }

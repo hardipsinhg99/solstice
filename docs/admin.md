@@ -77,7 +77,7 @@ npm run dev                 # repo root - http://localhost:5173
 
 Admin at **`http://localhost:5173/#admin/products`**, using the credentials you put in `ADMIN_SEED_EMAIL` / `ADMIN_SEED_PASSWORD`.
 
-`vite.config.js` proxies `/api` → `http://localhost:3001`, so the frontend and API are same-origin in development and CORS never applies locally. Override the target with `VITE_API_PROXY_TARGET` if the API runs elsewhere.
+`vite.config.js` proxies `/api` 🠖 `http://localhost:3001`, so the frontend and API are same-origin in development and CORS never applies locally. Override the target with `VITE_API_PROXY_TARGET` if the API runs elsewhere.
 
 ### Server scripts
 
@@ -229,7 +229,7 @@ Full definitions in `server/prisma/schema.prisma`.
 
 ### `updatedById` everywhere
 
-`Product` and all three child tables carry `updatedById → Admin`. There is **no role column and no role table** - see [Auth](#auth). The foreign keys exist from day one specifically so that adding roles later needs no data migration; backfilling who-did-what is the expensive half of retrofitting RBAC.
+`Product` and all three child tables carry `updatedById 🠖 Admin`. There is **no role column and no role table** - see [Auth](#auth). The foreign keys exist from day one specifically so that adding roles later needs no data migration; backfilling who-did-what is the expensive half of retrofitting RBAC.
 
 ---
 
@@ -407,7 +407,7 @@ light-mode map has to be.
 ### Rich text is targeted by section type and path
 
 `RICH_PATHS` in `PagesService` names the exact `type` + dotted path of every rich-text
-field — `about.story → nodes.body`, `about.missionVision → items.body`.
+field — `about.story 🠖 nodes.body`, `about.missionVision 🠖 items.body`.
 
 The first version keyed off the field NAME (`body`, `bio`) wherever it appeared, and
 Services disproved it immediately: its repeaters also use `body`, for plain textareas, and
@@ -682,7 +682,7 @@ The admin has **no second palette.** Every value comes from `src/styles/tokens.c
 | Cards, sidebar, table | `--surface` |
 | Hairlines | `--border` |
 | Control boundaries | `--line-strong` (`--border` is too faint for controls) |
-| Text | `--ink` → `--body` → `--muted` |
+| Text | `--ink` 🠖 `--body` 🠖 `--muted` |
 | Primary action / active nav | `--green-600` with `--on-green` |
 | Hover | `--green-700` |
 | **Destructive / error** | `--danger`, `--danger-bg`, `--on-danger` |

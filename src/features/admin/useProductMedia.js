@@ -25,7 +25,7 @@ export function preflight(file) {
 /**
  * XMLHttpRequest rather than fetch, for one reason: fetch cannot report upload
  * progress. There is no streaming-request support in browsers that would give a
- * percentage for a multipart body, and a progress bar that jumps 0 → 100 is
+ * percentage for a multipart body, and a progress bar that jumps 0 🠖 100 is
  * worse than none on a slow connection.
  */
 function upload(path, file, altText, onProgress) {

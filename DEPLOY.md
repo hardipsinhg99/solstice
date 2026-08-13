@@ -38,7 +38,7 @@ silently fails to bind and no certificate is ever requested — see *If Let's
 Encrypt fails* for how to spot that and re-read the live names.
 
 Also assumed present, and true today: the `coolify` Docker network, and DNS for
-`test.solsticellp.com` / `test-api.solsticellp.com` → `69.62.85.208`.
+`test.solsticellp.com` / `test-api.solsticellp.com` 🠖 `69.62.85.208`.
 
 ---
 
@@ -315,7 +315,7 @@ Vercel forwards unchanged.
 
 **Before the cutover:**
 
-1. **Create the `api.solsticellp.com` A record → `69.62.85.208`.** It does not
+1. **Create the `api.solsticellp.com` A record 🠖 `69.62.85.208`.** It does not
    exist yet. `test.solsticellp.com` and `test-api.solsticellp.com` already do;
    this is the third and the rewrite target above depends on it.
 2. Add `api.solsticellp.com` to the compose router rules (or stand up a separate

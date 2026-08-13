@@ -1,6 +1,6 @@
 import { Eyebrow } from '../ui/Eyebrow.jsx'
 import { Button } from '../ui/Button.jsx'
-import { navItems } from '../../data/navigation.js'
+import { navGroup } from '../../data/navigation.js'
 import { useNavigate } from '../../app/navigation.js'
 import { useSiteSettings } from '../../features/settings/index.js'
 
@@ -24,11 +24,11 @@ export function Footer() {
         </div>
         <div className="footer-col">
           <span className="footer-heading">Explore</span>
-          {navItems.slice(1, 4).map(item => <button key={item.route} onClick={() => navigate(item.route)}>{item.label}</button>)}
+          {navGroup('explore').map(item => <button key={item.route} onClick={() => navigate(item.route)}>{item.label}</button>)}
         </div>
         <div className="footer-col">
           <span className="footer-heading">Company</span>
-          {navItems.slice(4).map(item => <button key={item.route} onClick={() => navigate(item.route)}>{item.label}</button>)}
+          {navGroup('company').map(item => <button key={item.route} onClick={() => navigate(item.route)}>{item.label}</button>)}
         </div>
         <div className="footer-col">
           <span className="footer-heading">Get in touch</span>

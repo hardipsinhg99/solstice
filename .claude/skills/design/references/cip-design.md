@@ -101,9 +101,9 @@ python3 ~/.claude/skills/design/scripts/cip/render-html.py --brand "TopGroup" --
 
 ## Workflow
 
-1. Generate CIP brief → `scripts/cip/search.py --cip-brief`
-2. Generate mockups with logo → `scripts/cip/generate.py --brand --logo --industry --set`
-3. Render HTML presentation → `scripts/cip/render-html.py --brand --industry --images`
+1. Generate CIP brief 🠖 `scripts/cip/search.py --cip-brief`
+2. Generate mockups with logo 🠖 `scripts/cip/generate.py --brand --logo --industry --set`
+3. Render HTML presentation 🠖 `scripts/cip/render-html.py --brand --industry --images`
 
 **Tip:** If no logo exists, use Logo Design (built-in) to generate one first.
 

@@ -42,7 +42,7 @@ Collect via AskUserQuestion:
 1. Activate `ui-ux-pro-max` skill for design intelligence
 2. Use Chrome browser to research Pinterest for design references:
    ```
-   Navigate to pinterest.com → search "[purpose] banner design [style]"
+   Navigate to pinterest.com 🠖 search "[purpose] banner design [style]"
    Screenshot 3-5 reference pins for art direction inspiration
    ```
 3. Select 2-3 complementary art direction styles from references:

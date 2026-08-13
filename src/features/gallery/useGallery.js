@@ -10,7 +10,7 @@ export const MAX_GALLERY_IMAGES = 24
 /**
  * Upload goes through the SAME multipart shape the product media manager uses,
  * against /api/gallery. XMLHttpRequest rather than fetch for one reason: fetch
- * cannot report upload progress, and a bar that jumps 0 → 100 is worse than none
+ * cannot report upload progress, and a bar that jumps 0 🠖 100 is worse than none
  * on a slow connection. Lifted from useProductMedia, not reinvented.
  */
 function upload(file, { caption, altText }, onProgress) {

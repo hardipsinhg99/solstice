@@ -708,3 +708,70 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .team-monogram>span:first-child{font-size:44px;font-weight:700;letter-spacing:2px;color:var(--muted);line-height:1}
 .team-photo-note{font:9px 'DM Mono';letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
 .team-role{font:9px 'DM Mono';letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+
+/* ── Global Trade Network ────────────────────────────────────────────────────
+   Tokens only, both themes. The reference's blue accent and dark-teal band are
+   deliberately not carried over - the structural idea (a banded process
+   section, a card grid) is reused, the palette is Solstice's. */
+.network-hero{position:relative;padding:clamp(72px,10vw,132px) 0;background:var(--deep);color:#fff;overflow:hidden;isolation:isolate}
+.network-hero-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.34;z-index:-1}
+.network-hero-inner{position:relative}
+.network-hero h1{font-size:clamp(38px,5.4vw,68px);line-height:1.04;letter-spacing:-1.6px;margin:10px 0 0;max-width:14ch}
+/* --green-on-dark, not the ramp: this band is dark in BOTH themes, so a
+   theme-flipping green would drop to ~2.6:1 here. Measured 11.78:1. */
+.network-hero h1 em{font-style:normal;color:var(--green-on-dark)}
+.network-lede{margin:18px 0 0;max-width:60ch;font-size:15px;line-height:1.75;color:var(--muted)}
+.network-hero .network-lede{color:rgba(255,255,255,.86)}
+.network-hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px}
+
+.network-stats{background:var(--soft)}
+.network-stats-heading{text-align:center;margin:0 0 34px}
+.network-stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:22px}
+.network-stat{text-align:center;padding:26px 18px;background:var(--surface);border:1px solid var(--line)}
+.network-stat strong{display:block;font-size:clamp(30px,3.4vw,44px);line-height:1;color:var(--green-600);letter-spacing:-1.4px}
+.network-stat span{display:block;margin-top:8px;font:500 11px/1.4 'DM Mono';letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+/* Same treatment About uses for an unverified claim - visible, not hidden. */
+.network-stat.is-unresolved{border-color:var(--danger)}
+
+.network-step-list{list-style:none;margin:38px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;counter-reset:none}
+.network-step{position:relative;padding:26px 22px;background:var(--surface);border:1px solid var(--line)}
+.network-step-index{font:600 11px/1 'DM Mono';letter-spacing:1.4px;color:var(--green-600)}
+.network-step svg{display:block;margin:12px 0 10px;color:var(--green-600)}
+.network-step h3{margin:0 0 8px;font-size:17px;letter-spacing:-.4px}
+
+.network-services{background:var(--deep);color:#fff}
+.network-services .section-head h2,.network-services .section-head .eyebrow{color:#fff}
+.network-services .network-lede{color:rgba(255,255,255,.82)}
+.network-service-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:36px}
+.network-service{padding:26px 22px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14)}
+.network-service h3{margin:12px 0 8px;font-size:18px;letter-spacing:-.4px;color:#fff}
+.network-service svg{color:var(--green-on-dark)}
+.network-service .about-rich{color:rgba(255,255,255,.82)}
+/* Draft copy the client has not written yet. Loud on purpose - this must not
+   ship unnoticed, which is why the page seeds unpublished. */
+.network-service.is-unresolved{border-color:var(--gold);border-style:dashed}
+
+.network-category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-top:36px}
+.network-category{display:block;width:100%;padding:0;border:1px solid var(--line);background:var(--surface);text-align:left;overflow:hidden;transition:border-color .25s var(--ease),transform .25s var(--ease)}
+.network-category:hover{border-color:var(--green-600);transform:translateY(-3px)}
+.network-category img,.network-category-plate{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.network-category-plate{background:var(--monogram-plate)}
+.network-category-meta{display:block;padding:16px 18px}
+.network-category-meta strong{display:block;font-size:17px;letter-spacing:-.4px;color:var(--ink)}
+.network-category-meta span{display:block;margin-top:4px;font-size:12px;color:var(--muted)}
+
+.network-why-list{list-style:none;margin:32px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.network-why-list li{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--body)}
+.network-why-list svg{flex-shrink:0;color:var(--green-600)}
+
+.network-cta{background:var(--deep);color:#fff;text-align:center;padding:clamp(64px,8vw,104px) 0}
+.network-cta h2{font-size:clamp(30px,4vw,50px);line-height:1.08;letter-spacing:-1.3px;margin:10px 0 14px}
+.network-cta h2 em{font-style:normal;color:var(--green-on-dark)}
+.network-cta p{max-width:56ch;margin:0 auto 26px;color:rgba(255,255,255,.84);line-height:1.7}
+
+/* The shared unpublished-page state. */
+.page-unavailable{text-align:center;padding:clamp(80px,12vw,150px) 0}
+.page-unavailable h1{font-size:clamp(32px,4.4vw,54px);letter-spacing:-1.3px;margin:10px 0 14px}
+.page-unavailable h1 em{font-style:normal;color:var(--green-500)}
+.page-unavailable p{max-width:52ch;margin:0 auto 28px;color:var(--muted);line-height:1.75}
+.page-unavailable-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}

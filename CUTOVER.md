@@ -10,8 +10,8 @@ Target: **Saturday 15 August 2026.**
 > is deployed at `solstice-teal.vercel.app`.
 >
 > ```
-> solsticellp.com      307 →  www.solsticellp.com   (Next.js, 125KB SSR HTML)
-> solstice-teal...app  200  →  this repo             (Vite, /assets/index-*.js)
+> solsticellp.com      307 🠖  www.solsticellp.com   (Next.js, 125KB SSR HTML)
+> solstice-teal...app  200  🠖  this repo             (Vite, /assets/index-*.js)
 > ```
 >
 > This is therefore **not** "ship the CMS branch to production." It is
@@ -50,11 +50,11 @@ browser.
 
 **Before cutover you must:**
 
-1. Pull the full indexed URL list — Google Search Console → Pages → Indexed, and
+1. Pull the full indexed URL list — Google Search Console 🠖 Pages 🠖 Indexed, and
    the current `sitemap.xml` (production returns **404** for it today, so GSC is
    the only source).
 2. For every indexed path, decide: does an equivalent exist in the SPA?
-3. Implement a client-side path→hash bridge (a snippet in `index.html` that
+3. Implement a client-side path🠖hash bridge (a snippet in `index.html` that
    reads `location.pathname` and rewrites to the hash equivalent before React
    mounts), **plus** a Vercel rewrite sending those paths to `/index.html` so
    they return 200 rather than 404.
@@ -205,7 +205,7 @@ how a staging secret reaches production. Write a fresh file.
 |---|---|---|---|
 | Router host (API) | `test-api.solsticellp.com` | `api.solsticellp.com` | Record does not exist yet — §3.1 |
 | Router host (web) | `test.solsticellp.com` | *(none — Vercel serves it)* | Only the API moves to the VPS |
-| `CORS_ORIGIN` | `https://test.solsticellp.com,...` | `https://solsticellp.com,https://www.solsticellp.com` | **Both** apex and www — production 307s apex→www, and the browser sends the origin it is on |
+| `CORS_ORIGIN` | `https://test.solsticellp.com,...` | `https://solsticellp.com,https://www.solsticellp.com` | **Both** apex and www — production 307s apex🠖www, and the browser sends the origin it is on |
 | `JWT_SECRET` | staging value | **freshly generated** | See below |
 | `POSTGRES_PASSWORD` | staging value | **freshly generated** | See below |
 | `ADMIN_SEED_EMAIL` | test address | client's real address | — |
@@ -235,8 +235,8 @@ The `tr` strips characters that change the meaning of a Postgres connection URL.
 the VPS and in your shell history — it is **not** a credential the client should
 keep using.
 
-Sequence: seed with a throwaway → hand it to the client over a secure channel →
-**client logs in and changes it the same day** → confirm changed before you
+Sequence: seed with a throwaway 🠖 hand it to the client over a secure channel 🠖
+**client logs in and changes it the same day** 🠖 confirm changed before you
 consider cutover complete. After the first seed the value is inert: the seed
 finds an existing admin and leaves it untouched.
 
@@ -293,7 +293,7 @@ dig +noall +answer solsticellp.com www.solsticellp.com
 
 ### Step 2 — Create `api.solsticellp.com` · 10 min + propagation
 
-A record → `69.62.85.208`, TTL 300. Additive and invisible to users.
+A record 🠖 `69.62.85.208`, TTL 300. Additive and invisible to users.
 
 ```bash
 dig +short api.solsticellp.com @1.1.1.1     # expect 69.62.85.208
@@ -402,7 +402,7 @@ curl -sI https://www.solsticellp.com | head -1                      # 200
 curl -s  https://www.solsticellp.com/api/products | head -c 120     # JSON, not HTML
 curl -sI https://www.solsticellp.com | grep -i x-robots             # expect NOTHING
 curl -s  https://www.solsticellp.com/robots.txt | head -3           # must NOT be Disallow: /
-curl -sI https://solsticellp.com | head -1                          # 307 → www
+curl -sI https://solsticellp.com | head -1                          # 307 🠖 www
 ```
 
 In a browser: homepage renders · products list populated · a product detail page
@@ -442,12 +442,12 @@ client's leads.
 - Slow first paint
 
 The distinguishing question: *can a buyer still find products and send an
-enquiry?* No → abort. Yes → fix forward.
+enquiry?* No 🠖 abort. Yes 🠖 fix forward.
 
 ### 4.2 Vercel Instant Rollback — **the fastest lever, try this first** · ~2 min
 
-Dashboard → project → **Deployments** → the last known-good deployment →
-**⋯ → Instant Rollback** (or **Promote to Production**).
+Dashboard 🠖 project 🠖 **Deployments** 🠖 the last known-good deployment 🠖
+**⋯ 🠖 Instant Rollback** (or **Promote to Production**).
 
 No rebuild — Vercel re-points the alias at an existing artefact. Live within
 ~30s of confirming, plus CDN propagation.
@@ -512,8 +512,8 @@ Do not assume. Work down the list:
 
 ```bash
 curl -sI https://www.solsticellp.com | head -1                    # 200
-curl -s  https://www.solsticellp.com | grep -c '_next'            # >0 → old site restored
-curl -sI https://solsticellp.com | head -1                        # 307 → www
+curl -s  https://www.solsticellp.com | grep -c '_next'            # >0 🠖 old site restored
+curl -sI https://solsticellp.com | head -1                        # 307 🠖 www
 curl -s  https://www.solsticellp.com/products -o /dev/null -w '%{http_code}\n'  # 200
 ```
 

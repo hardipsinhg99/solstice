@@ -1,0 +1,198 @@
+import { useMemo } from 'react'
+import { Icon } from '../../components/ui/Icon.jsx'
+import { Button } from '../../components/ui/Button.jsx'
+import { Eyebrow } from '../../components/ui/Eyebrow.jsx'
+import { Reveal } from '../../components/motion/Reveal.jsx'
+import { PageUnavailable } from '../../components/layout/PageUnavailable.jsx'
+import { useNavigate } from '../../app/navigation.js'
+import { usePage } from '../../features/pages/index.js'
+import { useProductCatalogue } from '../../features/products/index.js'
+import { NETWORK_FALLBACK } from './networkFallback.js'
+
+/**
+ * Global Trade Network.
+ *
+ * Added as a config entry plus a seed row, exactly as Services was - no new
+ * content mechanism. Every string a buyer reads here comes from
+ * usePage('network'); there is no copy in this file. The only content NOT from
+ * the page record is the category grid, which is derived from the live product
+ * catalogue on purpose, so renaming a product type in the admin moves the tiles
+ * without a deploy.
+ */
+export default function NetworkPage() {
+  const navigate = useNavigate()
+  const { section, missing } = usePage('network', NETWORK_FALLBACK)
+  const [products] = useProductCatalogue()
+
+  const hero = section('hero')
+  const stats = section('stats')
+  const process = section('process')
+  const services = section('services')
+  const categories = section('categories')
+  const why = section('why')
+  const cta = section('cta')
+
+  // Tiles from the catalogue, not a hardcoded list. Grouped by the product's
+  // own `type`, counted, and with the placeholder rows excluded - an import slot
+  // typed "To be confirmed" is not a category a buyer can browse.
+  const tiles = useMemo(() => {
+    const groups = new Map()
+    for (const p of products ?? []) {
+      const type = (p.type ?? '').trim()
+      if (!type || /^to be confirmed$/i.test(type)) continue
+      const row = groups.get(type) ?? { type, count: 0, image: null, trade: p.trade }
+      row.count += 1
+      row.image = row.image ?? p.image?.url ?? p.gallery?.[0]?.url ?? null
+      groups.set(type, row)
+    }
+    return [...groups.values()].sort((a, b) => b.count - a.count)
+  }, [products])
+
+  if (missing) return <PageUnavailable/>
+
+  return <>
+    <section className="network-hero">
+      {hero.image?.url && (
+        <img className="network-hero-image" src={hero.image.url}
+             alt={hero.image.alt || ''} decoding="async" fetchPriority="high"/>
+      )}
+      <div className="container network-hero-inner">
+        <Reveal as="div">
+          <Eyebrow>{hero.eyebrow}</Eyebrow>
+          <h1>{hero.headingLine1}<br/><em>{hero.headingAccent}</em></h1>
+          <p className="network-lede">{hero.lede}</p>
+          <div className="network-hero-actions">
+            {hero.primaryCtaLabel &&
+              <Button onClick={() => navigate(hero.primaryCtaRoute)}>{hero.primaryCtaLabel}</Button>}
+            {hero.secondaryCtaLabel &&
+              <Button variant="outline" onClick={() => navigate(hero.secondaryCtaRoute)}>
+                {hero.secondaryCtaLabel}
+              </Button>}
+          </div>
+        </Reveal>
+      </div>
+    </section>
+
+    {/* Omitted entirely when empty rather than rendered as a hollow band - the
+        section exists to carry evidence, and no evidence means no section. */}
+    {(stats.items ?? []).length > 0 && (
+      <section className="section network-stats">
+        <div className="container">
+          <Reveal as="h2" className="network-stats-heading">{stats.heading}</Reveal>
+          <div className="network-stat-grid">
+            {stats.items.map((s, i) => (
+              <Reveal as="div" key={s.label ?? i} delay={i * 70}
+                      className={s.unresolvedScope ? 'network-stat is-unresolved' : 'network-stat'}>
+                <strong>{s.value}</strong>
+                <span>{s.label}</span>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    {(process.steps ?? []).length > 0 && (
+      <section className="section network-process">
+        <div className="container">
+          <Reveal as="div" className="section-head">
+            <Eyebrow>{process.eyebrow}</Eyebrow>
+            <h2>{process.heading}</h2>
+            {process.intro && <p className="network-lede">{process.intro}</p>}
+          </Reveal>
+          <ol className="network-step-list">
+            {process.steps.map((step, i) => (
+              <Reveal as="li" key={step.title ?? i} delay={i * 70} className="network-step">
+                <span className="network-step-index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                {step.icon && <Icon name={step.icon} size={20}/>}
+                <h3>{step.title}</h3>
+                {/* Sanitized server-side against the allowlist in
+                    common/sanitize.ts - not trusted at render. */}
+                {step.body && <div className="about-rich"
+                                   dangerouslySetInnerHTML={{ __html: step.body }}/>}
+              </Reveal>
+            ))}
+          </ol>
+        </div>
+      </section>
+    )}
+
+    {(services.items ?? []).length > 0 && (
+      <section className="section network-services">
+        <div className="container">
+          <Reveal as="div" className="section-head">
+            <Eyebrow>{services.eyebrow}</Eyebrow>
+            <h2>{services.heading}</h2>
+            {services.intro && <p className="network-lede">{services.intro}</p>}
+          </Reveal>
+          <div className="network-service-grid">
+            {services.items.map((item, i) => (
+              <Reveal as="article" key={item.title ?? i} delay={i * 70}
+                      className={item.unresolvedCopy ? 'network-service is-unresolved' : 'network-service'}>
+                {item.icon && <Icon name={item.icon} size={22}/>}
+                <h3>{item.title}</h3>
+                {item.body && <div className="about-rich"
+                                   dangerouslySetInnerHTML={{ __html: item.body }}/>}
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    {tiles.length > 0 && (
+      <section className="section network-categories">
+        <div className="container">
+          <Reveal as="div" className="section-head">
+            <Eyebrow>{categories.eyebrow}</Eyebrow>
+            <h2>{categories.heading}</h2>
+            {categories.intro && <p className="network-lede">{categories.intro}</p>}
+          </Reveal>
+          <div className="network-category-grid">
+            {tiles.map((tile, i) => (
+              <Reveal as="div" key={tile.type} delay={i * 70}>
+                <button className="network-category" onClick={() => navigate('products')}>
+                  {tile.image
+                    ? <img src={tile.image} alt="" loading="lazy" decoding="async"/>
+                    : <span className="network-category-plate" aria-hidden="true"/>}
+                  <span className="network-category-meta">
+                    <strong>{tile.type}</strong>
+                    <span>{tile.count} {tile.count === 1 ? 'product' : 'products'}</span>
+                  </span>
+                </button>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    {(why.points ?? []).length > 0 && (
+      <section className="section network-why">
+        <div className="container">
+          <Reveal as="div" className="section-head">
+            <h2>{why.heading}</h2>
+            {why.intro && <p className="network-lede">{why.intro}</p>}
+          </Reveal>
+          <ul className="network-why-list">
+            {why.points.map((p, i) => (
+              <Reveal as="li" key={p.text ?? i} delay={i * 50}>
+                <Icon name="check" size={16}/> {p.text}
+              </Reveal>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )}
+
+    <section className="network-cta">
+      <Reveal as="div" className="container">
+        <Eyebrow>{cta.eyebrow}</Eyebrow>
+        <h2>{cta.headingLine1}<br/><em>{cta.headingAccent}</em></h2>
+        {cta.body && <p>{cta.body}</p>}
+        {cta.ctaLabel &&
+          <Button variant="lime" onClick={() => navigate(cta.ctaRoute)}>{cta.ctaLabel}</Button>}
+      </Reveal>
+    </section>
+  </>
+}
