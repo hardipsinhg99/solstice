@@ -13,6 +13,7 @@ import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
 import { usePage } from '../../features/pages/index.js'
 import { HeroMedia } from './sections/HeroMedia.jsx'
 import { JourneyScroll } from './sections/JourneyScroll.jsx'
+import { Certifications } from './sections/Certifications.jsx'
 import { HOME_FALLBACK } from './homeFallback.js'
 
 export default function HomePage({ selectProduct, theme }) {
@@ -165,6 +166,10 @@ export default function HomePage({ selectProduct, theme }) {
         the component never mounts, no ScrollTrigger is created and none of the
         fourteen /journey/*.webp files are requested. */}
     {shows('journey') && <JourneyScroll/>}
+
+    {/* Hidden by the section visibility toggle like any other section, and it
+        renders nothing on its own when no certificate is published. */}
+    {shows('certifications') && <Certifications data={section('certifications')}/>}
 
     <section className="buyer-path">
       <div className="container">

@@ -1001,3 +1001,55 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
   .network-flow-body{max-width:none}
   .network-flow-num{margin:0}
 }
+
+/* ── Certifications marquee ──────────────────────────────────────────────────
+   Zero dependencies. The reference reaches for embla plus an auto-scroll
+   plugin to translate a row at a constant rate; two rules do it, and the same
+   technique already runs the Trade Network quotes, so the codebase has one
+   marquee pattern rather than two. */
+.certifications{background:var(--soft);overflow:hidden}
+.certifications-head{text-align:center;max-width:52ch;margin:0 auto}
+.certifications-head h2{font-size:clamp(28px,3.4vw,44px);letter-spacing:-1.2px;margin:0}
+.certifications-head p{margin:14px 0 0;color:var(--muted);font-size:15px;line-height:1.7}
+
+/* The fade is a mask, not two gradient overlays sitting on top: overlays have
+   to match the section background exactly and break the moment the theme
+   flips, whereas a mask removes the pixels and works on any backdrop. */
+.certifications-marquee{margin-top:clamp(30px,4vw,48px);
+  -webkit-mask:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);
+  mask:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent)}
+.certifications-track{display:flex;width:max-content}
+.certifications-run{display:flex;align-items:center;gap:clamp(30px,5vw,68px);
+  list-style:none;margin:0;padding:0 clamp(15px,2.5vw,34px) 0 0}
+
+@media(prefers-reduced-motion:no-preference){
+  .certifications-track{animation:certifications-scroll 46s linear infinite}
+  /* Pause on hover and on focus-within: a keyboard user tabbing to a logo
+     should not be chasing it across the row. */
+  .certifications-marquee:hover .certifications-track,
+  .certifications-marquee:focus-within .certifications-track{animation-play-state:paused}
+}
+@keyframes certifications-scroll{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+
+.certification{display:flex;flex-direction:column;align-items:center;gap:8px;flex:0 0 auto;text-align:center}
+/* Height-constrained, width auto: certificate marks come in wildly different
+   proportions, and fixing both axes is what distorts them. */
+.certification img{height:clamp(44px,5vw,66px);width:auto;max-width:170px;object-fit:contain;
+  filter:grayscale(1);opacity:.72;transition:filter .3s var(--ease),opacity .3s var(--ease)}
+.certification:hover img{filter:grayscale(0);opacity:1}
+.certification-name{font:600 15px/1.3 'DM Sans';color:var(--ink);max-width:16ch}
+.certification-note{font:500 10px/1.4 'DM Mono';letter-spacing:.8px;text-transform:uppercase;color:var(--muted);max-width:20ch}
+
+@media(max-width:780px){
+  .certifications-run{gap:26px}
+  .certification img{height:38px;max-width:120px}
+  .certification-note{display:none}
+}
+
+/* Reduced motion: the track does not animate at all - the rule above is inside
+   a no-preference query - so it becomes a row the reader scrolls themselves.
+   The duplicate run is removed so nothing is announced or shown twice. */
+@media(prefers-reduced-motion:reduce){
+  .certifications-marquee{overflow-x:auto}
+  .certifications-run[aria-hidden]{display:none}
+}

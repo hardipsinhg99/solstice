@@ -78,6 +78,17 @@ const HOME: Section[] = [
   // No editable copy yet - the row exists so the sequence has a section to be
   // shown or hidden by. Seeded visible, like everything else.
   { key: 'journey', type: 'home.journey', data: {} },
+  // items: [] DELIBERATELY. The only certification recorded anywhere in this
+  // project is "Phytosanitary certificate on every shipment", and it is marked
+  // verifiable:false. A certification is a legal claim in the destination
+  // market - CLAUDE.md forbids inventing one, and stock certificate logos would
+  // be exactly that. The section is built, wired and empty until real ones are
+  // uploaded, and it renders nothing at all until then.
+  { key: 'certifications', type: 'home.certifications', data: {
+    heading: 'Our certifications',
+    intro: 'Trusted standards behind every global trade.',
+    items: [],
+  } },
   { key: 'manifesto', type: 'home.manifesto', data: {
     image: null,
     stats: [

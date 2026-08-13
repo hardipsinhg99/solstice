@@ -124,6 +124,23 @@ const HOME = [
     fields: []
   },
   {
+    key: 'certifications', type: 'home.certifications', label: 'Our certifications',
+    help: 'Add, edit, remove and reorder certificates here; the arrows set the order they appear in the marquee. Each row has its own Published toggle, so a lapsed certificate can be taken down without deleting its record. SEEDED EMPTY - a certification is a legal claim in the destination market, so nothing appears until you add a real one.',
+    fields: [
+      f('heading', 'Heading'), f('intro', 'Supporting line', 'textarea'),
+      f('items', 'Certificates', 'list', {
+        itemLabel: 'Certificate',
+        fields: [
+          f('name', 'Name', 'text', { required: true }),
+          f('description', 'Short description'),
+          f('logo', 'Logo', 'image'),
+          f('published', 'Published', 'toggle',
+            { help: 'Off hides it from the marquee without deleting it.' })
+        ]
+      })
+    ]
+  },
+  {
     key: 'manifesto', type: 'home.manifesto', label: 'The Solstice approach',
     fields: [
       f('image', 'Image', 'image'),
