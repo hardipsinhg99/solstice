@@ -909,3 +909,94 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
     color-mix(in srgb,var(--deep) 92%,transparent) 100%)}
   .about-hero.has-banner{padding:clamp(88px,14vh,120px) 0 clamp(64px,10vh,90px)}
 }
+
+/* ── Trade Network hero ──────────────────────────────────────────────────────
+   The artwork carries no text, so every word is real HTML over it. That is the
+   whole reason this hero can stay readable at 390px, be indexed, translated and
+   read aloud - a composite with baked-in type can do none of those. */
+.network-hero{display:flex;align-items:center;min-height:min(92svh,860px);padding:clamp(112px,14vh,150px) 0 clamp(48px,7vh,80px)}
+.network-hero-art{position:absolute;inset:0;z-index:-2;display:block}
+.network-hero-art img{width:100%;height:100%;object-fit:cover;object-position:62% 50%;display:block}
+
+/* Left-weighted, because that is where the copy sits and the right of the frame
+   is the picture - the ship, crane and truck stay legible rather than being
+   flattened under a uniform wash. The artwork's own left third is already dark,
+   so this deepens what is there instead of inventing a panel. */
+.network-hero:before{content:'';position:absolute;inset:0;z-index:-1;background:
+  linear-gradient(100deg,
+    color-mix(in srgb,var(--deep) 92%,transparent) 0%,
+    color-mix(in srgb,var(--deep) 80%,transparent) 30%,
+    color-mix(in srgb,var(--deep) 40%,transparent) 58%,
+    color-mix(in srgb,var(--deep) 22%,transparent) 100%),
+  linear-gradient(0deg,color-mix(in srgb,var(--deep) 72%,transparent) 0%,transparent 42%)}
+.network-hero-inner{display:flex;flex-direction:column;gap:clamp(40px,6vh,72px);width:100%}
+.network-hero-copy{max-width:min(46rem,52%)}
+.network-hero-eyebrow{display:flex;align-items:center;gap:12px;margin:0 0 14px;font:600 12px/1 'DM Mono';letter-spacing:3px;text-transform:uppercase;color:var(--green-on-dark)}
+.network-hero-eyebrow:before{content:'';width:26px;height:1px;background:var(--green-on-dark);flex-shrink:0}
+/* clamp does the responsive scaling, so there is no per-breakpoint font rule to
+   drift: 34px on a phone, 76px on a wide desktop, continuous between. */
+.network-hero h1{color:#fff;font-size:clamp(34px,5.6vw,76px);line-height:1.02;letter-spacing:-2px;margin:0}
+.network-hero h1 em{color:var(--green-on-dark)}
+.network-hero .network-lede{color:rgba(255,255,255,.88);margin-top:20px;max-width:44ch}
+.network-hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:32px}
+
+/* Glass secondary. Border rather than fill, so it reads as the quieter of the
+   two without disappearing into the artwork behind it. */
+.button.glass{background:rgba(255,255,255,.07);color:#fff;border:1px solid rgba(255,255,255,.42);backdrop-filter:blur(6px)}
+.button.glass:hover{background:rgba(255,255,255,.14);border-color:#fff}
+.button.glass:active{transform:translateY(1px)}
+
+/* ── Process flow ──────────────────────────────────────────────────────────── */
+.network-hero-foot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(20px,3vw,40px);align-items:center}
+.network-flow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(8px,1.4vw,20px)}
+.network-flow-step{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;position:relative;min-width:0}
+/* The connector is a pseudo-element, not markup, so a screen reader hears five
+   steps and not five arrows. :not(:last-child) keeps it from trailing off the
+   end of the row. */
+.network-flow-step:not(:last-child):after{content:'';position:absolute;top:26px;left:calc(50% + 32px);right:calc(-50% + 32px);height:1px;background:linear-gradient(90deg,var(--green-on-dark),transparent)}
+.network-flow-icon{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;color:var(--green-on-dark);border:1px solid color-mix(in srgb,var(--green-on-dark) 42%,transparent);background:color-mix(in srgb,var(--deep) 55%,transparent);transition:transform .25s var(--ease),border-color .25s var(--ease)}
+.network-flow-step:hover .network-flow-icon{transform:translateY(-3px);border-color:var(--green-on-dark)}
+.network-flow-num{font:500 13px/1 'DM Mono';color:rgba(255,255,255,.72);margin-top:4px}
+.network-flow-label{font:700 12px/1.2 'DM Sans';letter-spacing:1.2px;text-transform:uppercase;color:var(--green-on-dark)}
+.network-flow-body{font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.76);max-width:20ch}
+
+.network-trust{display:flex;gap:14px;align-items:flex-start;max-width:330px;padding:20px 22px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);backdrop-filter:blur(8px)}
+.network-trust-mark{color:var(--green-on-dark);flex-shrink:0}
+.network-trust strong{display:block;font:700 13px/1.35 'DM Sans';letter-spacing:.6px;text-transform:uppercase;color:#fff}
+.network-trust p{margin:8px 0 0;font-size:12.5px;line-height:1.55;color:rgba(255,255,255,.78)}
+
+@media(max-width:1100px){
+  .network-hero-copy{max-width:min(46rem,62%)}
+  .network-hero-foot{grid-template-columns:1fr;gap:24px}
+  .network-trust{max-width:none}
+}
+@media(max-width:960px){
+  /* Three then two, rather than five squeezed: below ~150px per column the
+     one-line description wraps to four lines and the row stops reading as a
+     sequence. The connectors go with it - they only mean anything in a row. */
+  .network-flow{grid-template-columns:repeat(3,minmax(0,1fr));gap:22px 14px}
+  .network-flow-step:not(:last-child):after{display:none}
+  .network-hero-copy{max-width:none}
+  /* Portrait: hold the ship and truck in frame as the sides crop away. */
+  .network-hero-art img{object-position:70% 50%}
+}
+@media(max-width:780px){
+  .network-hero{min-height:auto;padding:clamp(96px,13vh,124px) 0 44px}
+  /* The copy now sits OVER the picture rather than beside it, so the scrim goes
+     near-solid vertically. A left-weighted gradient assumes a wide frame. */
+  .network-hero:before{background:linear-gradient(180deg,
+    color-mix(in srgb,var(--deep) 88%,transparent) 0%,
+    color-mix(in srgb,var(--deep) 74%,transparent) 46%,
+    color-mix(in srgb,var(--deep) 93%,transparent) 100%)}
+  .network-flow{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 12px}
+  .network-flow-icon{width:46px;height:46px}
+  .network-hero-actions .button{flex:1 1 auto;justify-content:center;min-height:48px}
+}
+@media(max-width:420px){
+  /* One column rather than two cramped ones. min-width:0 on the step already
+     stops the grid blowing out its track, so there is no horizontal overflow. */
+  .network-flow{grid-template-columns:1fr;gap:16px}
+  .network-flow-step{flex-direction:row;text-align:left;align-items:center;gap:14px}
+  .network-flow-body{max-width:none}
+  .network-flow-num{margin:0}
+}

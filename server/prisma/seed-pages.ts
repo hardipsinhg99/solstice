@@ -389,10 +389,24 @@ const NETWORK: Section[] = [
     eyebrow: 'GLOBAL TRADE NETWORK',
     headingLine1: 'From our growers',
     headingAccent: 'to your warehouse.',
-    lede: 'Every consignment moves through the same five stages - sourcing, quality control, documentation, shipping and delivery. This is what each of them involves, so you know what to expect before you send an enquiry.',
-    primaryCtaLabel: 'Browse products', primaryCtaRoute: 'products',
-    secondaryCtaLabel: 'Send enquiry', secondaryCtaRoute: 'contact',
+    lede: 'We connect global buyers with trusted suppliers and handle everything in between - so you can import with confidence and grow your business.',
+    primaryCtaLabel: 'Explore Products', primaryCtaRoute: 'products',
+    secondaryCtaLabel: 'Send Enquiry', secondaryCtaRoute: 'contact',
+    // null = use the built-in artwork at /trade-network-hero.webp. Uploading
+    // one in the admin replaces it without a deploy.
     image: null,
+    // Icons are mapped to what the sprite actually contains - there is no
+    // magnifier or document glyph, so sourcing uses leaf and documentation
+    // uses layers rather than referencing icons that would render empty.
+    steps: [
+      { icon: 'leaf',   label: 'Sourcing',        body: 'We find the right products and suppliers.' },
+      { icon: 'check',  label: 'Quality control', body: 'We ensure quality at every step.' },
+      { icon: 'layers', label: 'Documentation',   body: 'We handle all export-import documentation.' },
+      { icon: 'ship',   label: 'Shipping',        body: 'Safe and efficient global shipping.' },
+      { icon: 'box',    label: 'Delivery',        body: 'On-time delivery, every time.' },
+    ],
+    trustTitle: 'Your trust.', trustTitle2: 'Our commitment.',
+    trustBody: 'Transparent process. Reliable partners. Timely delivery.',
   } },
   // Source for all three: the About page's published globalPresence and
   // journeyStats sections. Nothing invented, nothing rounded up.

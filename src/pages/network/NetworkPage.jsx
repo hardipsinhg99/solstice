@@ -53,24 +53,66 @@ export default function NetworkPage() {
 
   return <>
     <section className="network-hero">
-      {hero.image?.url && (
-        <img className="network-hero-image" src={hero.image.url}
-             alt={hero.image.alt || ''} decoding="async" fetchPriority="high"/>
-      )}
+      {/* The artwork ships with the page but is replaceable from the admin.
+          Two sources: the browser takes the 960px file on small screens, so a
+          phone never downloads the 1536px one. No baked-in text - every word
+          below is real HTML, which is what keeps the hero readable at 390px,
+          indexable, translatable and reachable by a screen reader. */}
+      <picture className="network-hero-art">
+        <source media="(max-width: 780px)" srcSet="/trade-network-hero-960.webp"/>
+        <img src={hero.image?.url || '/trade-network-hero.webp'}
+             alt="" aria-hidden="true" fetchPriority="high" decoding="async"/>
+      </picture>
+
       <div className="container network-hero-inner">
-        <Reveal as="div">
-          <Eyebrow>{hero.eyebrow}</Eyebrow>
+        <Reveal as="div" className="network-hero-copy">
+          <p className="network-hero-eyebrow">{hero.eyebrow}</p>
+          {/* line 1 sans, line 2 serif. The <em> is not emphasis for its own
+              sake - base.css already renders h1 em as upright Playfair, so the
+              split typeface the design asks for is the site's existing rule
+              rather than a new one invented here. */}
           <h1>{hero.headingLine1}<br/><em>{hero.headingAccent}</em></h1>
           <p className="network-lede">{hero.lede}</p>
           <div className="network-hero-actions">
             {hero.primaryCtaLabel &&
               <Button onClick={() => navigate(hero.primaryCtaRoute)}>{hero.primaryCtaLabel}</Button>}
             {hero.secondaryCtaLabel &&
-              <Button variant="outline" onClick={() => navigate(hero.secondaryCtaRoute)}>
+              <Button variant="glass" onClick={() => navigate(hero.secondaryCtaRoute)}>
                 {hero.secondaryCtaLabel}
               </Button>}
           </div>
         </Reveal>
+
+        {((hero.steps ?? []).length > 0 || hero.trustTitle) && (
+          <Reveal as="div" delay={120} className="network-hero-foot">
+            {(hero.steps ?? []).length > 0 && (
+              /* An ordered list, because it is a sequence. The connectors are
+                 CSS pseudo-elements rather than markup, so a screen reader
+                 hears five steps and not five arrows. */
+              <ol className="network-flow">
+                {hero.steps.map((step, i) => (
+                  <li className="network-flow-step" key={step.label ?? i}>
+                    <span className="network-flow-icon" aria-hidden="true">
+                      <Icon name={step.icon || 'check'} size={22}/>
+                    </span>
+                    <span className="network-flow-num">{String(i + 1).padStart(2, '0')}</span>
+                    <span className="network-flow-label">{step.label}</span>
+                    <span className="network-flow-body">{step.body}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+            {hero.trustTitle && (
+              <aside className="network-trust">
+                <span className="network-trust-mark" aria-hidden="true"><Icon name="check" size={26}/></span>
+                <div>
+                  <strong>{hero.trustTitle}<br/>{hero.trustTitle2}</strong>
+                  <p>{hero.trustBody}</p>
+                </div>
+              </aside>
+            )}
+          </Reveal>
+        )}
       </div>
     </section>
 

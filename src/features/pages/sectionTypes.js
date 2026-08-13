@@ -383,7 +383,17 @@ const NETWORK = [
       f('primaryCtaRoute', 'Primary button goes to'),
       f('secondaryCtaLabel', 'Secondary button'),
       f('secondaryCtaRoute', 'Secondary button goes to'),
-      f('image', 'Background image', 'image')
+      f('image', 'Background image', 'image', {
+        help: 'Leave empty to use the built-in trade-network artwork. Upload one here to replace it.'
+      }),
+      f('steps', 'Process strip', 'list', {
+        itemLabel: 'Step',
+        fields: [f('label', 'Label'), f('body', 'One line'),
+                 f('icon', 'Icon', 'text', { help: 'search, check, box, ship, award, globe, leaf, chat.' })]
+      }),
+      f('trustTitle', 'Trust card, first line'),
+      f('trustTitle2', 'Trust card, second line'),
+      f('trustBody', 'Trust card copy', 'textarea')
     ]
   },
   {
