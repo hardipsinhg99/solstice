@@ -19,6 +19,12 @@ export class PagesController {
    * Express already emits an ETag for this JSON, so an unchanged page still
    * costs one 304 rather than a full body.
    */
+  /** Public. Which page slugs are currently published - drives the nav. */
+  @Get()
+  listPublic() {
+    return this.pages.listPublic();
+  }
+
   @Get(':slug')
   @Header('Cache-Control', 'public, max-age=0, must-revalidate')
   findPublic(@Param('slug') slug: string) {

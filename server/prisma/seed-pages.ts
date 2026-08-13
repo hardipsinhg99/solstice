@@ -293,11 +293,28 @@ const TEAM_MEMBERS = [
   { name: 'Buyer relationships', role: 'Buyer relationships', bio: '<p>A responsive point of contact for buyers exploring products from India.</p>' },
 ];
 
-async function seedPage(slug: string, title: string, sections: Section[]) {
+/**
+ * `published` defaults to true so every existing call behaves exactly as
+ * before. The network page passes false: its three service descriptions are
+ * bracketed placeholders the client has not written yet, and a page that seeds
+ * PUBLISHED would put "[CONFIRM] Describe what Solstice actually does here" in
+ * front of a buyer the moment the seed runs.
+ */
+async function seedPage(
+  slug: string,
+  title: string,
+  sections: Section[],
+  published = true,
+) {
   const page = await prisma.page.upsert({
     where: { slug },
     update: {},
-    create: { slug, title, status: ProductStatus.PUBLISHED, publishedAt: new Date() },
+    create: {
+      slug,
+      title,
+      status: published ? ProductStatus.PUBLISHED : ProductStatus.DRAFT,
+      publishedAt: published ? new Date() : null,
+    },
   });
   for (const [order, s] of sections.entries()) {
     await prisma.pageSection.upsert({
@@ -458,7 +475,8 @@ async function main() {
   await seedPage('about', 'About us', ABOUT);
   await seedPage('services', 'Services', SERVICES);
   await seedPage('team', 'Team', TEAM);
-  await seedPage('network', 'Global Trade Network', NETWORK);
+  // Unpublished on purpose - see seedPage's `published` parameter.
+  await seedPage('network', 'Global Trade Network', NETWORK, false);
 
   await backfillCoordinates();
 

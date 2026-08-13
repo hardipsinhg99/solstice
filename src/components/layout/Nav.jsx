@@ -1,8 +1,14 @@
 import { Icon } from '../ui/Icon.jsx'
-import { navItems } from '../../data/navigation.js'
+import { navItems, visibleNav } from '../../data/navigation.js'
+import { usePublishedPages } from '../../features/pages/index.js'
 import { NavDropdown } from './NavDropdown.jsx'
 
 export function Nav({ route, open, onNavigate }) {
+  // Nav follows publish state, so unpublishing a page in the admin removes its
+  // link automatically. Fails open - see usePublishedPages.
+  const { isPublished } = usePublishedPages()
+  const items = visibleNav(navItems, isPublished)
+
   return (
     // aria-current marks the active page programmatically; the `.active` class
     // alone communicated it through weight and an underline, i.e. visually only.
@@ -12,7 +18,7 @@ export function Nav({ route, open, onNavigate }) {
     // (visibility:hidden), not with `inert` here: `open` is also false on
     // desktop, where the nav is permanently visible and must stay operable.
     <nav id="primary-navigation" aria-label="Primary" className={open ? 'nav-links open' : 'nav-links'}>
-      {navItems.map(item => (
+      {items.map(item => (
         item.children
           ? <NavDropdown key={item.route} item={item} route={route} onNavigate={onNavigate}/>
           : (

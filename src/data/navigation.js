@@ -26,12 +26,28 @@ export const navItems = [
       { route: 'products/import', label: 'Import', meta: 'Sourced abroad, brought in' }
     ]
   },
-  // Takes the slot Team occupied while Team is unpublished.
+  // Team stays in this list even while it is unpublished. Hand-removing it was
+  // the wrong fix: the list would then need editing again on republish, and the
+  // next page to come down would hit the same trap. visibleNav drops it from
+  // the rendered nav based on the page's actual publish state.
+  { route: 'team', label: 'Team', group: 'company' },
   { route: 'network', label: 'Trade Network', group: 'company' },
   { route: 'gallery', label: 'Gallery', group: 'company' },
   { route: 'contact', label: 'Contact us', group: 'company' }
 ]
 
+/**
+ * Which nav routes are backed by a real CMS Page row, and therefore have a
+ * publish state worth honouring. Products, Gallery and Contact are static
+ * routes with no Page record - they must NEVER be filtered out, because
+ * isPublished() would have no row to find and would hide them forever.
+ */
+export const CMS_ROUTES = new Set(['home', 'about', 'services', 'team', 'network'])
+
+/** Drops CMS-backed items whose page is unpublished; leaves static routes alone. */
+export const visibleNav = (items, isPublished) =>
+  items.filter((i) => !CMS_ROUTES.has(i.route) || isPublished(i.route))
+
 /** Footer columns, grouped explicitly. Home is the brand mark, not a link here. */
-export const navGroup = (name) =>
-  navItems.filter((i) => i.group === name && i.route !== 'home')
+export const navGroup = (name, isPublished = () => true) =>
+  visibleNav(navItems.filter((i) => i.group === name && i.route !== 'home'), isPublished)

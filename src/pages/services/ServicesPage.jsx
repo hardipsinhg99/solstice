@@ -1,4 +1,5 @@
 import { Button } from '../../components/ui/Button.jsx'
+import { PageUnavailable } from '../../components/layout/PageUnavailable.jsx'
 import { Eyebrow } from '../../components/ui/Eyebrow.jsx'
 import { Icon } from '../../components/ui/Icon.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
@@ -12,13 +13,19 @@ import { SERVICES_FALLBACK } from './servicesFallback.js'
 // editor; nothing else about the page changed.
 export default function ServicesPage() {
   const navigate = useNavigate()
-  const { section } = usePage('services', SERVICES_FALLBACK)
+  const { section, missing } = usePage('services', SERVICES_FALLBACK)
   const intro = section('intro')
   const services = section('services')
   const supply = section('supply')
   const process = section('process')
   const trust = section('trust')
   const callout = section('callout')
+
+
+  // Unpublished in the admin - see usePage's three-state result.
+
+  if (missing) return <PageUnavailable/>
+
 
   return <>
     <PageTitle mark={intro.mark} eyebrow={intro.eyebrow} title={intro.title} accent={intro.accent} copy={intro.copy}/>

@@ -51,6 +51,25 @@ export class PagesService {
   constructor(private prisma: PrismaService) {}
 
   /**
+   * Which pages are live. Drives the public navigation, so that unpublishing a
+   * page removes its nav item automatically instead of requiring someone to
+   * remember to hand-edit navigation.js as well - two places to change was the
+   * reason unpublishing looked like it worked while the link stayed.
+   *
+   * Slugs only. The nav needs to know which pages exist, not their content, and
+   * shipping section payloads here would be a needless second copy of every
+   * page on every page load.
+   */
+  async listPublic() {
+    const pages = await this.prisma.page.findMany({
+      where: { status: ProductStatus.PUBLISHED },
+      select: { slug: true },
+      orderBy: { slug: 'asc' },
+    });
+    return { slugs: pages.map((p) => p.slug) };
+  }
+
+  /**
    * Public read. PUBLISHED pages only, and each section returns publishedData -
    * never draftData. This is the whole draft/publish contract in two lines: an
    * unpublished edit is not merely hidden by the UI, it is not in the response.

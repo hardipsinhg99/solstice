@@ -65,6 +65,15 @@ async function fetchPage(slug) {
  * because every consumer wants one section by name and none of them wants to
  * care about order or about a section that has never been published.
  */
+// Plain fetch, not apiFetch: this is a PUBLIC endpoint and apiFetch attaches
+// the admin bearer token. A visitor has no token, and the nav must work for
+// them.
+async function fetchPageList() {
+  const res = await fetch('/api/pages')
+  if (!res.ok) throw new Error(`Page list unavailable (${res.status})`)
+  return res.json()
+}
+
 export function usePage(slug, fallback = {}) {
   const [data, status] = useApiResource(publicKey(slug), () => fetchPage(slug), null)
   const map = {}
@@ -84,15 +93,45 @@ export function usePage(slug, fallback = {}) {
   // mounting for one frame and firing off its image requests.
   const shows = (key) => (data ? key in map : key in fallback)
 
-  // Page-level availability, as opposed to section-level presence.
+  // THREE states, not two. This is the same collapse Phase 1e found on
+  // ProductDetailPage: "no data" meant both "still fetching" and "does not
+  // exist", so one code path served both and the wrong one won.
   //
-  // findPublic returns null for a page whose status is not PUBLISHED, but
-  // section() would then quietly substitute the caller's static fallback and
-  // render the page anyway - so unpublishing a page in the admin changed
-  // nothing on the public site. `missing` is true only once the fetch has
-  // COMPLETED and produced no page, so a slow network never flashes a
-  // not-found state at someone.
-  const missing = status !== 'loading' && !data
+  //   loading      - fetch in flight. Render the fallback; that is what it is for.
+  //   ready + data - the page exists and is published.
+  //   ready + null - findPublic said no. The page is UNPUBLISHED.
+  //   error        - the network failed. Render the fallback, NOT a not-found
+  //                  state: an unreachable API is not a statement about whether
+  //                  the page exists, and telling a buyer the page is gone
+  //                  because their wifi dropped is worse than showing stale copy.
+  //
+  // The error case is why this is not simply `status !== 'loading' && !data` -
+  // that version reported every failed fetch as an unpublished page.
+  const state = status === 'error' ? 'error' : status === 'loading' ? 'loading' : data ? 'ready' : 'unpublished'
+  const missing = state === 'unpublished'
 
-  return { section, shows, status, loaded: Boolean(data), missing }
+  return { section, shows, status, state, loaded: Boolean(data), missing }
+}
+
+/**
+ * Which CMS pages are currently published.
+ *
+ * The nav used to be a hand-maintained list with no relationship to publish
+ * state, so unpublishing a page left its link in the header pointing at a page
+ * that no longer rendered. Two places to remember instead of one, and the
+ * second was always going to be forgotten.
+ *
+ * Fails OPEN: until the fetch lands, and if it fails, every item stays visible.
+ * A nav that empties itself because the API blinked is far worse than one that
+ * briefly shows a link to an unpublished page - and that link now lands on the
+ * not-available state rather than a broken route, so the failure is contained.
+ */
+export function usePublishedPages() {
+  const [data, status] = useApiResource('pages:list', fetchPageList, null)
+  const slugs = data?.slugs ?? null
+  return {
+    slugs,
+    status,
+    isPublished: (slug) => (slugs === null ? true : slugs.includes(slug))
+  }
 }

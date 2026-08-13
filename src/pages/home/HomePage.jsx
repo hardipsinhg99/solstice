@@ -1,4 +1,5 @@
 import { Fragment, useMemo } from 'react'
+import { PageUnavailable } from '../../components/layout/PageUnavailable.jsx'
 import { Button } from '../../components/ui/Button.jsx'
 import { Eyebrow } from '../../components/ui/Eyebrow.jsx'
 import { Icon } from '../../components/ui/Icon.jsx'
@@ -20,7 +21,7 @@ export default function HomePage({ selectProduct, theme }) {
   // Published section data, edited at #admin/page-home. HOME_FALLBACK is the
   // wording that was hardcoded here before, kept as the pre-fetch and
   // API-unreachable render so the page is never a blank frame.
-  const { section, shows } = usePage('home', HOME_FALLBACK)
+  const { section, shows, missing } = usePage('home', HOME_FALLBACK)
   const hero = section('hero')
   const intro = section('intro')
   const cards = section('differentiators')
@@ -41,6 +42,10 @@ export default function HomePage({ selectProduct, theme }) {
     () => mapFromLocations(legend, (row) => row.text, HOME_MAP_FALLBACK),
     [legend]
   )
+
+  // Unpublished in the admin - see usePage's three-state result.
+  if (missing) return <PageUnavailable/>
+
   return <>
     <section className="home-hero">
       <HeroMedia/>

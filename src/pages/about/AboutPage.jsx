@@ -1,4 +1,5 @@
 import { usePage } from '../../features/pages/index.js'
+import { PageUnavailable } from '../../components/layout/PageUnavailable.jsx'
 import { ABOUT_FALLBACK } from './aboutFallback.js'
 import { HeroQuote } from './sections/HeroQuote.jsx'
 import { StoryTimeline } from './sections/StoryTimeline.jsx'
@@ -23,7 +24,11 @@ import { MissionVision } from './sections/MissionVision.jsx'
 // pure renderer with no data import of its own, which is what makes them
 // testable and what will make them portable to Astro.
 export default function AboutPage() {
-  const { section } = usePage('about', ABOUT_FALLBACK)
+  const { section, missing } = usePage('about', ABOUT_FALLBACK)
+
+  // Unpublished in the admin - see usePage's three-state result.
+  if (missing) return <PageUnavailable/>
+
   return <>
     <HeroQuote data={section('heroQuote')}/>
     <StoryTimeline data={section('story')}/>

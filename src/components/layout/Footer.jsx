@@ -1,10 +1,13 @@
 import { Eyebrow } from '../ui/Eyebrow.jsx'
 import { Button } from '../ui/Button.jsx'
 import { navGroup } from '../../data/navigation.js'
+import { usePublishedPages } from '../../features/pages/index.js'
 import { useNavigate } from '../../app/navigation.js'
 import { useSiteSettings } from '../../features/settings/index.js'
 
 export function Footer() {
+  const { isPublished } = usePublishedPages()
+
   const navigate = useNavigate()
   const { contactEmail } = useSiteSettings()
   return (
@@ -24,11 +27,11 @@ export function Footer() {
         </div>
         <div className="footer-col">
           <span className="footer-heading">Explore</span>
-          {navGroup('explore').map(item => <button key={item.route} onClick={() => navigate(item.route)}>{item.label}</button>)}
+          {navGroup('explore', isPublished).map(item => <button key={item.route} onClick={() => navigate(item.route)}>{item.label}</button>)}
         </div>
         <div className="footer-col">
           <span className="footer-heading">Company</span>
-          {navGroup('company').map(item => <button key={item.route} onClick={() => navigate(item.route)}>{item.label}</button>)}
+          {navGroup('company', isPublished).map(item => <button key={item.route} onClick={() => navigate(item.route)}>{item.label}</button>)}
         </div>
         <div className="footer-col">
           <span className="footer-heading">Get in touch</span>
