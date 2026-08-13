@@ -185,6 +185,11 @@ export default function NetworkPage() {
       </section>
     )}
 
+    {/* Guarded like every other section. It was the one band that rendered
+        unconditionally, so a page with no data still painted an empty dark
+        slab under the hero - which is exactly what the fallback-only render
+        looked like before the seed row existed. */}
+    {cta.headingLine1 && (
     <section className="network-cta">
       <Reveal as="div" className="container">
         <Eyebrow>{cta.eyebrow}</Eyebrow>
@@ -194,5 +199,6 @@ export default function NetworkPage() {
           <Button variant="lime" onClick={() => navigate(cta.ctaRoute)}>{cta.ctaLabel}</Button>}
       </Reveal>
     </section>
+    )}
   </>
 }

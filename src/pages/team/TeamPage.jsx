@@ -34,6 +34,10 @@ export default function TeamPage() {
 
   return <>
     <PageTitle mark={intro.mark} eyebrow={intro.eyebrow} title={intro.title} accent={intro.accent} copy={intro.copy}/>
+    {/* An empty member list rendered an empty grid, which reads as a large
+        unexplained void between the hero and the closing CTA rather than as
+        "no one is listed yet". */}
+    {members.length > 0 && (
     <section className="team section">
       <div className="container team-grid">
         {members.map((member, index) => (
@@ -65,6 +69,7 @@ export default function TeamPage() {
         ))}
       </div>
     </section>
+    )}
     <section className="team-join">
       <Reveal as="div" className="container">
         <h2>{cta.headingLine1}<br/><em>{cta.headingAccent}</em></h2>
