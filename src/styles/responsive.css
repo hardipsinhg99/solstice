@@ -423,3 +423,63 @@
   .worldmap-pin{r:4}
   .worldmap-pin.is-hq{r:5}
 }
+
+/* ── Trade Network: mobile pass ──────────────────────────────────────────────
+   Redesigned rather than shrunk. The desktop composition is a five-across row
+   with a card beside it; neither of those shapes means anything on a phone, so
+   the parts are recomposed instead of scaled down. */
+@media(max-width:780px){
+  /* HERO. min-height:auto lets the content set the height - a viewport-height
+     hero on a phone pushes the process strip entirely below the fold, so the
+     one thing the page exists to explain is never seen. */
+  .network-hero{min-height:auto;padding:calc(70px + clamp(26px,7vw,44px)) 0 clamp(40px,9vw,60px)}
+  .network-hero h1{font-size:clamp(31px,8.6vw,42px);letter-spacing:-1.2px;line-height:1.06}
+  .network-hero .network-lede{font-size:14.5px;line-height:1.65;max-width:38ch;margin-top:16px}
+  .network-hero-eyebrow{font-size:10.5px;letter-spacing:2.2px}
+  .network-hero-inner{gap:clamp(30px,7vw,44px)}
+  /* Buttons go full width and stack. Side by side at 360px leaves each about
+     150px, which is a cramped target for the page's primary action. */
+  .network-hero-actions{flex-direction:column;align-items:stretch;gap:11px;margin-top:26px}
+  .network-hero-actions .button{width:100%;justify-content:center;min-height:50px}
+
+  /* PROCESS. A vertical list, not a grid: the icon holds a fixed rail on the
+     left and the text runs beside it, so the numbers line up down the page and
+     each step reads as one row rather than four wrapped fragments. */
+  .network-flow{display:flex;flex-direction:column;gap:0}
+  .network-flow-step{display:grid;grid-template-columns:46px minmax(0,1fr);
+    grid-template-areas:'icon head' 'icon body';column-gap:15px;row-gap:3px;
+    text-align:left;align-items:start;padding:14px 0;position:relative}
+  .network-flow-icon{grid-area:icon;width:46px;height:46px}
+  /* Number and label share a line: "QUALITY CONTROL" was wrapping mid-label
+     with the description beside it, which read as two broken columns. */
+  .network-flow-num{grid-area:head;display:flex;align-items:center;gap:9px;margin:0;font-size:12px}
+  .network-flow-label{grid-area:head;margin-left:30px;align-self:center;font-size:12px;letter-spacing:1px;line-height:1.25}
+  .network-flow-body{grid-area:body;max-width:none;font-size:13px;line-height:1.55}
+
+  /* The connector returns as a vertical rail through the icon column, so the
+     sequence still reads as a flow rather than five unrelated rows. Drawn from
+     the icon's centre down to the next one, and never below the last. */
+  .network-flow-step:not(:last-child):before{content:'';position:absolute;
+    left:23px;top:60px;bottom:0;width:1px;
+    background:linear-gradient(180deg,color-mix(in srgb,var(--green-on-dark) 46%,transparent),transparent);
+    display:block}
+  .network-flow-step:not(:last-child):after{display:none}
+
+  /* TRUST CARD. The right gutter is the fix for the floating buttons sitting
+     on the text: the corner column occupies the right 62px of the viewport at
+     this width (47px button + 15px inset), so the copy stops before it rather
+     than running underneath. Height follows content - nothing is fixed. */
+  .network-trust{max-width:none;padding:18px 20px;padding-right:78px;gap:12px;border-radius:12px}
+  .network-trust strong{font-size:12.5px;line-height:1.4}
+  .network-trust p{font-size:12.5px;line-height:1.55}
+}
+
+@media(max-width:390px){
+  /* 360 and 320 are where a two-word label and a 46px rail stop coexisting. */
+  .network-hero h1{font-size:clamp(28px,8.4vw,34px)}
+  .network-flow-step{grid-template-columns:40px minmax(0,1fr);column-gap:12px}
+  .network-flow-icon{width:40px;height:40px}
+  .network-flow-step:not(:last-child):before{left:20px;top:54px}
+  .network-flow-label{margin-left:28px;font-size:11.5px}
+  .network-trust{padding-right:72px}
+}
