@@ -13,10 +13,15 @@
 // Those indices silently changed meaning the moment an item was added or
 // removed - taking Team out shifted the Company column by one, and it only
 // still read correctly by luck. The group is now stated rather than inferred.
+// ORDER IS THE RENDER ORDER. Header and footer both map this one array, so the
+// sequence here is the sequence on screen everywhere - there is no second list
+// to keep in step.
+//
+// Products sits second, straight after Home: it is what a buyer came to see,
+// and it is the only item carrying a dropdown, so burying it mid-row made the
+// one interactive nav control the hardest to find.
 export const navItems = [
   { route: 'home', label: 'Home', group: 'explore' },
-  { route: 'about', label: 'About us', group: 'explore' },
-  { route: 'services', label: 'Services', group: 'explore' },
   {
     route: 'products',
     label: 'Products',
@@ -26,15 +31,18 @@ export const navItems = [
       { route: 'products/import', label: 'Import', meta: 'Sourced abroad, brought in' }
     ]
   },
+  { route: 'about', label: 'About us', group: 'explore' },
+  { route: 'network', label: 'Trade Network', group: 'company' },
+  { route: 'services', label: 'Services', group: 'explore' },
   // Team is deliberately absent. It is not merely unpublished - it is removed
   // from discovery entirely, so it appears in neither the header nor the
   // footer (both read this one list). The page, its member CRUD, the photo
   // pipeline and #admin/team all remain fully functional; restoring the page
   // to the site is this one line plus a publish.
-  { route: 'network', label: 'Trade Network', group: 'company' },
   { route: 'gallery', label: 'Gallery', group: 'company' },
   { route: 'contact', label: 'Contact us', group: 'company' }
 ]
+
 
 /**
  * Which nav routes are backed by a real CMS Page row, and therefore have a

@@ -79,7 +79,7 @@ function CertificationRows({ rows, onChange }) {
               </>
             ) : (
               <>
-                <span className="admin-chip is-unverified">Claimed — not verifiable</span>
+                <span className="admin-chip is-unverified">Claimed - not verifiable</span>
                 <button
                   type="button"
                   className="admin-btn"
@@ -219,7 +219,7 @@ export default function AdminProductEditPage({ productId }) {
     try {
       const result = isNew ? await createProduct(payload) : await updateProduct(productId, payload)
       setStatus('ready')
-      setSaved(`Saved — ${result.status === 'PUBLISHED' ? 'live on the public site' : 'draft, not published'}`)
+      setSaved(`Saved - ${result.status === 'PUBLISHED' ? 'live on the public site' : 'draft, not published'}`)
       if (isNew) goTo(`admin/product/${result.id}`)
     } catch (err) {
       setStatus('ready')
@@ -299,8 +299,8 @@ export default function AdminProductEditPage({ productId }) {
         </Field>
         <Field label="Publish state">
           <select value={form.status} onChange={(e) => set('status', e.target.value)}>
-            <option value="DRAFT">Draft — not on the public site</option>
-            <option value="PUBLISHED">Published — visible to buyers</option>
+            <option value="DRAFT">Draft - not on the public site</option>
+            <option value="PUBLISHED">Published - visible to buyers</option>
           </select>
         </Field>
       </fieldset>
@@ -321,7 +321,7 @@ export default function AdminProductEditPage({ productId }) {
       {isNew && (
         <fieldset className="admin-fieldset">
           <legend>Images</legend>
-          <p className="admin-meta">Save the product first — images attach to a saved record.</p>
+          <p className="admin-meta">Save the product first - images attach to a saved record.</p>
         </fieldset>
       )}
 
@@ -356,7 +356,7 @@ export default function AdminProductEditPage({ productId }) {
       </fieldset>
 
       <fieldset className="admin-fieldset">
-        <legend>Commercial spec <span className="admin-meta">— optional, none of this is required to save</span></legend>
+        <legend>Commercial spec <span className="admin-meta">- optional, none of this is required to save</span></legend>
         <Field label="HS code" hint="6–10 digits. Buyers' customs brokers search on this." error={errors.hsCode}>
           <input value={form.hsCode} onChange={(e) => set('hsCode', e.target.value)}/>
         </Field>

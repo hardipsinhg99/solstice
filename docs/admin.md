@@ -256,23 +256,23 @@ Global prefix `/api`. Public routes are unguarded; every mutating route requires
 | `GET` | `/api/enquiries` | JWT | Newest first. `?search=` matches name/email/message, `?status=` filters |
 | `PATCH` | `/api/enquiries/:id/status` | JWT | NEW / CONTACTED / CLOSED |
 | `DELETE` | `/api/enquiries/:id` | JWT | Permanent |
-| `GET` | `/api/gallery` | — | **Published rows only.** `max-age=60` |
+| `GET` | `/api/gallery` | - | **Published rows only.** `max-age=60` |
 | `GET` | `/api/gallery/admin` | JWT | Every row, including hidden ones |
-| `POST` | `/api/gallery` | JWT | Multipart upload — **the same `MediaService` pipeline products use** |
+| `POST` | `/api/gallery` | JWT | Multipart upload - **the same `MediaService` pipeline products use** |
 | `PATCH` | `/api/gallery/order` | JWT | Full-list reorder |
 | `PATCH` | `/api/gallery/:id` | JWT | Caption and published flag |
 | `DELETE` | `/api/gallery/:id` | JWT | Removes the row **and the bytes** |
 | `GET` | `/api/dashboard` | JWT | Stats + notifications + activity, one request |
 | `GET` | `/api/dashboard/notifications` | JWT | The bell alone |
-| `GET` | `/api/pages/:slug` | — | **PUBLISHED pages, `publishedData` only.** `max-age=0, must-revalidate` |
+| `GET` | `/api/pages/:slug` | - | **PUBLISHED pages, `publishedData` only.** `max-age=0, must-revalidate` |
 | `GET` | `/api/pages/admin/:slug` | JWT | Draft + published, with `hasUnpublishedChanges` per section |
 | `PATCH` | `/api/pages/admin/:slug/section/:key` | JWT | Saves the **draft**. Never touches published |
 | `POST` | `/api/pages/admin/:slug/publish` | JWT | Copies every draft onto published, in one transaction |
 | `POST` | `/api/pages/admin/:slug/unpublish` | JWT | Off the public site. Drafts kept |
 | `POST` | `/api/pages/admin/:slug/discard` | JWT | Draft back to what is live |
-| `GET` | `/api/team` | — | Published members only |
+| `GET` | `/api/team` | - | Published members only |
 | `POST` `PATCH` `DELETE` | `/api/team[/:id]` | JWT | Full CRUD, plus `/order` and `/:id/photo` |
-| `POST` | `/api/media/assets` | JWT | An unattached asset — section image fields and TipTap image insert |
+| `POST` | `/api/media/assets` | JWT | An unattached asset - section image fields and TipTap image insert |
 
 ### Validation is not a mirror of the client
 
@@ -304,7 +304,7 @@ An editor picks values inside a section the site has a component for; they canno
 section, or drag a hero into the middle of the footer. That was the blueprint's whole
 argument against drag-and-drop page building, and `sectionTypes.js` is where it is enforced.
 
-`data` is `Json` rather than columns because the shape genuinely differs per type — a
+`data` is `Json` rather than columns because the shape genuinely differs per type - a
 repeater of four cards and a two-CTA hero have nothing in common. **The type is the
 contract; the JSON is only its storage.**
 
@@ -314,14 +314,14 @@ This is the one place the Page model deliberately does **not** copy Product. Pro
 single status flag, and an edit to a published product goes live instantly. That cannot
 express *"save this wording but do not ship it yet"*, which is exactly what an editor needs.
 
-- `PageSection.draftData` — what the admin edits
-- `PageSection.publishedData` — what `/api/pages/:slug` returns, and nothing else
+- `PageSection.draftData` - what the admin edits
+- `PageSection.publishedData` - what `/api/pages/:slug` returns, and nothing else
 - **Publish** copies draft onto published for every section, in one transaction
 
 An unpublished edit is not hidden by the UI; it is not in the public response. Verified by
 saving a section, reading the public endpoint (unchanged), publishing, and reading again.
 
-`hasUnpublishedChanges` is **computed** by comparing the two payloads, never stored — a
+`hasUnpublishedChanges` is **computed** by comparing the two payloads, never stored - a
 stored flag is one more thing that can drift out of step with what it describes.
 
 **Publishing is blocked while a section has unsaved edits on screen**, because publishing
@@ -337,12 +337,12 @@ This shipped as a real bug during Phase 1e and was caught by the acceptance test
 ### Team members
 
 Records, not section JSON, because they need individual CRUD, ordering and a photograph
-through the media pipeline — the same three things `GalleryImage` needs. They publish
+through the media pipeline - the same three things `GalleryImage` needs. They publish
 immediately: someone who has left should come off the site when they are removed, not when
 somebody remembers to publish the page.
 
 **`name` did not exist before Phase 1e.** The live page rendered three *anonymous* role
-cards — the array was `[role, copy, image]` — each illustrated with a stock Unsplash
+cards - the array was `[role, copy, image]` - each illustrated with a stock Unsplash
 portrait of a stranger. `docs/website-strategy.md` §2.5 calls that a falsifiable trust
 claim, and it was the longest-standing flag in the original audit. The stock photographs
 were **not** migrated; a member without a photograph renders an initials monogram, the same
@@ -357,7 +357,7 @@ permitted and drop everything else. `ALLOWED_URI_REGEXP` is what stops `javascri
 `data:` in an `href` or `src`.
 
 The editor cannot produce hostile markup either, but **the editor is a convenience and the
-endpoint is the control** — an attacker POSTs to the endpoint and never opens the editor.
+endpoint is the control** - an attacker POSTs to the endpoint and never opens the editor.
 Verified by POSTing `<script>`, `onerror=`, `javascript:`, `<iframe>`, `<svg onload>`,
 `onclick=` and `<style>` directly, and reading back what was stored.
 
@@ -371,7 +371,7 @@ one, so the safe direction is the default.
 2. A seed row in `prisma/seed-pages.ts` carrying the copy that is live today.
 3. The public component calls `usePage(slug, FALLBACK)`.
 
-No new admin file, no schema change, **and no sidebar edit** — `AdminSidebar` and the
+No new admin file, no schema change, **and no sidebar edit** - `AdminSidebar` and the
 top-bar titles are derived from `PAGE_CONFIG`.
 
 Phase 1e claimed this was already true and it was not: `AdminSidebar` and `AdminApp` each
@@ -381,20 +381,20 @@ generalization, which is the argument for adding the fourth page rather than ass
 
 ### The globe plots from the page's own list
 
-Both globes — Home's "A truly global footprint" and About's "Our Global Presence" — read
+Both globes - Home's "A truly global footprint" and About's "Our Global Presence" - read
 their markers from the same editable list the legend beside them renders. Adding a country
 in the admin moves the pin; `src/data/globe.js` is now only the pre-fetch fallback.
 
 Each location row carries `lat`, `lng` and an `hq` toggle. Arcs radiate from whichever row
 is flagged headquarters (the first plotted row stands in if none is). **A row with no
-coordinates is still listed, just not plotted** — an editor adding an office before anyone
+coordinates is still listed, just not plotted** - an editor adding an office before anyone
 has looked up its latitude should not have the location silently vanish from the text, and
 inventing a coordinate to avoid a gap would be inventing a fact.
 
 The opening rotation is derived, not fixed. The globe used to open on the Americas with
 every Solstice office on the far side, which is a poor look for a section titled "Our
 Global Presence". `phiForMarkers()` centres the mean longitude of the plotted markers,
-averaged **on the unit circle** — a plain numeric mean of 170 and −170 gives 0, the exact
+averaged **on the unit circle** - a plain numeric mean of 170 and −170 gives 0, the exact
 opposite side of the planet. cobe's convention is `phi = −longitude − π/2`; that was
 measured by rendering a single marker at three known longitudes and reading back its pixel
 centroid, not guessed.
@@ -407,13 +407,13 @@ light-mode map has to be.
 ### Rich text is targeted by section type and path
 
 `RICH_PATHS` in `PagesService` names the exact `type` + dotted path of every rich-text
-field — `about.story 🠖 nodes.body`, `about.missionVision 🠖 items.body`.
+field - `about.story 🠖 nodes.body`, `about.missionVision 🠖 items.body`.
 
 The first version keyed off the field NAME (`body`, `bio`) wherever it appeared, and
 Services disproved it immediately: its repeaters also use `body`, for plain textareas, and
-inherited About's allowlist. Nothing dangerous survived either way — `<script>`, `onerror`,
+inherited About's allowlist. Nothing dangerous survived either way - `<script>`, `onerror`,
 `javascript:`, `<iframe>`, `<svg onload>`, `onclick` and `<style>` are stripped by both
-cleaners — but a plain textarea could store `<img>` and `<a>`, which the page then prints
+cleaners - but a plain textarea could store `<img>` and `<a>`, which the page then prints
 literally because it renders that field as a string.
 
 Adding a third rich field means an entry here **as well as** in `sectionTypes.js`. That
@@ -444,28 +444,28 @@ of unlabelled icons for a screen-reader user.
 
 State lives in `localStorage` under `solstice-admin-nav-collapsed` and
 `solstice-admin-nav-catalogue`, matching the precedent `solstice-theme` set. This is a UI
-preference belonging to a person and a machine — it has no business in the database.
+preference belonging to a person and a machine - it has no business in the database.
 
 **The Catalogue group reopens itself when it holds the current page**, so collapsing it can
 never hide where you are.
 
 ### The top bar is not the reference mockup's top bar
 
-The design this phase was based on mirrored the whole public site navigation — Home, About
-us, Services, Products, Team, Gallery, Contact us — across the top of the admin. That was
+The design this phase was based on mirrored the whole public site navigation - Home, About
+us, Services, Products, Team, Gallery, Contact us - across the top of the admin. That was
 rejected. An operator editing a product does not navigate to the public About page from
 here, and reproducing the marketing nav means a second navigation model to keep in sync
 with `data/navigation.js` for a workflow nobody has. The sidebar already carries one
 "View site" button for the one time it is wanted.
 
-What it carries instead: the page title (the document's single `<h1>` — every page owns an
+What it carries instead: the page title (the document's single `<h1>` - every page owns an
 `<h2>`), the notification bell, and an account menu.
 
 **The account menu prints no role.** There are no roles. "Administrator" under the name
 would imply a permission system that does not exist.
 
 Both menus are native buttons and a plain `<ul>`: no dropdown library, no focus trap. They
-are menus, not dialogs — Escape closes, outside pointerdown closes, Tab walks out. **Escape
+are menus, not dialogs - Escape closes, outside pointerdown closes, Tab walks out. **Escape
 returns focus to the trigger** when focus was inside the panel; without that the browser
 drops focus to `<body>` and a keyboard user is silently returned to the top of the document.
 
@@ -484,14 +484,14 @@ sampled, estimated or derived from a constant.
 |---|---|
 | Total products | `product.count()` |
 | Published | `product.count({ status: PUBLISHED })` |
-| Unverified claims | `product.count({ certifications: { some: { verifiable: false } } })` — counted over **products**, not certification rows, because the operator acts on a product |
+| Unverified claims | `product.count({ certifications: { some: { verifiable: false } } })` - counted over **products**, not certification rows, because the operator acts on a product |
 | Open enquiries | `enquiry.count({ status: { not: CLOSED } })` |
 
 ### "Exports This Month" was removed, not implemented
 
 The reference mockup carried an *Exports This Month: 12* card. **Nothing in this schema
 records an export, a shipment or a dispatch**, so that number could only ever have been
-invented — on a panel whose entire job is trustworthy status at a glance. It is replaced by
+invented - on a panel whose entire job is trustworthy status at a glance. It is replaced by
 **Open enquiries**: leads not yet closed, the one figure on the page that means "work
 waiting for you".
 
@@ -502,13 +502,13 @@ card repeating it would be decoration.
 
 `notifications.count` and `notifications.items` come from the same query, so the badge and
 the list cannot disagree. **The count is in the button's `aria-label`, not only in the
-badge** — a superscript number is invisible to a screen reader. Clicking an item navigates
+badge** - a superscript number is invisible to a screen reader. Clicking an item navigates
 to `#admin/enquiries/<id>`, which scrolls that row into view and marks it.
 
 ### Recent activity
 
 `AuditLog` has been written to since Phase 1a and read by nothing. The last six entries are
-surfaced here — one query, no chart, no library. Action strings are mapped to English in
+surfaced here - one query, no chart, no library. Action strings are mapped to English in
 `AdminDashboardPage.jsx`; that is a display concern and does not belong in the database.
 
 ---
@@ -546,7 +546,7 @@ reshuffling rows somebody else added.
 ### Deleting removes the bytes
 
 `GalleryService.remove()` calls `MediaService.deleteAsset()`, which unlinks through
-`StorageService` and then drops the row — storage first, so a failed unlink leaves a
+`StorageService` and then drops the row - storage first, so a failed unlink leaves a
 reachable asset rather than an orphaned file. `EXTERNAL` assets skip the unlink: there is no
 file of ours to remove. Remaining rows are compacted so `order` stays dense.
 
@@ -744,10 +744,10 @@ The seed imports the 8 live products as `PUBLISHED`, everything else defaults to
 
 | Not built | Why |
 |---|---|
-| **Privacy and Terms** | All that remains of the original IA blocker, and **not a technical gap**. They are specified and do not exist because nobody has written them. The site takes enquiries from EU and UK buyers, so what those pages must say is a decision for the client and likely for counsel. A stub page would make the gap harder to see, not easier — so there is deliberately no `privacy` or `terms` row, no sidebar entry and no placeholder copy anywhere in the codebase |
+| **Privacy and Terms** | All that remains of the original IA blocker, and **not a technical gap**. They are specified and do not exist because nobody has written them. The site takes enquiries from EU and UK buyers, so what those pages must say is a decision for the client and likely for counsel. A stub page would make the gap harder to see, not easier - so there is deliberately no `privacy` or `terms` row, no sidebar entry and no placeholder copy anywhere in the codebase |
 | **Live / split-view preview** | Still deferred, for the reason the blueprint gave: a naively re-rendering preview iframe would fight the scroll-driven GSAP canvases on Home and Products |
-| **"Enquiry Quotes"** | Appeared in the reference mockup's sidebar. It implies a quoting subsystem — line items, pricing logic, PDF generation — that is not specified anywhere and that nothing in the schema supports. Not built, and not stubbed |
-| **Charts / analytics** | The dashboard is counts and a list. No chart library, no export or shipment tracking — there is no shipment data to track |
+| **"Enquiry Quotes"** | Appeared in the reference mockup's sidebar. It implies a quoting subsystem - line items, pricing logic, PDF generation - that is not specified anywhere and that nothing in the schema supports. Not built, and not stubbed |
+| **Charts / analytics** | The dashboard is counts and a list. No chart library, no export or shipment tracking - there is no shipment data to track |
 | **Split-view live preview** | Phase 2. Non-trivial here because the Products page runs a scroll-driven GSAP explode sequence that a naively re-rendering preview iframe would fight |
 | **Rich text (TipTap)** | Arrives with Pages. Product descriptions are a plain textarea |
 | **Reply-from-the-admin / inbox UI** | Out of scope by decision. The notification email carries the buyer's address as `Reply-To`, so replying is one click in a real mail client. Building this here would mean owning deliverability, threading and a sent-items store |

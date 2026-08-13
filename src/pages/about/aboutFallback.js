@@ -8,13 +8,13 @@
 export const ABOUT_FALLBACK = {
   "heroQuote": {
     "primary": "Building Global Trade Through Trust, Quality & Execution.",
-    "alternate": "From India to the World — Delivering Reliable Global Trade Solutions."
+    "alternate": "From India to the World - Delivering Reliable Global Trade Solutions."
   },
   "story": {
     "nodes": [
       {
         "id": "vision",
-        "body": "<p>Solstice Trading International LLP was founded with a simple vision — to make international trade more transparent, reliable, and execution-driven.</p>",
+        "body": "<p>Solstice Trading International LLP was founded with a simple vision - to make international trade more transparent, reliable, and execution-driven.</p>",
         "label": "The vision"
       },
       {
@@ -172,7 +172,7 @@ export const ABOUT_FALLBACK = {
     "heading": "Why Businesses Choose Solstice"
   },
   "industryRecognition": {
-    "intro": "[REWRITE — placeholder hedge language removed, needs real editorial copy]",
+    "intro": "[REWRITE - placeholder hedge language removed, needs real editorial copy]",
     "points": [
       {
         "text": "Rapid international expansion"

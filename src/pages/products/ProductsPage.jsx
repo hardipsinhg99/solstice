@@ -50,7 +50,7 @@ export default function ProductsPage({ trade, selectProduct }) {
   const countLabel = filtered.length === 0
     ? `No ${combined ? '' : trade + ' '}products published yet`
     : combined
-      ? `${filtered.length} ${noun} — ${exportCount} export, ${importCount} import`
+      ? `${filtered.length} ${noun} - ${exportCount} export, ${importCount} import`
       : `${filtered.length} ${trade} ${noun}`
   // Defensive: an unknown trade must degrade to a real view, not throw. This
   // page is the fallback target for a missing product, so a crash here takes out

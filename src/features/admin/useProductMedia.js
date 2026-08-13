@@ -17,7 +17,7 @@ export function preflight(file) {
   // A hint only. The browser's type comes from the file extension, which is why
   // the server reads magic bytes and does not trust this.
   if (file.type && !ACCEPTED_TYPES.includes(file.type)) {
-    return 'Images only — JPEG, PNG or WebP.'
+    return 'Images only - JPEG, PNG or WebP.'
   }
   return null
 }
@@ -49,7 +49,7 @@ function upload(path, file, altText, onProgress) {
       const message = Array.isArray(payload?.message) ? payload.message.join(', ') : payload?.message
       reject(new Error(message || `Upload failed (${xhr.status})`))
     })
-    xhr.addEventListener('error', () => reject(new Error('Upload failed — could not reach the server.')))
+    xhr.addEventListener('error', () => reject(new Error('Upload failed - could not reach the server.')))
     xhr.send(body)
   })
 }

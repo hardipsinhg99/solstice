@@ -40,7 +40,7 @@ function ImageField({ field, value, onChange, id }) {
           <img src={value.url} alt={value.alt || ''}/>
           <figcaption>
             <input
-              value={value.alt || ''} placeholder="Alt text — what the photograph shows"
+              value={value.alt || ''} placeholder="Alt text - what the photograph shows"
               aria-label={`Alt text for ${field.label}`}
               onChange={(e) => onChange({ ...value, alt: e.target.value })}
             />

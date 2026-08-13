@@ -54,7 +54,7 @@ function UploadField({ id, label, hint, busy, progress, error, onPick }) {
                aria-label="Upload progress">
             <div className="admin-progress-bar" style={{ width: `${progress}%` }}/>
           </div>
-          <span className="admin-meta">{progress}% uploaded{progress === 100 ? ' — processing…' : ''}</span>
+          <span className="admin-meta">{progress}% uploaded{progress === 100 ? ' - processing…' : ''}</span>
         </div>
       )}
       {error && <p className="admin-error" role="alert">{error}</p>}
@@ -134,7 +134,7 @@ export function ProductImageManager({ productId, primaryImage, gallery, onChange
               <span className="admin-meta">
                 {primaryImage.width && primaryImage.height
                   ? `${primaryImage.width}×${primaryImage.height} · ${bytes(primaryImage.sizeBytes)}`
-                  : 'External URL — not stored by this site'}
+                  : 'External URL - not stored by this site'}
               </span>
               <AltEditor asset={primaryImage} onSaved={onChange} productId={productId}/>
               <button type="button" className="admin-btn admin-btn-danger-quiet"
@@ -160,7 +160,7 @@ export function ProductImageManager({ productId, primaryImage, gallery, onChange
       {/* ── Gallery ─────────────────────────────────────────────────────── */}
       <div className="admin-media-gallery">
         <p className="admin-meta">
-          Gallery — {gallery.length} of {MAX_GALLERY_IMAGES}. Drag to reorder, or use the arrows.
+          Gallery - {gallery.length} of {MAX_GALLERY_IMAGES}. Drag to reorder, or use the arrows.
         </p>
 
         <ul className="admin-media-grid">
@@ -206,7 +206,7 @@ export function ProductImageManager({ productId, primaryImage, gallery, onChange
         )}
       </div>
 
-      {/* The same DangerConfirm the product delete uses — one component, not a
+      {/* The same DangerConfirm the product delete uses - one component, not a
           second confirmation UI. */}
       {confirming && (
         <DangerConfirm
@@ -220,7 +220,7 @@ export function ProductImageManager({ productId, primaryImage, gallery, onChange
   )
 }
 
-/** Alt text stays editable after upload — it is content, not a file property. */
+/** Alt text stays editable after upload - it is content, not a file property. */
 function AltEditor({ asset, onSaved, productId }) {
   const [value, setValue] = useState(asset.altText || '')
   const [state, setState] = useState('idle')

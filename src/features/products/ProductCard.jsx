@@ -87,7 +87,7 @@ export function ProductCard({ product, delay = 0, onSelect, showTrade = false })
           decoding="async"
         />
         ) : (
-          <div className="product-list-image-empty" role="img" aria-label={`${product.name} — photograph to follow`}>
+          <div className="product-list-image-empty" role="img" aria-label={`${product.name} - photograph to follow`}>
             <Icon name="box" size={24}/>
             <span>Photograph to follow</span>
           </div>

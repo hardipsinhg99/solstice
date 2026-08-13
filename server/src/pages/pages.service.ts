@@ -141,7 +141,7 @@ export class PagesService {
         updatedById: adminId,
       },
     });
-    await this.audit(page.id, 'page.section.saved', adminId, `${page.title} — ${key}`);
+    await this.audit(page.id, 'page.section.saved', adminId, `${page.title} - ${key}`);
     return updated;
   }
 

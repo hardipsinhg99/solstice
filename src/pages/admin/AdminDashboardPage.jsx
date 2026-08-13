@@ -125,7 +125,7 @@ export default function AdminDashboardPage({ dashboard }) {
                 <span className="admin-activity-what">
                   <strong>{a.actor ?? 'Someone'}</strong>{' '}
                   {ACTIONS[a.action] ?? a.action.replace(/[._]/g, ' ')}
-                  {a.summary && <> — <em>{a.summary}</em></>}
+                  {a.summary && <> - <em>{a.summary}</em></>}
                 </span>
                 <span className="admin-meta">{when(a.createdAt)}</span>
               </li>

@@ -19,7 +19,7 @@
 export const heroQuote = {
   primary: 'Building Global Trade Through Trust, Quality & Execution.',
   // Kept for meta description / A-B use, per the source file's note.
-  alternate: 'From India to the World — Delivering Reliable Global Trade Solutions.'
+  alternate: 'From India to the World - Delivering Reliable Global Trade Solutions.'
 }
 
 export const story = {
@@ -30,7 +30,7 @@ export const story = {
     {
       id: 'vision',
       label: 'The vision',
-      body: 'Solstice Trading International LLP was founded with a simple vision — to make international trade more transparent, reliable, and execution-driven.'
+      body: 'Solstice Trading International LLP was founded with a simple vision - to make international trade more transparent, reliable, and execution-driven.'
     },
     {
       id: 'origin',
@@ -129,7 +129,7 @@ export const industryRecognition = {
   heading: 'Industry Recognition',
   // Rendered verbatim, brackets and all. Real copy has not been written; the
   // marker text is the safeguard that stops it shipping unnoticed.
-  intro: '[REWRITE — placeholder hedge language removed, needs real editorial copy]',
+  intro: '[REWRITE - placeholder hedge language removed, needs real editorial copy]',
   unresolvedCopy: true,
   points: [
     { text: 'Rapid international expansion' },

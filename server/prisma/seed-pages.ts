@@ -110,12 +110,12 @@ const HOME: Section[] = [
 const ABOUT: Section[] = [
   { key: 'heroQuote', type: 'about.heroQuote', data: {
     primary: 'Building Global Trade Through Trust, Quality & Execution.',
-    alternate: 'From India to the World — Delivering Reliable Global Trade Solutions.',
+    alternate: 'From India to the World - Delivering Reliable Global Trade Solutions.',
   } },
   { key: 'story', type: 'about.story', data: {
     eyebrow: 'OUR STORY', heading: 'From One Challenge to a Global Trading Network',
     nodes: [
-      { id: 'vision', label: 'The vision', body: '<p>Solstice Trading International LLP was founded with a simple vision — to make international trade more transparent, reliable, and execution-driven.</p>' },
+      { id: 'vision', label: 'The vision', body: '<p>Solstice Trading International LLP was founded with a simple vision - to make international trade more transparent, reliable, and execution-driven.</p>' },
       { id: 'origin', label: 'The starting point', body: '<p>The journey began after one of our founders experienced an unexpected career setback. Instead of an end, it became the starting point for building a company focused on connecting manufacturers, suppliers, and buyers across international markets.</p>' },
       { id: 'expansion', label: 'Expansion', body: '<p>Solstice expanded from a single office into a growing international trading group with operations across multiple countries, serving clients worldwide through trusted sourcing, quality execution, and long-term business relationships.</p>', unresolvedScope: true },
       { id: 'today', label: 'Today', body: '<p>Solstice continues to help businesses source products from India while building strong partnerships across global markets.</p>' },
@@ -188,7 +188,7 @@ const ABOUT: Section[] = [
   } },
   { key: 'industryRecognition', type: 'about.recognition', data: {
     heading: 'Industry Recognition',
-    intro: '[REWRITE — placeholder hedge language removed, needs real editorial copy]',
+    intro: '[REWRITE - placeholder hedge language removed, needs real editorial copy]',
     unresolvedCopy: true,
     points: [
       { text: 'Rapid international expansion' },

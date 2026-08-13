@@ -1,8 +1,8 @@
-# Production cutover — solsticellp.com
+# Production cutover - solsticellp.com
 
 Target: **Saturday 15 August 2026.**
 
-> ## ⛔ READ THIS FIRST — the premise of this cutover is not what it appeared
+> ## ⛔ READ THIS FIRST - the premise of this cutover is not what it appeared
 >
 > `www.solsticellp.com` is **not** serving this repository. It is a **Next.js
 > application** (89 `_next/static/*` references, React Server Components
@@ -23,15 +23,15 @@ Target: **Saturday 15 August 2026.**
 
 ---
 
-# §0 Blocking gates — resolve before anything else
+# §0 Blocking gates - resolve before anything else
 
 These are not pre-flight checks. They are unknowns that determine whether this
 cutover is a one-evening job or a multi-week project. **None can be answered
 from this repository.**
 
-### 0.1 — URL structure. This is the SEO blocker.
+### 0.1 - URL structure. This is the SEO blocker.
 
-The Next.js site serves **real server paths**. This SPA is **hash-routed** —
+The Next.js site serves **real server paths**. This SPA is **hash-routed** -
 `router.js:5` sets `window.location.hash`, so the server never sees the route.
 
 Measured today:
@@ -44,13 +44,13 @@ Measured today:
 
 `/products` is live, indexable, and would **404 after cutover**. A server-side
 redirect cannot fix this: `https://solsticellp.com/#products` sends only `/` to
-the server — **the fragment is never transmitted**, so no rewrite, redirect or
+the server - **the fragment is never transmitted**, so no rewrite, redirect or
 middleware can map an old path to a hash route. The mapping must happen in the
 browser.
 
 **Before cutover you must:**
 
-1. Pull the full indexed URL list — Google Search Console 🠖 Pages 🠖 Indexed, and
+1. Pull the full indexed URL list - Google Search Console 🠖 Pages 🠖 Indexed, and
    the current `sitemap.xml` (production returns **404** for it today, so GSC is
    the only source).
 2. For every indexed path, decide: does an equivalent exist in the SPA?
@@ -61,7 +61,7 @@ browser.
 
 Without this, every indexed URL except `/` loses its ranking. **Red gate.**
 
-### 0.2 — Which Vercel project serves the domain?
+### 0.2 - Which Vercel project serves the domain?
 
 There is no `.vercel/` directory in this repo and `vercel.json` declares no git
 or build settings. The Next.js site is almost certainly a **different Vercel
@@ -77,7 +77,7 @@ Moving the domain means **detaching it from the Next.js project and attaching it
 to this one**. That is a dashboard action, not a git push. **Red gate until
 confirmed.**
 
-### 0.3 — Production branch and auto-deploy behaviour
+### 0.3 - Production branch and auto-deploy behaviour
 
 Unknowable from the repo. Determine in the dashboard:
 
@@ -88,14 +88,14 @@ This decides the whole sequencing:
 
 | Auto-deploy | Cutover step 8 becomes | Rollback |
 |---|---|---|
-| **On** | `git push origin master` — deploys immediately, no confirmation | Instant Rollback in dashboard |
+| **On** | `git push origin master` - deploys immediately, no confirmation | Instant Rollback in dashboard |
 | **Off** | Push, then **Promote to Production** by hand | Same, plus you can stage silently first |
 
 **Off is strongly preferable.** It lets you build and smoke-test the exact
 production artefact before any user sees it. If it is currently on, turn it off
 before 15 Aug.
 
-### 0.4 — Content parity sign-off
+### 0.4 - Content parity sign-off
 
 The Next.js site's copy, imagery and page inventory are not in this repo. The
 client must confirm the SPA is not *losing* content that exists today. Compare
@@ -103,16 +103,16 @@ page by page against the live site, not against staging.
 
 ---
 
-# §1 Pre-flight gates — run Thursday 14 Aug
+# §1 Pre-flight gates - run Thursday 14 Aug
 
 **Any red item means the cutover does not happen. This is not a judgement call
-on the day** — an amber item at 22:00 on the 15th becomes a red item at 02:00,
+on the day** - an amber item at 22:00 on the 15th becomes a red item at 02:00,
 and the client's site is the thing that suffers.
 
 | # | Gate | Pass | Red if |
 |---|---|---|---|
 | 1.1 | All three VERIFY.md tiers passed on staging | Signed off in writing | Any Tier 3 item unverified |
-| 1.2 | Upload durability re-tested (VERIFY 3.1) | 200 after `down && up -d` | 404 — media loss on every deploy |
+| 1.2 | Upload durability re-tested (VERIFY 3.1) | 200 after `down && up -d` | 404 - media loss on every deploy |
 | 1.3 | **SMTP verified from the VPS** | Real mail delivered | See below |
 | 1.4 | Firewall closed | 8000/8080 unreachable externally | Still open |
 | 1.5 | Backup taken **and test-restored** | Restore verified into a scratch DB | Backup exists but was never restored |
@@ -120,13 +120,13 @@ and the client's site is the thing that suffers.
 | 1.7 | Headroom with both stacks sized | ≥3GB RAM, ≥20GB disk free | Below either |
 | 1.8 | §0 gates all closed | All four | Any open |
 
-### 1.3 — SMTP. Close this gate by 12 Aug at the latest.
+### 1.3 - SMTP. Close this gate by 12 Aug at the latest.
 
 > **Outbound port 25 is blocked by default on virtually every cloud VPS,
 > Hostinger included.** Local testing used Mailpit, which accepts everything and
 > proves nothing about real delivery.
 >
-> Discovering this on the 15th is a **same-day failure with no quick fix** —
+> Discovering this on the 15th is a **same-day failure with no quick fix** -
 > unblocking 25 requires a support ticket with a turnaround measured in days, and
 > switching providers requires DNS records (SPF/DKIM) that need their own
 > propagation time.
@@ -149,7 +149,7 @@ n.createTransport({host:process.env.SMTP_HOST,port:+process.env.SMTP_PORT,
 **Pass** = the mail is in the inbox (check spam; if it landed there, SPF/DKIM
 are missing and that is its own amber item). `ETIMEDOUT` = port blocked.
 
-### 1.4 — Firewall
+### 1.4 - Firewall
 
 The box currently has **no firewall rules**, which leaves Coolify's login (8000)
 and Traefik's dashboard (8080) publicly reachable.
@@ -161,7 +161,7 @@ sudo ufw enable
 sudo ufw status numbered
 ```
 
-**Verify from a machine that is not the VPS** — a local `curl` to 8080 succeeds
+**Verify from a machine that is not the VPS** - a local `curl` to 8080 succeeds
 regardless of ufw:
 
 ```bash
@@ -169,10 +169,10 @@ curl -s --max-time 8 -o /dev/null -w '%{http_code}\n' http://69.62.85.208:8000  
 curl -s --max-time 8 -o /dev/null -w '%{http_code}\n' http://69.62.85.208:8080   # expect timeout
 ```
 
-Confirm SSH from a second terminal **before closing the first** — locking
+Confirm SSH from a second terminal **before closing the first** - locking
 yourself out on the eve of cutover is a self-inflicted red gate.
 
-### 1.5 — Backup, restored not merely taken
+### 1.5 - Backup, restored not merely taken
 
 An untested backup is not a backup.
 
@@ -183,7 +183,7 @@ docker compose exec -T db pg_dump -U solstice -d solstice --clean --if-exists \
 docker run --rm -v solstice_uploads:/d:ro -v ~:/b alpine \
   tar czf /b/preflight-uploads.tar.gz -C /d .
 
-# Prove the dump restores — into a scratch database, never the live one
+# Prove the dump restores - into a scratch database, never the live one
 docker compose exec -T db psql -U solstice -d postgres -c 'CREATE DATABASE restoretest;'
 gunzip -c ~/preflight-db.sql.gz | docker compose exec -T db psql -U solstice -d restoretest
 docker compose exec -T db psql -U solstice -d restoretest -c \
@@ -191,7 +191,7 @@ docker compose exec -T db psql -U solstice -d restoretest -c \
 docker compose exec -T db psql -U solstice -d postgres -c 'DROP DATABASE restoretest;'
 ```
 
-**Pass** = counts match live. Copy both files **off the VPS** — a backup that
+**Pass** = counts match live. Copy both files **off the VPS** - a backup that
 only exists on the machine it protects is not a backup.
 
 ---
@@ -203,12 +203,12 @@ how a staging secret reaches production. Write a fresh file.
 
 | Variable | Staging | Production | Why it differs |
 |---|---|---|---|
-| Router host (API) | `test-api.solsticellp.com` | `api.solsticellp.com` | Record does not exist yet — §3.1 |
-| Router host (web) | `test.solsticellp.com` | *(none — Vercel serves it)* | Only the API moves to the VPS |
-| `CORS_ORIGIN` | `https://test.solsticellp.com,...` | `https://solsticellp.com,https://www.solsticellp.com` | **Both** apex and www — production 307s apex🠖www, and the browser sends the origin it is on |
+| Router host (API) | `test-api.solsticellp.com` | `api.solsticellp.com` | Record does not exist yet - §3.1 |
+| Router host (web) | `test.solsticellp.com` | *(none - Vercel serves it)* | Only the API moves to the VPS |
+| `CORS_ORIGIN` | `https://test.solsticellp.com,...` | `https://solsticellp.com,https://www.solsticellp.com` | **Both** apex and www - production 307s apex🠖www, and the browser sends the origin it is on |
 | `JWT_SECRET` | staging value | **freshly generated** | See below |
 | `POSTGRES_PASSWORD` | staging value | **freshly generated** | See below |
-| `ADMIN_SEED_EMAIL` | test address | client's real address | — |
+| `ADMIN_SEED_EMAIL` | test address | client's real address | - |
 | `ADMIN_SEED_PASSWORD` | test value | throwaway, rotated immediately | See below |
 | `NOTIFY_EMAIL` | your inbox | client's enquiry inbox | Real leads land here |
 | Compose project name | `solstice` | `solstice-prod` | Keeps volumes and containers distinct |
@@ -216,7 +216,7 @@ how a staging secret reaches production. Write a fresh file.
 
 ### 2.1 Why secrets are never reused
 
-Staging secrets are handled loosely by design — they are pasted into terminals,
+Staging secrets are handled loosely by design - they are pasted into terminals,
 sit in shell history, and are shared with anyone testing. Reusing them means a
 staging compromise is a **production data breach**, and the blast radius of
 `JWT_SECRET` is total: it signs admin sessions, so anyone holding it can mint a
@@ -232,7 +232,7 @@ The `tr` strips characters that change the meaning of a Postgres connection URL.
 ### 2.2 The admin password belongs to the client, not the deploy
 
 `ADMIN_SEED_PASSWORD` exists only to create the first row. It lives in a file on
-the VPS and in your shell history — it is **not** a credential the client should
+the VPS and in your shell history - it is **not** a credential the client should
 keep using.
 
 Sequence: seed with a throwaway 🠖 hand it to the client over a secure channel 🠖
@@ -250,13 +250,13 @@ Two independent mechanisms, and neither can cross over:
 - The `X-Robots-Tag: noindex` header comes from a **Traefik label** on the
   staging `web` container. Vercel is not behind Traefik.
 
-The file is deliberately **not** in `public/` — everything there ships to every
+The file is deliberately **not** in `public/` - everything there ships to every
 Vite build, including Vercel's.
 
 **Verify after cutover regardless** (§5.4). A `noindex` on the client's live
 domain is the single most expensive mistake available here.
 
-### 2.4 Run production **alongside** staging — recommendation
+### 2.4 Run production **alongside** staging - recommendation
 
 **Keep both up.** Cost is ~1.2–2GB RAM on a box with ~6GB free.
 
@@ -279,11 +279,11 @@ Requirements: distinct compose project names (`solstice-prod` vs
 Every step verifies before the next runs. Times are realistic including
 verification.
 
-### Step 1 — Lower DNS TTLs (do this **48h before**, 13 Aug) · 5 min
+### Step 1 - Lower DNS TTLs (do this **48h before**, 13 Aug) · 5 min
 
 Set TTL to **300s** on `solsticellp.com` and `www.solsticellp.com` **before**
 cutover day. TTL changes only take effect after the *old* TTL expires, so doing
-this on the day gives you nothing — you would still be waiting out the old value
+this on the day gives you nothing - you would still be waiting out the old value
 during a rollback.
 
 ```bash
@@ -291,7 +291,7 @@ dig +noall +answer solsticellp.com www.solsticellp.com
 ```
 **Verify:** TTL reads 300. **Do not proceed on the 15th if it does not.**
 
-### Step 2 — Create `api.solsticellp.com` · 10 min + propagation
+### Step 2 - Create `api.solsticellp.com` · 10 min + propagation
 
 A record 🠖 `69.62.85.208`, TTL 300. Additive and invisible to users.
 
@@ -299,10 +299,10 @@ A record 🠖 `69.62.85.208`, TTL 300. Additive and invisible to users.
 dig +short api.solsticellp.com @1.1.1.1     # expect 69.62.85.208
 dig +short api.solsticellp.com @8.8.8.8     # expect 69.62.85.208
 ```
-**Verify:** both resolvers agree. **Do not proceed until they do** — Let's
+**Verify:** both resolvers agree. **Do not proceed until they do** - Let's
 Encrypt will query public resolvers, not yours.
 
-### Step 3 — Bring up the production stack · 15 min
+### Step 3 - Bring up the production stack · 15 min
 
 ```bash
 mkdir -p /opt/solstice-prod && cd /opt/solstice-prod
@@ -313,7 +313,7 @@ chmod 600 .env
 ```
 
 Edit `docker-compose.yml`: `name: solstice-prod`, router names `solstice-prod-*`,
-API host `api.solsticellp.com`. **Remove the `web` service** — Vercel serves the
+API host `api.solsticellp.com`. **Remove the `web` service** - Vercel serves the
 frontend; running a second copy on the VPS creates a duplicate indexable site.
 
 ```bash
@@ -323,16 +323,16 @@ docker compose ps
 **Verify:** `db` and `api` healthy. Staging and a2ztrading untouched
 (`docker ps` uptimes unchanged).
 
-### Step 4 — SSL for `api.solsticellp.com` · 5 min
+### Step 4 - SSL for `api.solsticellp.com` · 5 min
 
 ```bash
 echo | openssl s_client -connect api.solsticellp.com:443 \
   -servername api.solsticellp.com 2>/dev/null | openssl x509 -noout -issuer -dates
 ```
-**Verify:** Let's Encrypt issuer, ~90 days. **Do not proceed on a default cert** —
+**Verify:** Let's Encrypt issuer, ~90 days. **Do not proceed on a default cert** -
 Vercel's rewrite will refuse an invalid upstream certificate.
 
-### Step 5 — Migrations and seed · 10 min
+### Step 5 - Migrations and seed · 10 min
 
 Migrations run automatically at container start. Then, once:
 
@@ -345,7 +345,7 @@ SELECT (SELECT count(*) FROM admins) admins, (SELECT count(*) FROM products) pro
 **Verify:** `admins=1, products=8, pages=4, team=3`, and six rows in
 `_prisma_migrations` with non-null `finished_at`.
 
-### Step 6 — Verify the production API directly · 10 min
+### Step 6 - Verify the production API directly · 10 min
 
 **The last moment the old site is still safely serving.** Nothing user-visible
 has changed yet.
@@ -361,15 +361,15 @@ curl -s  -X POST https://api.solsticellp.com/api/auth/login \
 **Verify:** settings JSON, 8 products, and a login returning a token.
 **If any fail, stop. Nothing is broken yet and there is nothing to roll back.**
 
-### Step 7 — Move the domain to this Vercel project · 15 min
+### Step 7 - Move the domain to this Vercel project · 15 min
 
 Per §0.2. In the Vercel dashboard: remove `solsticellp.com` and
 `www.solsticellp.com` from the Next.js project, add them to this one.
 
 **Verify:** the domain shows Valid Configuration. Expect a brief window where
-the domain resolves to neither — schedule this in the lowest-traffic hour.
+the domain resolves to neither - schedule this in the lowest-traffic hour.
 
-### Step 8 — Deploy the frontend · 10 min ⚠️ **POINT OF NO RETURN**
+### Step 8 - Deploy the frontend · 10 min ⚠️ **POINT OF NO RETURN**
 
 ```bash
 cd /home/jadeja/Videos/solstice
@@ -378,7 +378,7 @@ git push origin master
 ```
 
 If auto-deploy is **off** (as §0.3 recommends), the build runs but does not go
-live — **smoke-test the preview URL first**, then click **Promote to
+live - **smoke-test the preview URL first**, then click **Promote to
 Production**. Promotion is the irreversible step, not the push.
 
 > ### ⚠️ Point of no return
@@ -388,14 +388,14 @@ Production**. Promotion is the irreversible step, not the push.
 > nothing and no one notices.
 >
 > **After Step 8**, the client's live business domain serves the new SPA.
-> Rollback is now **user-visible** — fast (~2 min via Instant Rollback) but not
+> Rollback is now **user-visible** - fast (~2 min via Instant Rollback) but not
 > silent.
 >
 > **The genuinely irreversible moment comes later**: the first time the client
 > edits content in the production CMS. From then on, a database rollback
 > destroys their work (§4.5). Until they log in and edit, rollback is clean.
 
-### Step 9 — End-to-end verification · 20 min
+### Step 9 - End-to-end verification · 20 min
 
 ```bash
 curl -sI https://www.solsticellp.com | head -1                      # 200
@@ -421,7 +421,7 @@ Rollback is faster than cutover: **~2 minutes** versus ~100. If in doubt, roll
 back. You can always try again next week; you cannot un-lose a day of the
 client's leads.
 
-### 4.1 Triggers — abort vs fix forward
+### 4.1 Triggers - abort vs fix forward
 
 **ABORT immediately** (do not debug on the live site):
 
@@ -431,7 +431,7 @@ client's leads.
 - Admin login failing with correct credentials
 - Any `noindex` header or `Disallow: /` on the live domain
 - SSL warning on `solsticellp.com` or `www`
-- **More than 10 minutes spent diagnosing** — the clock is the trigger, not your
+- **More than 10 minutes spent diagnosing** - the clock is the trigger, not your
   confidence
 
 **Fix forward** (site is serving, defect is contained):
@@ -444,32 +444,32 @@ client's leads.
 The distinguishing question: *can a buyer still find products and send an
 enquiry?* No 🠖 abort. Yes 🠖 fix forward.
 
-### 4.2 Vercel Instant Rollback — **the fastest lever, try this first** · ~2 min
+### 4.2 Vercel Instant Rollback - **the fastest lever, try this first** · ~2 min
 
 Dashboard 🠖 project 🠖 **Deployments** 🠖 the last known-good deployment 🠖
 **⋯ 🠖 Instant Rollback** (or **Promote to Production**).
 
-No rebuild — Vercel re-points the alias at an existing artefact. Live within
+No rebuild - Vercel re-points the alias at an existing artefact. Live within
 ~30s of confirming, plus CDN propagation.
 
 ```bash
 curl -sI https://www.solsticellp.com | head -1
 curl -s  https://www.solsticellp.com | grep -oE '/_next/static|/assets/index-[A-Za-z0-9_-]+\.js' | head -2
 ```
-**Verify:** `_next` references are back — you are on the Next.js build again.
+**Verify:** `_next` references are back - you are on the Next.js build again.
 
 > If the domain was moved between projects in Step 7, rollback means **moving
 > the domain back** to the Next.js project, not just rolling back a deployment.
 > That is a dashboard action taking ~5 min plus propagation. **Note the exact
-> previous configuration before Step 7 — screenshot it.**
+> previous configuration before Step 7 - screenshot it.**
 
-### 4.3 DNS rollback — only if the `api` record itself is at fault
+### 4.3 DNS rollback - only if the `api` record itself is at fault
 
 Rarely needed: `api.solsticellp.com` is additive, so deleting it fixes nothing
 that rolling back the frontend does not fix faster. **Do 4.2 first.**
 
 If the record is genuinely wrong (typo, wrong IP), correct it and wait out the
-TTL — **300s if Step 1 was done**, otherwise up to the old TTL, commonly 1–24h.
+TTL - **300s if Step 1 was done**, otherwise up to the old TTL, commonly 1–24h.
 This is precisely why Step 1 happens 48 hours early.
 
 DNS is the slowest lever available. Never reach for it first.
@@ -487,7 +487,7 @@ docker run --rm -v solstice-prod_uploads:/d -v ~:/b alpine \
   sh -c "rm -rf /d/* && tar xzf /b/preflight-uploads.tar.gz -C /d"
 docker compose start api
 ```
-**Lost:** every change since the backup — enquiries submitted, content edited,
+**Lost:** every change since the backup - enquiries submitted, content edited,
 images uploaded.
 
 ### 4.5 ⚠️ What rollback CANNOT recover
@@ -500,13 +500,13 @@ images uploaded.
 >
 > **This is why the decision window is short.** If the client starts editing at
 > 10:00 and you roll back the database at 16:00, six hours of their work is
-> gone — and they will reasonably expect it not to be.
+> gone - and they will reasonably expect it not to be.
 >
 > **Therefore: do not give the client CMS access until the site has been stable
 > for at least 24 hours.** Until then, rollback is clean and costs nothing but
-> enquiries — which the API also emails, so they are not truly lost.
+> enquiries - which the API also emails, so they are not truly lost.
 
-### 4.6 Rollback verification — confirm it worked
+### 4.6 Rollback verification - confirm it worked
 
 Do not assume. Work down the list:
 
@@ -517,7 +517,7 @@ curl -sI https://solsticellp.com | head -1                        # 307 🠖 www
 curl -s  https://www.solsticellp.com/products -o /dev/null -w '%{http_code}\n'  # 200
 ```
 
-Then, **in a browser with a hard reload** (Ctrl-Shift-R — your own cache will
+Then, **in a browser with a hard reload** (Ctrl-Shift-R - your own cache will
 lie to you): homepage renders · `/products` loads · no SSL warning · no console
 errors. Check from a phone on mobile data too, bypassing your DNS cache entirely.
 
@@ -526,7 +526,7 @@ changed and what did not.
 
 ---
 
-# §5 Post-cutover — first 48 hours
+# §5 Post-cutover - first 48 hours
 
 ### 5.1 What to watch, and where
 
@@ -549,7 +549,7 @@ confirm **all three**: the row appears in the admin, the notification arrives in
 `NOTIFY_EMAIL`, and the reply-to is the enquirer's address.
 
 Then confirm the **first genuine** enquiry the same way. If notifications fail,
-the enquiry is still in the database — check the admin daily until fixed.
+the enquiry is still in the database - check the admin daily until fixed.
 
 ### 5.3 Upload durability, in production
 
@@ -565,7 +565,7 @@ curl -sI https://api.solsticellp.com/api/uploads/<xx>/<uuid>.webp | head -1   # 
 A 404 on the second means every image the client uploads dies at the next
 deploy. **Fix before telling them the CMS is theirs.**
 
-### 5.4 SEO — production must not carry noindex
+### 5.4 SEO - production must not carry noindex
 
 ```bash
 curl -sI https://www.solsticellp.com | grep -i x-robots      # expect NOTHING
@@ -575,7 +575,7 @@ curl -s  https://www.solsticellp.com | grep -i 'name="robots"'
 
 Then:
 
-- Generate and deploy a `sitemap.xml` — production returns **404** for it today,
+- Generate and deploy a `sitemap.xml` - production returns **404** for it today,
   so this is new work, and hash routes mean it can only list `/`
   unless §0.1's path bridge is in place
 - Submit it in Google Search Console
@@ -602,11 +602,11 @@ Keep permanently: `docker-compose.yml`, `.env` (offline, encrypted), `DEPLOY.md`
 
 ```bash
 cd /opt/solstice
-docker compose down          # containers only — volumes survive
+docker compose down          # containers only - volumes survive
 # only once you are certain, and after copying backups off the box:
 docker compose down -v
 ```
 
-**Never `docker system prune -a` or `docker volume prune` on this box** — both
+**Never `docker system prune -a` or `docker volume prune` on this box** - both
 are daemon-wide and would reach the a2ztrading project and your own production
 volumes.

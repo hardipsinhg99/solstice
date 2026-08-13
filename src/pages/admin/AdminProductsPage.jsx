@@ -28,7 +28,7 @@ function Thumb({ product }) {
   if (!url) {
     return (
       <span className="admin-thumb is-empty" role="img"
-            aria-label={`${product.name} — no image set`}>
+            aria-label={`${product.name} - no image set`}>
         <Icon name="image" size={16}/>
       </span>
     )

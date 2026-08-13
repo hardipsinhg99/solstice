@@ -67,7 +67,7 @@ export default function ProductDetailPage({ product, selectProduct }) {
             decoding="async"
           />
           ) : (
-            <div className="product-list-image-empty" role="img" aria-label={`${product.name} — photograph to follow`}>
+            <div className="product-list-image-empty" role="img" aria-label={`${product.name} - photograph to follow`}>
               <Icon name="box" size={30}/>
               <span>Photograph to follow</span>
             </div>
