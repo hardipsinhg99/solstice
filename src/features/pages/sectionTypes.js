@@ -153,9 +153,17 @@ const HOME = [
 const ABOUT = [
   {
     key: 'heroQuote', type: 'about.heroQuote', label: 'Opening statement',
+    help: 'Leave the banner empty and the hero keeps its plain deep-green background.',
     fields: [f('primary', 'Statement', 'textarea'),
              f('alternate', 'Alternate (meta description only)', 'textarea',
-               { help: 'Not rendered on the page. Kept for the meta description and A/B use.' })]
+               { help: 'Not rendered on the page. Kept for the meta description and A/B use.' }),
+             f('image', 'Banner image', 'image'),
+             f('imageFit', 'How the banner fills the hero', 'text', {
+               help: 'cover (default) fills edge to edge and crops the long edge - use for photography. contain shows the WHOLE image and adds bands above/below on narrow screens - use only for artwork that must not be cropped.'
+             }),
+             f('imageFocus', 'Keep this part in frame', 'text', {
+               help: 'A CSS object-position, e.g. "70% 50%" to hold the right of the image as the screen narrows. Default 50% 50%.'
+             })]
   },
   {
     key: 'story', type: 'about.story', label: 'Our story',

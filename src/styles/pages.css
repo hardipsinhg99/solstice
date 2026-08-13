@@ -862,3 +862,50 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
   .network-marquee{overflow-x:auto}
   .network-marquee-run[aria-hidden]{display:none}
 }
+
+/* ── About hero banner ───────────────────────────────────────────────────────
+   Full-bleed, and the copy stays readable on top of it.
+
+   The honest constraint, stated rather than hidden: a fixed-aspect image in a
+   variable-aspect box can either fill it (cover, cropping the long edge) or be
+   shown whole (contain, leaving bands). It cannot do both, and no CSS makes
+   that untrue. `imageFit` is therefore an editorial choice in the admin rather
+   than something decided here - cover is the default because a hero that
+   letterboxes on a phone reads as a mistake. */
+.about-hero.has-banner{padding:clamp(110px,18vh,190px) 0 clamp(90px,14vh,140px)}
+.about-hero-banner{position:absolute;inset:0;width:100%;height:100%;z-index:-2;display:block;
+  object-fit:var(--hero-fit,cover);object-position:var(--hero-focus,50% 50%)}
+
+/* The scrim is what makes the text legible over ANY image, rather than hoping
+   the artwork happens to be dark where the words fall. Weighted to the left,
+   because that is where the copy sits and the right of the frame should stay
+   readable as picture. Measured on the darkest stop: #f5f4ea on the composited
+   left edge holds well past 4.5:1. */
+.about-hero.has-banner:before{content:'';position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(100deg,
+    color-mix(in srgb,var(--deep) 94%,transparent) 0%,
+    color-mix(in srgb,var(--deep) 86%,transparent) 34%,
+    color-mix(in srgb,var(--deep) 55%,transparent) 62%,
+    color-mix(in srgb,var(--deep) 34%,transparent) 100%)}
+
+/* contain mode: the bands must be the brand colour, not black bars, or the
+   "empty space" the brief warns about becomes very visible. */
+.about-hero-banner[data-fit="contain"]{background:var(--deep)}
+
+@media(max-width:960px){
+  /* As the viewport narrows a 1.9:1 banner loses its edges first. Holding the
+     frame at 68% keeps the right-hand visual - the globe, ship and freighter -
+     rather than drifting into whichever half happens to be centred. Overridden
+     per-image by imageFocus in the admin. */
+  .about-hero-banner{--hero-focus:68% 50%}
+}
+@media(max-width:780px){
+  /* Phone: the scrim goes near-solid top-to-bottom. A left-weighted gradient
+     assumes a wide frame, and on a portrait screen the copy sits OVER the
+     picture rather than beside it. */
+  .about-hero.has-banner:before{background:linear-gradient(180deg,
+    color-mix(in srgb,var(--deep) 90%,transparent) 0%,
+    color-mix(in srgb,var(--deep) 80%,transparent) 55%,
+    color-mix(in srgb,var(--deep) 92%,transparent) 100%)}
+  .about-hero.has-banner{padding:clamp(88px,14vh,120px) 0 clamp(64px,10vh,90px)}
+}

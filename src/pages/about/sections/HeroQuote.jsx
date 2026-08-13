@@ -21,7 +21,34 @@ export function HeroQuote({ data }) {
   const ref = useTilt3d({ max: 5 })
 
   return (
-    <section className="about-hero">
+    <section
+      className={heroQuote.image?.url ? 'about-hero has-banner' : 'about-hero'}
+      /* Custom properties on the SECTION, not object-fit/position inline on the
+         image. An inline style beats the stylesheet, so per-breakpoint framing
+         would have needed !important to override it - which the house rules
+         forbid, and rightly. Declared on the parent, the value inherits down to
+         the image, and a media query targeting the image itself is the closer
+         rule and simply wins. No !important anywhere. */
+      style={{
+        '--hero-fit': heroQuote.imageFit === 'contain' ? 'contain' : 'cover',
+        '--hero-focus': heroQuote.imageFocus || '50% 50%'
+      }}
+    >
+      {/* A real <img>, not a background-image: it gets the browser's own
+          responsive loading, it can carry alt text, and object-fit gives
+          per-breakpoint framing that background-size cannot express as
+          precisely. Sits behind the copy via CSS, not via DOM order, so the
+          text stays first in the reading order. */}
+      {heroQuote.image?.url && (
+        <img
+          className="about-hero-banner"
+          src={heroQuote.image.url}
+          alt={heroQuote.image.alt || ''}
+          data-fit={heroQuote.imageFit === 'contain' ? 'contain' : 'cover'}
+          fetchPriority="high"
+          decoding="async"
+        />
+      )}
       <span className="title-mark" aria-hidden="true">02</span>
       <div className="container">
         <div className="about-hero-stage" ref={ref}>
