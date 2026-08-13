@@ -26,11 +26,11 @@ export const navItems = [
       { route: 'products/import', label: 'Import', meta: 'Sourced abroad, brought in' }
     ]
   },
-  // Team stays in this list even while it is unpublished. Hand-removing it was
-  // the wrong fix: the list would then need editing again on republish, and the
-  // next page to come down would hit the same trap. visibleNav drops it from
-  // the rendered nav based on the page's actual publish state.
-  { route: 'team', label: 'Team', group: 'company' },
+  // Team is deliberately absent. It is not merely unpublished - it is removed
+  // from discovery entirely, so it appears in neither the header nor the
+  // footer (both read this one list). The page, its member CRUD, the photo
+  // pipeline and #admin/team all remain fully functional; restoring the page
+  // to the site is this one line plus a publish.
   { route: 'network', label: 'Trade Network', group: 'company' },
   { route: 'gallery', label: 'Gallery', group: 'company' },
   { route: 'contact', label: 'Contact us', group: 'company' }

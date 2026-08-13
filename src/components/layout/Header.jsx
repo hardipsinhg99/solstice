@@ -25,15 +25,42 @@ export function Header({ route, theme, setTheme }) {
   // too, so an unmount mid-open cannot leave the page permanently frozen.
   useEffect(() => {
     if (!menuOpen) return
-    document.body.style.overflow = 'hidden'
+
+    // Scroll lock that PRESERVES the scroll offset.
+    //
+    // `body{overflow:hidden}` alone was the bug behind "opening the menu jumps
+    // me to another part of the page". The body is the scrolling element here,
+    // so hiding its overflow clamps the current offset - the browser has
+    // nowhere to keep it - and releasing it on close restored a different
+    // position. Mid-page it looked like being thrown to the end of the
+    // document.
+    //
+    // position:fixed with a negative top holds the page exactly where it was
+    // and gives the drawer a viewport to sit in, then the offset is written
+    // back by hand on close. `width:100%` stops the fixed body collapsing to
+    // its content and reflowing the layout behind the overlay.
+    const y = window.scrollY
+    const body = document.body
+    const prev = { position: body.style.position, top: body.style.top, width: body.style.width }
+    body.style.position = 'fixed'
+    body.style.top = `-${y}px`
+    body.style.width = '100%'
+
     const onKey = (event) => {
       if (event.key !== 'Escape') return
       setMenuOpen(false)
       toggleRef.current?.focus()
     }
     document.addEventListener('keydown', onKey)
+
     return () => {
-      document.body.style.overflow = ''
+      body.style.position = prev.position
+      body.style.top = prev.top
+      body.style.width = prev.width
+      // 'instant' overrides html{scroll-behavior:smooth}. Without it the
+      // restore ANIMATES back to where you already were, which reads as the
+      // page sliding away the moment the menu closes.
+      window.scrollTo({ top: y, left: 0, behavior: 'instant' })
       document.removeEventListener('keydown', onKey)
     }
   }, [menuOpen])
