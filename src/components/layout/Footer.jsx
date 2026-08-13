@@ -14,7 +14,7 @@ export function Footer() {
     <footer>
       <div className="footer-cta">
         <div className="container footer-cta-inner">
-          <div><Eyebrow>NEW ENQUIRY</Eyebrow><h3>Looking to source fresh produce, spices or staples from India?</h3></div>
+          <div><Eyebrow>NEW ENQUIRY</Eyebrow><h3>Looking to source <em>fresh produce, spices or staples</em> from India?</h3></div>
           <Button onClick={() => navigate('contact')} variant="lime">Start an enquiry</Button>
         </div>
       </div>
