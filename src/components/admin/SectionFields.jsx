@@ -71,7 +71,17 @@ function ListField({ field, value, onChange, idBase }) {
     next.splice(to, 0, row)
     onChange(next)
   }
-  const blank = Object.fromEntries(field.fields.map((f) => [f.name, f.kind === 'toggle' ? false : '']))
+  // A new row starts from each field's declared default, falling back to
+  // false for a toggle and '' for everything else.
+  //
+  // This existed because every toggle defaulted to false, which is right for
+  // "Flag as unverified" and exactly wrong for "Published": pressing "Add
+  // certificate" created a certificate that was invisible, with nothing on
+  // screen explaining why. The default belongs to the field, not to the kind.
+  const blank = Object.fromEntries(field.fields.map((f) => [
+    f.name,
+    f.default !== undefined ? f.default : f.kind === 'toggle' ? false : ''
+  ]))
 
   return (
     <fieldset className="admin-fieldset admin-repeater-set">

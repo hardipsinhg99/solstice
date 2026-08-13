@@ -32,6 +32,12 @@ export function Certifications({ data }) {
   const run = []
   while (run.length < MIN_PER_RUN) run.push(...items)
 
+  // A fixed duration would make the strip appear to speed up as certificates
+  // are added, because the same time is spent covering a longer track. Tying
+  // the duration to the number of tiles keeps the pixels-per-second constant,
+  // so three logos and thirty drift at the same rate.
+  const seconds = Math.max(24, run.length * 5)
+
   return (
     <section className="section certifications">
       <div className="container">
@@ -48,7 +54,7 @@ export function Certifications({ data }) {
           The second run is aria-hidden - it is a visual duplicate, and the list
           should be announced once. */}
       <div className="certifications-marquee">
-        <div className="certifications-track">
+        <div className="certifications-track" style={{ '--marquee-duration': `${seconds}s` }}>
           {[0, 1].map((copy) => (
             <ul className="certifications-run" key={copy}
                 aria-hidden={copy === 1 || undefined}>

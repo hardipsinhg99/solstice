@@ -135,7 +135,7 @@ const HOME = [
           f('description', 'Short description'),
           f('logo', 'Logo', 'image'),
           f('published', 'Published', 'toggle',
-            { help: 'Off hides it from the marquee without deleting it.' })
+            { default: true, help: 'On by default. Switch off to hide it from the marquee without deleting the record.' })
         ]
       })
     ]

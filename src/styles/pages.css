@@ -1023,7 +1023,7 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
   list-style:none;margin:0;padding:0 clamp(15px,2.5vw,34px) 0 0}
 
 @media(prefers-reduced-motion:no-preference){
-  .certifications-track{animation:certifications-scroll 46s linear infinite}
+  .certifications-track{animation:certifications-scroll var(--marquee-duration,46s) linear infinite}
   /* Pause on hover and on focus-within: a keyboard user tabbing to a logo
      should not be chasing it across the row. */
   .certifications-marquee:hover .certifications-track,
