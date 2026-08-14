@@ -10,6 +10,7 @@ import { MediaModule } from './media/media.module';
 import { SettingsModule } from './settings/settings.module';
 import { EnquiriesModule } from './enquiries/enquiries.module';
 import { GalleryModule } from './gallery/gallery.module';
+import { SocialModule } from './social/social.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { PagesModule } from './pages/pages.module';
 import { TeamModule } from './team/team.module';
@@ -26,6 +27,7 @@ import { TeamModule } from './team/team.module';
     SettingsModule,
     EnquiriesModule,
     GalleryModule,
+    SocialModule,
     DashboardModule,
     PagesModule,
     TeamModule,

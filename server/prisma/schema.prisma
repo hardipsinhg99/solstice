@@ -52,6 +52,7 @@ model Admin {
   auditEntries   AuditLog[]
   mediaAssets    MediaAsset[]
   settingsEdits  SiteSettings[]
+  socialEdits    SocialLink[]
   galleryEdits   GalleryImage[]
   pageEdits      Page[]
   sectionEdits   PageSection[]
@@ -436,6 +437,17 @@ model SiteSettings {
   /// have to agree. Empty means the site simply does not show a phone number.
   contactPhone    String @default("")
 
+  /// Enable flags are NOT the same question as "is the value empty". An empty
+  /// contactPhone means nothing is configured; disabled means the operator has a
+  /// number and has chosen not to publish it right now. Collapsing the two would
+  /// make hiding a number destroy it.
+  contactPhoneEnabled Boolean @default(true)
+  contactEmailEnabled Boolean @default(true)
+  /// Optional display label above each row ("Sales", "Head office"). Empty means
+  /// the row renders without one, which is the current appearance.
+  contactPhoneLabel   String  @default("")
+  contactEmailLabel   String  @default("")
+
   /// Whether the Google Translate widget renders in the header at all.
   /// Defaults true so applying this migration changes nothing about a site
   /// that already has it. Off is a real removal, not a CSS hide - the script
@@ -498,4 +510,36 @@ model AuditLog {
 
   @@index([entityType, entityId, createdAt])
   @@map("audit_log")
+}
+
+/// A social profile in the footer.
+///
+/// A TABLE, not more columns on SiteSettings, and not a JSON blob. This is an
+/// ordered collection with per-row enable and per-row validation - which is the
+/// exact shape a table is for, and the same call already made for GalleryItem
+/// and TeamMember. The named-columns argument in SiteSettings is about settings
+/// that are one fixed value each; it was never an argument against relations.
+///
+/// `platform` is unique and constrained server-side to the set the icon sprite
+/// can actually draw. Letting an operator invent a platform would let them
+/// create a row that renders no icon, and a blank circle in the footer is worse
+/// than not offering the option.
+///
+/// enabled defaults to FALSE and url to empty: a migration that switched four
+/// social links on would publish four dead links the moment it ran.
+model SocialLink {
+  id       String  @id @default(cuid())
+  platform String  @unique
+  url      String  @default("")
+  enabled  Boolean @default(false)
+  /// Ascending. Ties break on platform so the order is always total and the
+  /// footer never reshuffles between requests.
+  order    Int     @default(0)
+
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+  updatedBy   Admin?   @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([enabled, order])
+  @@map("social_links")
 }

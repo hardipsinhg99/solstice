@@ -42,6 +42,37 @@ footer{background:var(--deep);color:var(--body-on-dark)}
    grey was a colour-only distinction. */
 .footer-grid a{color:var(--green-on-dark);transition:opacity .2s;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
 .footer-grid a:hover{opacity:.8}
+
+/* --- Footer contact rows + social marks ------------------------------------
+   Both are inside .footer-grid, which force-underlines every <a>. An underline
+   under an icon is meaningless, so the icon links opt out - and the CONTACT
+   rows keep theirs, because those are still text links and the underline is the
+   non-colour cue SC 1.4.1 requires. */
+.footer-contact{display:grid;grid-template-columns:16px 1fr;align-items:start;gap:9px;
+  text-decoration:none;color:var(--body-on-dark);min-height:24px;padding:2px 0}
+.footer-contact svg{margin-top:2px;color:var(--green-on-dark);flex:none}
+/* The address itself keeps the underline; the icon column must not sit under
+   one, which is why the rule targets the text span and not the anchor. */
+.footer-contact>span{display:grid;gap:1px;text-decoration:underline;
+  text-underline-offset:3px;text-decoration-thickness:1px;overflow-wrap:anywhere}
+.footer-contact:hover>span{opacity:.8}
+.footer-contact-label{display:block;font-style:normal;font-size:10px;letter-spacing:.4px;
+  text-transform:uppercase;color:var(--muted-on-dark);text-decoration:none}
+
+.footer-social{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 0;padding:0}
+/* 40px, well clear of the 24px floor the columns above settled on - these are
+   the smallest targets in the footer and the ones most likely to be tapped with
+   a thumb. The icon is 18px; the rest is hit area. */
+.footer-social a{display:grid;place-items:center;width:40px;height:40px;min-height:40px;
+  border-radius:50%;text-decoration:none;color:var(--green-on-dark);
+  border:1px solid color-mix(in srgb,var(--green-on-dark) 30%,transparent);
+  background:color-mix(in srgb,#fff 6%,transparent);
+  transition:background .2s var(--ease),border-color .2s var(--ease),color .2s var(--ease)}
+.footer-social a:hover{background:color-mix(in srgb,#fff 14%,transparent);
+  border-color:var(--green-on-dark);color:#fff;opacity:1}
+/* The global focus ring is a colour pair; restated here so it reads against the
+   footer's dark band rather than inheriting a light-theme halo. */
+.footer-social a:focus-visible{outline:2px solid var(--green-on-dark);outline-offset:2px}
 .footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:22px 0;border-top:1px solid rgba(255,255,255,.12);font-size:10px;color:var(--muted-on-dark)}
 .chat-button{position:fixed;right:21px;bottom:20px;z-index:120;width:51px;height:51px;border:0;border-radius:50%;background:var(--green-600);color:var(--on-green);box-shadow:0 10px 25px rgba(13,43,27,.3);display:grid;place-items:center;transition:transform .25s var(--ease)}
 .chat-button:hover{transform:scale(1.08)}

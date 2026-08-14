@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
+import { AdminFooterSocial } from './AdminFooterSocial.jsx'
 import { getSettings, updateSettings } from '../../features/admin/index.js'
 import { isUsableWhatsappNumber, whatsappHref } from '../../features/settings/index.js'
 
-const EMPTY = { whatsappNumber: '', whatsappMessage: '', contactEmail: '', contactPhone: '', translateEnabled: true }
+const EMPTY = { whatsappNumber: '', whatsappMessage: '', contactEmail: '', contactPhone: '', contactEmailEnabled: true, contactPhoneEnabled: true, contactEmailLabel: '', contactPhoneLabel: '', translateEnabled: true }
 
 /**
  * One record, so one form and one Save - no list, no create, no delete.
@@ -155,6 +156,15 @@ export default function AdminSettingsPage() {
               form falls back to if the API cannot be reached.
             </span>
           </label>
+          <label className="admin-field">
+            <span>Email label (optional)</span>
+            <input value={form.contactEmailLabel} onChange={set('contactEmailLabel')} placeholder="e.g. Sales"/>
+          </label>
+          <label className="admin-toggle-row">
+            <input type="checkbox" checked={form.contactEmailEnabled}
+                   onChange={(e) => setForm((f) => ({ ...f, contactEmailEnabled: e.target.checked }))}/>
+            <span>Show the email in the footer</span>
+          </label>
 
           <label className="admin-field">
             <span>Public phone number</span>
@@ -165,6 +175,17 @@ export default function AdminSettingsPage() {
               want it read - the spacing is kept. Include the country code, since the people
               reading it are dialling from abroad. Leave empty to show no phone number at all.
             </span>
+          </label>
+          <label className="admin-field">
+            <span>Phone label (optional)</span>
+            <input value={form.contactPhoneLabel} onChange={set('contactPhoneLabel')} placeholder="e.g. Head office"/>
+          </label>
+          {/* Switching off HIDES the number; it does not erase it. That is why
+              this is a toggle and not "clear the field". */}
+          <label className="admin-toggle-row">
+            <input type="checkbox" checked={form.contactPhoneEnabled}
+                   onChange={(e) => setForm((f) => ({ ...f, contactPhoneEnabled: e.target.checked }))}/>
+            <span>Show the phone number in the footer</span>
           </label>
         </fieldset>
 
@@ -200,6 +221,11 @@ export default function AdminSettingsPage() {
         </label>
 
       </form>
+
+      {/* Outside the <form> on purpose: each social row saves itself, so it must
+          not be submitted by the settings Save button - one button writing to two
+          tables with two failure modes is how a half-saved screen happens. */}
+      <AdminFooterSocial/>
     </section>
   )
 }

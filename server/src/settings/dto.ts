@@ -39,4 +39,11 @@ export class UpdateSettingsDto {
    */
   @IsOptional() @IsString() @MaxLength(40)
   contactPhone?: string;
+
+  /** Withheld, not erased - see the schema note on contactPhoneEnabled. */
+  @IsOptional() @IsBoolean() contactPhoneEnabled?: boolean;
+  @IsOptional() @IsBoolean() contactEmailEnabled?: boolean;
+
+  @IsOptional() @IsString() @MaxLength(40) contactPhoneLabel?: string;
+  @IsOptional() @IsString() @MaxLength(40) contactEmailLabel?: string;
 }

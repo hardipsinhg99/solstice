@@ -39,7 +39,15 @@ export const Icon = ({ name, size = 20 }) => {
     // `sun` is the public site's theme toggle. Two icons that mean different
     // things must not look the same at the size they are actually used.
     sliders: <><path d="M4 8h9M17 8h3M4 16h3M11 16h9"/><circle cx="15" cy="8" r="2.2"/><circle cx="9" cy="16" r="2.2"/></>,
-    bell: <><path d="M18 8.5a6 6 0 1 0-12 0c0 5-2 6.5-2 6.5h16s-2-1.5-2-6.5Z"/><path d="M13.7 19a2 2 0 0 1-3.4 0"/></>
+    bell: <><path d="M18 8.5a6 6 0 1 0-12 0c0 5-2 6.5-2 6.5h16s-2-1.5-2-6.5Z"/><path d="M13.7 19a2 2 0 0 1-3.4 0"/></>,
+    // Footer contact + social. Outline marks, not the brands' filled logos: the
+    // whole sprite is fill:none / stroke 1.8, and `instagram` above was already
+    // drawn that way. A filled Facebook "f" beside an outlined Instagram is two
+    // icon systems in one row, which is exactly what this sprite exists to avoid.
+    phone: <><path d="M7 3.5h3l1.5 4-2 1.4a12 12 0 0 0 5.6 5.6l1.4-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 5.5 5.7 2 2 0 0 1 7.5 3.5Z"/></>,
+    whatsapp: <><path d="M4 20l1.4-4A8 8 0 1 1 8 18.6L4 20Z"/><path d="M9 9.2c.3 1 .9 2 1.7 2.8.8.8 1.8 1.4 2.8 1.7l1-1.2 1.8.8v1.4c-.6.4-1.4.4-2.2.2a8.6 8.6 0 0 1-5.5-5.5c-.2-.8-.2-1.6.2-2.2h1.4l.8 1.8L9 9.2Z"/></>,
+    facebook: <><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M15 8h-1.5A1.5 1.5 0 0 0 12 9.5V12m-1.6 0h3.8M13 12v5"/></>,
+    linkedin: <><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M8 10.5V17M8 7.6v.01M12 17v-3.6a2 2 0 0 1 4 0V17"/></>
   }
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>
 }

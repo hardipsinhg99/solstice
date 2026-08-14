@@ -4,6 +4,8 @@ import { navGroup } from '../../data/navigation.js'
 import { usePublishedPages } from '../../features/pages/index.js'
 import { useNavigate } from '../../app/navigation.js'
 import { useSiteSettings, telHref } from '../../features/settings/index.js'
+import { useSocialLinks, SOCIAL_LABELS } from '../../features/social/index.js'
+import { Icon } from '../ui/Icon.jsx'
 
 export function Footer() {
   const { isPublished } = usePublishedPages()
@@ -36,8 +38,44 @@ export function Footer() {
         </div>
         <div className="footer-col">
           <span className="footer-heading">Get in touch</span>
-          <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
-          {tel && <a href={tel}>{contactPhone}</a>}
+
+          {showEmail && (
+            <a className="footer-contact" href={`mailto:${contactEmail}`}>
+              <Icon name="mail" size={16}/>
+              <span>
+                {contactEmailLabel && <em className="footer-contact-label">{contactEmailLabel}</em>}
+                {contactEmail}
+              </span>
+            </a>
+          )}
+
+          {showPhone && (
+            <a className="footer-contact" href={tel}>
+              <Icon name="phone" size={16}/>
+              <span>
+                {contactPhoneLabel && <em className="footer-contact-label">{contactPhoneLabel}</em>}
+                {contactPhone}
+              </span>
+            </a>
+          )}
+
+          {/* Nothing is hardcoded here - not the platforms, not the order, not
+              the URLs. An empty list renders no row at all rather than an empty
+              strip, which is what an operator who has enabled nothing expects. */}
+          {social.length > 0 && (
+            <ul className="footer-social">
+              {social.map(({ platform, url }) => (
+                <li key={platform}>
+                  <a href={url} target="_blank" rel="noopener noreferrer"
+                     aria-label={SOCIAL_LABELS[platform] ?? platform}
+                     title={SOCIAL_LABELS[platform] ?? platform}>
+                    <Icon name={platform} size={18}/>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+
           <span className="footer-note">International buyer enquiries welcome</span>
         </div>
       </div>

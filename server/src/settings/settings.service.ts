@@ -26,6 +26,10 @@ export class SettingsService {
         whatsappMessage: '',
         contactEmail: '',
         contactPhone: '',
+        contactPhoneEnabled: true,
+        contactEmailEnabled: true,
+        contactPhoneLabel: '',
+        contactEmailLabel: '',
         translateEnabled: true,
       },
     });
@@ -39,6 +43,10 @@ export class SettingsService {
       whatsappMessage: s.whatsappMessage,
       contactEmail: s.contactEmail,
       contactPhone: s.contactPhone,
+      contactPhoneEnabled: s.contactPhoneEnabled,
+      contactEmailEnabled: s.contactEmailEnabled,
+      contactPhoneLabel: s.contactPhoneLabel,
+      contactEmailLabel: s.contactEmailLabel,
       translateEnabled: s.translateEnabled,
     };
   }
@@ -50,6 +58,10 @@ export class SettingsService {
     if (dto.whatsappMessage !== undefined) data.whatsappMessage = sanitizePlainText(dto.whatsappMessage);
     if (dto.contactEmail !== undefined) data.contactEmail = sanitizePlainText(dto.contactEmail);
     if (dto.contactPhone !== undefined) data.contactPhone = sanitizePlainText(dto.contactPhone);
+    if (dto.contactPhoneEnabled !== undefined) data.contactPhoneEnabled = dto.contactPhoneEnabled;
+    if (dto.contactEmailEnabled !== undefined) data.contactEmailEnabled = dto.contactEmailEnabled;
+    if (dto.contactPhoneLabel !== undefined) data.contactPhoneLabel = sanitizePlainText(dto.contactPhoneLabel);
+    if (dto.contactEmailLabel !== undefined) data.contactEmailLabel = sanitizePlainText(dto.contactEmailLabel);
     // Boolean, so it does not go through the text sanitizer - coerced instead,
     // because the global ValidationPipe would reject a non-boolean anyway.
     if (dto.translateEnabled !== undefined) data.translateEnabled = Boolean(dto.translateEnabled);

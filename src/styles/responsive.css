@@ -138,6 +138,10 @@
 @media(max-width:780px){
   .container{width:min(100% - 40px,560px)}
   .footer-logo img{width:180px}
+  /* min-width:0 so a long email address wraps inside its column instead of
+     widening the grid track and taking the page with it. */
+  .footer-contact{min-width:0}
+  .footer-social{gap:10px}
 
   .home-hero{height:auto;min-height:790px}
   .home-hero-inner{height:717px;padding-top:61px}
@@ -289,6 +293,10 @@
   .enquiry-form{padding:16px}
   .footer-grid{grid-template-columns:1fr;gap:18px}
   .footer-logo img{width:180px}
+  /* min-width:0 so a long email address wraps inside its column instead of
+     widening the grid track and taking the page with it. */
+  .footer-contact{min-width:0}
+  .footer-social{gap:10px}
   /* 47px, matching the launcher exactly rather than rounding the FAB up to 48:
      the two are a vertical stack of circles sharing a right edge, and a 1px
      difference in diameter is visible as a misaligned column. 47 clears both the

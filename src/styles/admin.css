@@ -438,6 +438,22 @@ td.admin-row-actions>*+*{margin-left:8px}
 .admin-toggle-row{display:inline-flex;align-items:center;gap:10px;font-size:13px;color:var(--ink);cursor:pointer}
 .admin-toggle-row input{width:16px;height:16px;accent-color:var(--green-600);cursor:pointer}
 
+/* --- Footer social rows ---------------------------------------------------- */
+.admin-social-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:12px;
+  align-items:start;padding:14px 0;border-bottom:1px solid var(--border)}
+.admin-social-row:last-child{border-bottom:0;padding-bottom:0}
+.admin-social-mark{display:grid;place-items:center;width:34px;height:34px;border-radius:8px;
+  background:var(--soft);color:var(--green-600);border:1px solid var(--border)}
+.admin-social-body{min-width:0;display:grid;gap:8px}
+.admin-social-url{margin-bottom:0}
+.admin-social-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start}
+@media(max-width:900px){
+  /* The action buttons drop under the field rather than squeezing the URL input
+     into an unusable width on a narrow admin screen. */
+  .admin-social-row{grid-template-columns:34px minmax(0,1fr)}
+  .admin-social-actions{grid-column:2;margin-top:2px}
+}
+
 /* Video in the gallery list. Same row, same thumbnail slot - a kind badge and a
    status stand-in, not a second list component. */
 .admin-media-kind{position:absolute;left:6px;bottom:6px;z-index:2;width:22px;height:22px;
