@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { MAP_WIDTH, MAP_HEIGHT, project, projectPercent, arcPath } from './project.js'
+import { placeLabels } from './placeLabels.js'
 
 /**
  * The dotted world map. Replaced the cobe WebGL globe on Home and About.
@@ -203,10 +204,11 @@ export function WorldMap({ markers = [], arcs = [], className = '' }) {
       </svg>
 
       <div className="worldmap-labels">
-        {pts.map((m) => {
+        {placeLabels(pts).map((m) => {
           const { left, top } = projectPercent(m.lng, m.lat)
           return (
-            <span key={`l-${m.id ?? m.label}`} className="worldmap-label"
+            <span key={`l-${m.id ?? m.label}`}
+                  className={`worldmap-label is-${m.place}`}
                   style={{ left: `${left}%`, top: `${top}%` }}>
               {m.label}
             </span>

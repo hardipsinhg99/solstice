@@ -70,10 +70,17 @@
 /* The pill carries its own surface, so legibility never depends on which dots
    happen to fall behind it: --ink on --surface measures 13.6:1 light and 13.2:1
    dark, both far clear of 4.5:1. */
-.worldmap-label{position:absolute;transform:translate(-50%,-160%);white-space:nowrap;
+.worldmap-label{position:absolute;white-space:nowrap;
   background:var(--surface);color:var(--ink);border:1px solid var(--line);
   border-radius:999px;padding:3px 9px;font:600 11px/1 'DM Sans',sans-serif;
   letter-spacing:-.1px;box-shadow:var(--elev-1)}
+/* One class per side, chosen by placeLabels(). The transform is what lifts the
+   pill off the pin, so the % coordinates stay the pin's own and the two can
+   never drift apart. */
+.worldmap-label.is-top{transform:translate(-50%,calc(-100% - 9px))}
+.worldmap-label.is-bottom{transform:translate(-50%,9px)}
+.worldmap-label.is-right{transform:translate(11px,-50%)}
+.worldmap-label.is-left{transform:translate(calc(-100% - 11px),-50%)}
 
 /* ?mapdebug=1 only - see WorldMap.jsx. Deliberately loud. */
 .worldmap-debug{position:absolute;inset:auto 0 0 0;z-index:3;margin:0;padding:8px 10px;

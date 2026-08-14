@@ -78,8 +78,16 @@
 .stat-card span{font-size:11px;color:var(--muted)}
 
 .global-footprint{background:var(--bg)}
-.globe-layout{display:grid;grid-template-columns:1fr 1fr;gap:8%;align-items:center}
-.globe-stage{max-width:420px;margin:0 auto;width:100%}
+/* The map is the evidence in this section, so it gets the larger share of the
+   row rather than an even split. minmax(0,..) on both tracks because a grid
+   child's default min-width:auto refuses to shrink below content and would push
+   the map wider than its column. */
+.globe-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:5%;align-items:center}
+/* No 420px cap. That number sized the CIRCULAR cobe globe that used to sit here;
+   when the 2:1 world map replaced it the cap stayed, so the map rendered at
+   420x210 inside a ~600px column - a small faded decoration with dead space
+   around it. The stage now takes the column it was given. */
+.globe-stage{width:100%;margin:0}
 .globe-wrap{position:relative;aspect-ratio:1;user-select:none}
 /* The no-WebGL globe. Its own tokens rather than new palette entries: these are
    local to one graphic and have no business in tokens.css. Both themes, because
@@ -337,8 +345,10 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 
 /* -- 5. global presence ----------------------------------------------------- */
 .about-presence{background:var(--bg)}
-.about-presence-layout{display:grid;grid-template-columns:1fr 1fr;gap:8%;align-items:center}
-.about-globe-stage{max-width:420px;width:100%;margin:0 auto}
+/* Same composition and the same stale-cap fix as .globe-layout on Home - one
+   component, one treatment. */
+.about-presence-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:5%;align-items:center}
+.about-globe-stage{width:100%;margin:0}
 .about-presence-list-title{margin:0 0 18px;font:500 10px 'DM Mono';letter-spacing:1.15px;text-transform:uppercase;color:var(--green-600)}
 .about-presence-list ul{list-style:none;margin:0 0 22px;padding:0;display:grid;gap:14px}
 .about-presence-list li{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line)}

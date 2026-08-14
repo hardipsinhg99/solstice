@@ -125,6 +125,16 @@
   .nav-backdrop{display:block;position:fixed;top:0;left:0;right:0;height:100vh;height:100dvh;background:var(--scrim);z-index:90}
 }
 
+/* The two map sections stay single-column up to 900px, wider than the 780px the
+   rest of the site uses. Splitting them into columns earlier made the map
+   NARROWER on a tablet than on a large phone - at 834px a half-column map is
+   434px against 560px one breakpoint below. The map is the content here, so it
+   keeps the full width until there is genuinely room for a column beside it. */
+@media(max-width:900px){
+  .globe-layout,.about-presence-layout{grid-template-columns:1fr;gap:26px}
+  .globe-stage,.about-globe-stage{max-width:none}
+}
+
 @media(max-width:780px){
   .container{width:min(100% - 40px,560px)}
   .footer-logo img{width:180px}
@@ -152,7 +162,8 @@
   .differentiator-grid{grid-template-columns:1fr 1fr;gap:10px}
   .stats-grid{gap:10px}
   .globe-layout{grid-template-columns:1fr;gap:26px;text-align:center}
-  .globe-stage{max-width:280px}
+  /* Full width, not a 280px thumbnail. The map is the point of the section. */
+  .globe-stage{max-width:none}
   .globe-legend ul{justify-items:center}
   .globe-legend p{margin:0 auto}
   .supply-cta-grid{grid-template-columns:1fr;gap:26px}
@@ -366,7 +377,7 @@
   .about-industry-card .about-tilt-inner{min-height:0;padding:20px 16px}
 
   .about-presence-layout{grid-template-columns:1fr;gap:30px}
-  .about-globe-stage{max-width:280px}
+  .about-globe-stage{max-width:none}
 
   .about-stat-grid{grid-template-columns:1fr 1fr;gap:10px}
   .about-stat{min-height:128px;padding:20px 16px}
@@ -408,12 +419,21 @@
   .home-hero-inner{height:auto;min-height:100svh;padding-top:88px;padding-bottom:36px}
 }
 
-/* World map labels are dropped on phones. At 390px the map is ~310x155 and five
-   pill labels cannot sit on it without overlapping each other and the
-   coastlines. The names are not lost: both pages render the same locations as a
-   real list beside the map, and that list is already the accessible source of
-   truth - so this removes a duplicate, not information. Arcs and pins stay,
-   which is what makes the shape of the network readable at that size. */
+/* World map labels are dropped on phones. At 390px the map is ~390x195 and the
+   pills cannot sit on it without overlapping each other and the coastlines: the
+   pill width is set by the text, so it does NOT shrink with the map, and
+   "United Arab Emirates" alone is over a third of a 360px viewport.
+   placeLabels() reasons in viewBox units on the assumption that the stage is
+   near its 800-unit nominal width, which stops being true here - so the labels
+   are removed rather than left to be placed on bad arithmetic.
+   The names are not lost: both pages render the same locations as a real list
+   directly below the map, and that list is already the accessible source of
+   truth - so this removes a duplicate, not information. Arcs and pins stay, and
+   the pins get larger, which is what keeps the shape of the network readable.
+   The threshold is 780px because that is where .container caps at 560px: below
+   it the map is 288-560 wide, far enough from the 800-unit nominal that the
+   placement estimates stop being trustworthy. Above it the map is 733px+ and
+   they hold. */
 @media(max-width:780px){
   .worldmap-labels{display:none}
   /* Slightly larger pins to stay legible once the labels are gone. */
