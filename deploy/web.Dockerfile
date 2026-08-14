@@ -24,9 +24,15 @@ FROM nginx:1.27-alpine AS runtime
 COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /build/dist /usr/share/nginx/html
 
-# Overwrites whatever the build produced. Kept outside public/ so the
-# production Vercel build never sees it - see the file's own header.
-COPY deploy/robots.staging.txt /usr/share/nginx/html/robots.txt
+# WHICH robots.txt this image gets is a build argument, defaulting to the
+# staging one. That default is deliberate: a stack that forgets to set it gets
+# Disallow, which is the safe direction to fail. Production passes
+# deploy/robots.production.txt explicitly.
+#
+# Caught on the real cutover - production had been serving the staging
+# Disallow: / , which would have deindexed the live site.
+ARG ROBOTS_SRC=deploy/robots.staging.txt
+COPY ${ROBOTS_SRC} /usr/share/nginx/html/robots.txt
 
 EXPOSE 8080
 

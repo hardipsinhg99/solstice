@@ -1,0 +1,13 @@
+# solsticellp.com - the live site. Crawlable, deliberately.
+#
+# The staging host serves deploy/robots.staging.txt instead, which is
+# Disallow: /. Which file a build gets is the ROBOTS_SRC build arg in
+# deploy/web.Dockerfile - production must never inherit the staging one, and
+# that mistake is exactly what this split exists to prevent.
+
+User-agent: *
+Allow: /
+
+# The admin is a client-rendered hash route, so a crawler cannot reach it
+# anyway - this is belt and braces, not the control.
+Disallow: /#admin
