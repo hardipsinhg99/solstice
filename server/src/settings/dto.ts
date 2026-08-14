@@ -30,4 +30,13 @@ export class UpdateSettingsDto {
   /** Whether the header renders the Google Translate widget at all. */
   @IsOptional() @IsBoolean()
   translateEnabled?: boolean;
+
+  /**
+   * Deliberately looser than whatsappNumber's digits-only rule. That one feeds
+   * a wa.me URL where a stray space silently breaks the link; this one is only
+   * ever displayed and put in a tel: href, so it should keep whatever spacing
+   * reads best to a human.
+   */
+  @IsOptional() @IsString() @MaxLength(40)
+  contactPhone?: string;
 }

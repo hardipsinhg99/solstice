@@ -3,11 +3,12 @@ import { Icon } from '../../components/ui/Icon.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
 import { PageTitle } from '../../components/layout/PageTitle.jsx'
 import { EnquiryForm } from '../../features/enquiry/index.js'
-import { useSiteSettings } from '../../features/settings/index.js'
+import { useSiteSettings, telHref } from '../../features/settings/index.js'
 import { Faq } from './sections/Faq.jsx'
 
 export default function ContactPage() {
-  const { contactEmail } = useSiteSettings()
+  const { contactEmail, contactPhone } = useSiteSettings()
+  const tel = telHref(contactPhone)
   return <>
     <PageTitle mark="07" eyebrow="CONTACT SOLSTICE" title="Let’s talk" accent="produce." copy="Tell us what you are looking for and where you want it to go."/>
     <section className="contact-page section">

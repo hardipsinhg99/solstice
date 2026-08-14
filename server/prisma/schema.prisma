@@ -417,9 +417,10 @@ model GalleryImage {
 /// number and let the form label it in the operator's language. One migration per
 /// new setting is the cheaper side of that trade at this site's rate of change.
 ///
-/// There is no contactPhone and no address: no phone number, postal address or
-/// social link exists anywhere in the codebase today, and columns invented ahead
-/// of the content that fills them are how a table ends up mostly null.
+/// contactPhone was added when a real number existed to put in it - the original
+/// note here said there was none, and that a column invented ahead of its content
+/// is how a table ends up mostly null. That reasoning still stands for the
+/// address and social links, which is why neither is here.
 model SiteSettings {
   id String @id @default("singleton")
 
@@ -429,6 +430,11 @@ model SiteSettings {
   whatsappNumber  String
   whatsappMessage String
   contactEmail    String
+  /// Display format, not a dialling format: rendered as written, so it can carry
+  /// the spacing a reader expects (+91 90813 66630). The tel: href strips
+  /// everything but digits and a leading +, so presentation and dialling do not
+  /// have to agree. Empty means the site simply does not show a phone number.
+  contactPhone    String @default("")
 
   /// Whether the Google Translate widget renders in the header at all.
   /// Defaults true so applying this migration changes nothing about a site

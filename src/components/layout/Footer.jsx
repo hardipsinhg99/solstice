@@ -3,13 +3,14 @@ import { Button } from '../ui/Button.jsx'
 import { navGroup } from '../../data/navigation.js'
 import { usePublishedPages } from '../../features/pages/index.js'
 import { useNavigate } from '../../app/navigation.js'
-import { useSiteSettings } from '../../features/settings/index.js'
+import { useSiteSettings, telHref } from '../../features/settings/index.js'
 
 export function Footer() {
   const { isPublished } = usePublishedPages()
 
   const navigate = useNavigate()
-  const { contactEmail } = useSiteSettings()
+  const { contactEmail, contactPhone } = useSiteSettings()
+    const tel = telHref(contactPhone)
   return (
     <footer>
       <div className="footer-cta">
@@ -36,6 +37,7 @@ export function Footer() {
         <div className="footer-col">
           <span className="footer-heading">Get in touch</span>
           <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
+          {tel && <a href={tel}>{contactPhone}</a>}
           <span className="footer-note">International buyer enquiries welcome</span>
         </div>
       </div>

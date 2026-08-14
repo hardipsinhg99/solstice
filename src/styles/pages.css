@@ -636,6 +636,11 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
    the copy around it. text-underline-offset keeps the rule off the descenders
    of the g and the y. */
 .contact-page aside>a{display:block;color:var(--green-600);font-size:13px;font-weight:600;margin:22px 0;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+/* Email and phone are two lines of ONE contact block, so the 22px rhythm that
+   separates that block from its neighbours reads wrong between them. Adjacent
+   margins collapse to the larger of the two, so a smaller margin-top here would
+   be ignored - a negative one sums with it instead, landing on 8px. */
+.contact-page aside>a+a{margin-top:-14px}
 .contact-points{display:grid;gap:10px;margin-top:38px}
 .contact-points span{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--muted)}
 .contact-points svg{color:var(--green-500)}

@@ -1,4 +1,4 @@
 export {
   useSiteSettings, primeSiteSettings, clearSiteSettings,
-  isUsableWhatsappNumber, whatsappHref
+  isUsableWhatsappNumber, whatsappHref, telHref
 } from './useSiteSettings.js'

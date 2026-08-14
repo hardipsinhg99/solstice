@@ -15,6 +15,11 @@ export const HERO_IMAGE_SRCSET = [
 // to a mailto: pointing at "undefined".
 export const ENQUIRY_EMAIL = 'hello@solsticetrading.com'
 
+// Display fallback only, same role as ENQUIRY_EMAIL: what renders before the
+// settings request resolves, and if the API is unreachable. The live value is
+// SiteSettings.contactPhone. Spacing is the number as a reader would say it.
+export const CONTACT_PHONE = '+91 90813 66630'
+
 // wa.me takes the number in international format as DIGITS ONLY - no leading +,
 // no spaces, no dashes, no parentheses. Any of those are not rejected with an
 // error, they silently resolve to "phone number shared via url is invalid", so

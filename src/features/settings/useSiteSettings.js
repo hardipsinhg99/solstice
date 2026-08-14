@@ -1,5 +1,5 @@
 import { useApiResource, primeResource, clearResource } from '../api/useApiResource.js'
-import { ENQUIRY_EMAIL, WHATSAPP_NUMBER, WHATSAPP_MESSAGE } from '../../lib/constants.js'
+import { ENQUIRY_EMAIL, CONTACT_PHONE, WHATSAPP_NUMBER, WHATSAPP_MESSAGE } from '../../lib/constants.js'
 
 // The second consumer of useApiResource, and the reason it was generalised out
 // of useProductCatalogue.
@@ -13,6 +13,7 @@ const FALLBACK = {
   whatsappNumber: WHATSAPP_NUMBER,
   whatsappMessage: WHATSAPP_MESSAGE,
   contactEmail: ENQUIRY_EMAIL,
+  contactPhone: CONTACT_PHONE,
   // Fails OPEN. A settings fetch that has not landed, or that failed, must not
   // blink the language selector out of the header - the widget staying is the
   // safe direction, and turning it off is a deliberate admin action.
@@ -56,4 +57,18 @@ export function whatsappHref({ whatsappNumber, whatsappMessage }) {
   // Hand-escaping the message is what breaks wa.me links - an apostrophe or an
   // accented character arrives as a truncated or mojibake'd draft.
   return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage ?? '')}`
+}
+
+/**
+ * A tel: href from a number written for humans.
+ *
+ * The stored value carries display spacing (+91 90813 66630); a dialler wants
+ * none of it. Strip to digits, keeping a leading + because that is what makes
+ * it dialable from outside India - which is the only kind of buyer this site
+ * has. Returns null for an empty setting so the caller renders nothing rather
+ * than an href to nowhere.
+ */
+export function telHref(contactPhone) {
+  const digits = (contactPhone ?? '').replace(/[^\d+]/g, '').replace(/(?!^)\+/g, '')
+  return digits.replace(/\D/g, '').length >= 6 ? `tel:${digits}` : null
 }

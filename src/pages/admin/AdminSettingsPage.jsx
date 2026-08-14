@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { getSettings, updateSettings } from '../../features/admin/index.js'
 import { isUsableWhatsappNumber, whatsappHref } from '../../features/settings/index.js'
 
-const EMPTY = { whatsappNumber: '', whatsappMessage: '', contactEmail: '', translateEnabled: true }
+const EMPTY = { whatsappNumber: '', whatsappMessage: '', contactEmail: '', contactPhone: '', translateEnabled: true }
 
 /**
  * One record, so one form and one Save - no list, no create, no delete.
@@ -31,6 +31,7 @@ export default function AdminSettingsPage() {
           whatsappNumber: row.whatsappNumber ?? '',
           whatsappMessage: row.whatsappMessage ?? '',
           contactEmail: row.contactEmail ?? '',
+          contactPhone: row.contactPhone ?? '',
           // Only an explicit false turns it off, so a row saved before this
           // column existed reads as enabled rather than silently hiding the
           // widget on the live site.
@@ -152,6 +153,17 @@ export default function AdminSettingsPage() {
             <span className="admin-hint" id="email-hint">
               Shown in the footer and on the contact page, and used as the address the enquiry
               form falls back to if the API cannot be reached.
+            </span>
+          </label>
+
+          <label className="admin-field">
+            <span>Public phone number</span>
+            <input type="tel" value={form.contactPhone} onChange={set('contactPhone')}
+                   placeholder="+91 90813 66630" aria-describedby="phone-hint"/>
+            <span className="admin-hint" id="phone-hint">
+              Shown on the contact page below the email, and in the footer. Write it the way you
+              want it read - the spacing is kept. Include the country code, since the people
+              reading it are dialling from abroad. Leave empty to show no phone number at all.
             </span>
           </label>
         </fieldset>
