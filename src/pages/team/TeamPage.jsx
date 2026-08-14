@@ -23,7 +23,7 @@ const initials = (name) =>
 
 export default function TeamPage() {
   const navigate = useNavigate()
-  const { section, missing } = usePage('team', TEAM_FALLBACK)
+  const { section, shows, missing } = usePage('team', TEAM_FALLBACK)
   const [members] = usePublicTeam()
 
   // Unpublished in the admin: render the shared not-available state rather than
@@ -70,12 +70,14 @@ export default function TeamPage() {
       </div>
     </section>
     )}
-    <section className="team-join">
-      <Reveal as="div" className="container">
-        <h2>{cta.headingLine1}<br/><em>{cta.headingAccent}</em></h2>
-        <p>{cta.body}</p>
-        <Button onClick={() => navigate(cta.ctaRoute)} variant="lime">{cta.ctaLabel}</Button>
-      </Reveal>
-    </section>
+    {shows('cta') && (
+      <section className="team-join">
+        <Reveal as="div" className="container">
+          <h2>{cta.headingLine1}<br/><em>{cta.headingAccent}</em></h2>
+          <p>{cta.body}</p>
+          <Button onClick={() => navigate(cta.ctaRoute)} variant="lime">{cta.ctaLabel}</Button>
+        </Reveal>
+      </section>
+    )}
   </>
 }

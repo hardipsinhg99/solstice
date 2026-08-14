@@ -80,7 +80,15 @@ export function usePage(slug, fallback = {}) {
   for (const s of data?.sections ?? []) map[s.key] = s.data
   // Until the fetch lands - and if it fails - the caller's own copy is used, so
   // the page renders its existing wording instead of a blank frame.
-  const section = (key) => map[key] ?? fallback[key] ?? {}
+  //
+  // But ONLY until then. Once `data` is in hand the server has answered, and
+  // findPublic omits a hidden section entirely, so absence from `map` is the
+  // server SAYING "hidden". Falling through to the fallback there resurrected
+  // the section with its seed wording - which is why unticking "Show on the
+  // site" appeared to do nothing on the live page while the admin correctly
+  // showed it as Hidden. The fallback is for "no answer yet", never for "the
+  // answer was no".
+  const section = (key) => (data ? map[key] ?? {} : fallback[key] ?? {})
 
   // Presence, which is NOT the same question as content. findPublic omits a
   // hidden section entirely, so absence from `map` is how the server says

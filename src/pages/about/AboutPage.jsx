@@ -24,20 +24,20 @@ import { MissionVision } from './sections/MissionVision.jsx'
 // pure renderer with no data import of its own, which is what makes them
 // testable and what will make them portable to Astro.
 export default function AboutPage() {
-  const { section, missing } = usePage('about', ABOUT_FALLBACK)
+  const { section, shows, missing } = usePage('about', ABOUT_FALLBACK)
 
   // Unpublished in the admin - see usePage's three-state result.
   if (missing) return <PageUnavailable/>
 
   return <>
-    <HeroQuote data={section('heroQuote')}/>
-    <StoryTimeline data={section('story')}/>
-    <Founders data={section('founders')}/>
-    <WhatWeDo data={section('whatWeDo')}/>
-    <GlobalPresence data={section('globalPresence')}/>
-    <JourneyStats data={section('journeyStats')}/>
-    <WhyChooseUs data={section('whyChooseUs')}/>
-    <IndustryRecognition data={section('industryRecognition')}/>
-    <MissionVision data={section('missionVision')}/>
+    {shows('heroQuote') && <HeroQuote data={section('heroQuote')}/>}
+    {shows('story') && <StoryTimeline data={section('story')}/>}
+    {shows('founders') && <Founders data={section('founders')}/>}
+    {shows('whatWeDo') && <WhatWeDo data={section('whatWeDo')}/>}
+    {shows('globalPresence') && <GlobalPresence data={section('globalPresence')}/>}
+    {shows('journeyStats') && <JourneyStats data={section('journeyStats')}/>}
+    {shows('whyChooseUs') && <WhyChooseUs data={section('whyChooseUs')}/>}
+    {shows('industryRecognition') && <IndustryRecognition data={section('industryRecognition')}/>}
+    {shows('missionVision') && <MissionVision data={section('missionVision')}/>}
   </>
 }
