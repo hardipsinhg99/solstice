@@ -59,12 +59,19 @@
   --danger:#A3231B;
   --danger-bg:#FBEDEC;
   --on-danger:#ffffff;
-  --bg:#f8f7f1;--surface:#fffefa;--ink:#12211B;--body:#3F4A44;--muted:#546258;
+  /* Retuned for the premium green+white identity. Measured on the surfaces the
+     site actually paints on:
+       ink   16.89 on surface, 15.81 on bg
+       body   9.29 / 8.70
+       muted  5.66 / 5.30   - all clear AA body text with headroom
+     --bg is a warm off-white rather than pure white, and --surface IS pure
+     white, so a card lifts off the page without needing a heavy border. */
+  --bg:#F6F8F5;--surface:#FFFFFF;--ink:#10201A;--body:#3D4A44;--muted:#5A6B61;
   /* --border is the canonical hairline; --line is kept pointing at it so the 40
      existing consumers keep working rather than two near-identical greys living
      side by side. Both are decorative and exempt from SC 1.4.11; --line-strong
      remains the one that must reach 3:1 on interactive boundaries. */
-  --border:#D8E3DC;--line:var(--border);--line-strong:#78877a;
+  --border:#E2E9E4;--line:var(--border);--line-strong:#78877a;
   /* Same treatment: --green-050 is the canonical tinted section surface and
      --soft aliases onto it. */
   --soft:var(--green-050);
@@ -91,6 +98,15 @@
      Measured 8.90:1 on the lightest of those surfaces (--deep) and 11.78:1 on
      the hero. */
   --green-on-dark:#b7dcb5;
+  /* Ink for bands that are dark in BOTH themes - the hero, the footer CTA, the
+     manifesto, the network bands. These surfaces do not invert, so their text
+     must not either, which is why every one of them previously carried a
+     hardcoded literal: #f5f4ea appeared seven times, #d8e2da and #c7d3c9 twice
+     each. One name per role instead, declared once and NOT overridden in the
+     dark block. Measured on --deep: 12.46 / 8.88 / 6.50. */
+  --ink-on-dark:#F5F7F3;
+  --body-on-dark:#C9D5CD;
+  --muted-on-dark:#A9B8AF;
   /* The journey's "sky" caption sits on a scrim that is deliberately LIGHT in
      both themes (pages.css explains why: no single ink passes on both the yard
      and the sky act). A theme-flipping green therefore cannot be used on it -
@@ -190,8 +206,11 @@ html[data-theme='dark']{
   --danger:#FF9E96;
   --danger-bg:#3A1714;
   --on-danger:#12211B;
-  --bg:#0e1c16;--surface:#152a21;--ink:#f2f2ea;--body:#d5ddd7;--muted:#aebbb2;
-  --border:#31473c;--line-strong:#688674;
+  /* Deep forest, not neon. Measured: ink 16.66 on bg, body 12.76, muted 8.06 -
+     and the green ramp sits at 7.81 on surface, so the accent reads as brand
+     colour rather than as a glow. */
+  --bg:#0B1712;--surface:#13251D;--ink:#F1F5F2;--body:#CFDAD3;--muted:#9FB0A6;
+  --border:#24382E;--line-strong:#688674;
   --deep:#0a1510;--lime:#e2f27a;--gold:#d9bb74;--gold-text:#d9bb74;
   --shadow:0 24px 60px rgba(0,0,0,.4);
   --elev-1:0 2px 6px rgba(0,0,0,.3),0 12px 28px rgba(0,0,0,.34);

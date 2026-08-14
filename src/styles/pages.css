@@ -16,19 +16,19 @@
 .hero-media:after{content:'';position:absolute;inset:0;background:var(--hero-scrim)}
 .home-hero-inner{height:620px;position:relative;z-index:2;display:flex;align-items:center}
 .hero-copy{position:relative;z-index:5;max-width:600px}
-.hero-copy .eyebrow{color:var(--lime)}
+.hero-copy .eyebrow{color:var(--green-on-dark)}
 .hero-copy h1{font-size:clamp(56px,6.6vw,93px);margin:0 0 24px;color:#f9f8ef}
-.hero-copy h1 em{color:var(--lime)}
+.hero-copy h1 em{color:var(--green-on-dark)}
 .hero-copy>p{font-size:15px;line-height:1.72;color:#dbe1d3;max-width:430px;margin-bottom:29px}
 .hero-buttons{display:flex;align-items:center;gap:26px}
 .hero-buttons .quiet-link{color:#f2f4ea}
-.hero-buttons .quiet-link:hover{color:var(--lime)}
+.hero-buttons .quiet-link:hover{color:var(--green-on-dark)}
 .hero-meta{display:flex;align-items:center;gap:10px;margin-top:61px;color:#e7ebe0;font:9px 'DM Mono';letter-spacing:.7px}
 .hero-meta span{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);padding:7px 13px;border-radius:20px;backdrop-filter:blur(6px)}
 .hero-meta i{display:none}
 .hero-footer{height:70px;position:relative;z-index:5;border-top:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:space-between;color:#cad3c1;font:9px 'DM Mono';letter-spacing:.8px}
 .hero-footer div{height:1px;background:rgba(255,255,255,.22);width:54%}
-.hero-footer b{font-weight:400;color:#f5f4ea}
+.hero-footer b{font-weight:400;color:var(--ink-on-dark)}
 
 /* Hero entrance - plays once on load, not scroll-triggered */
 @keyframes heroUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
@@ -110,7 +110,7 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .product-feature-desc{left:20px;right:65px;bottom:15px;margin:0;font-size:12px;line-height:1.5;color:#e3e8dc;opacity:0;transform:translateY(10px);transition:opacity .3s,transform .3s}
 .product-feature:hover h3{transform:translateY(-30px)}
 .product-feature:hover .product-feature-desc{opacity:1;transform:translateY(-14px)}
-.product-feature .card-cue{right:17px;bottom:17px;width:34px;height:34px;border:0;border-radius:50%;background:var(--lime);display:grid;place-items:center;color:#143426;transition:transform .3s var(--ease)}
+.product-feature .card-cue{right:17px;bottom:17px;width:34px;height:34px;border:0;border-radius:50%;background:var(--green-600);display:grid;place-items:center;color:var(--on-green);transition:transform .3s var(--ease)}
 .product-feature:hover .card-cue{transform:rotate(45deg)}
 
 /* ============================================================
@@ -176,7 +176,7 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .journey-captions{position:absolute;top:clamp(100px,14vh,150px);right:0;width:min(480px,38vw);padding:0 clamp(24px,4vw,64px);pointer-events:none;z-index:2}
 .journey-caption{position:absolute;top:0;right:clamp(24px,4vw,64px);margin:0;max-width:min(400px,32vw);padding:16px 20px;background:rgba(6,21,15,.55);border-left:2px solid var(--lime)}
 .journey-caption-label{font:500 10px 'DM Mono';letter-spacing:1.15px;text-transform:uppercase;color:var(--green-on-dark);margin-bottom:12px}
-.journey-caption-text{margin:0;color:#f5f4ea;font-size:clamp(17px,1.5vw,23px);line-height:1.3;text-wrap:balance}
+.journey-caption-text{margin:0;color:var(--ink-on-dark);font-size:clamp(17px,1.5vw,23px);line-height:1.3;text-wrap:balance}
 .journey-caption-sky{background:rgba(248,247,241,.82);border-left-color:var(--green-on-scrim)}
 .journey-caption-sky .journey-caption-label{color:var(--green-on-scrim)}
 .journey-caption-sky .journey-caption-text{color:var(--deep)}
@@ -197,7 +197,7 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .buyer-path-grid h3{font-size:20px;letter-spacing:-.6px;margin:40px 0 9px}
 .buyer-path-grid p{font-size:12px;line-height:1.65;color:var(--muted);max-width:240px}
 
-.home-manifesto{background:var(--deep);color:#f5f4ea;padding:113px 0}
+.home-manifesto{background:var(--deep);color:var(--ink-on-dark);padding:113px 0}
 .manifesto-grid{display:grid;grid-template-columns:45% 1fr;gap:13%;align-items:center}
 .manifesto-visual{position:relative}
 .manifesto-image{height:440px;background:linear-gradient(#0c2d1e25,#0c2d1e6b),url('https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=1000&q=85') center/cover;border-radius:0 150px 0 0}
@@ -206,15 +206,19 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .manifesto-stat b{font-size:26px;font-family:'Playfair Display',Georgia,serif;font-weight:500;color:var(--green-500);letter-spacing:-1px}
 .manifesto-stat span{font-size:11px;line-height:1.4;color:var(--muted)}
 .home-manifesto .eyebrow{color:var(--green-on-dark)}
-.home-manifesto h2 em{color:var(--lime)}
+.home-manifesto h2 em{color:var(--green-on-dark)}
 .home-manifesto p{max-width:370px;color:#c1cec5;font-size:14px;line-height:1.75;margin:25px 0}
-.home-manifesto .quiet-link{color:var(--lime)}
+.home-manifesto .quiet-link{color:var(--green-on-dark)}
 
-.home-cta{background:linear-gradient(100deg,var(--lime),#eddaa2);padding:87px 0}
-.home-cta h2{color:#173529;font-size:clamp(42px,5vw,67px);margin-bottom:29px}
-.home-cta h2 em{color:#173529}
-.home-cta .eyebrow{color:#416348}
-.home-cta .button{background:#173c2c;color:#fff}
+.home-cta{background:linear-gradient(100deg,#0E2B1E,var(--deep));padding:87px 0;color:var(--ink-on-dark)}
+/* The band flipped from a light lime gradient to deep green, so its ink had to
+   flip with it. #173529 measured 1.14:1 on the new background - invisible, the
+   same failure the footer CTA and the network hero both hit. Every dark band on
+   this site now names its ink explicitly rather than inheriting it. */
+.home-cta h2{color:var(--ink-on-dark);font-size:clamp(42px,5vw,67px);margin-bottom:29px}
+.home-cta h2 em{color:var(--green-on-dark)}
+.home-cta .eyebrow{color:var(--green-on-dark)}
+.home-cta .button{background:var(--green-600);color:var(--on-green)}
 
 /* ============================================================
    Page title - ghost numeral signature
@@ -385,8 +389,8 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .about-mv{background:var(--surface);padding-bottom:112px}
 .about-mv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .about-mv-panel .about-tilt-inner{padding:36px 32px;background:var(--deep);border-color:transparent;color:#e7efe8;height:100%}
-.about-mv-panel h2{margin:0 0 16px;font-size:clamp(26px,2.8vw,36px);letter-spacing:-1.2px;color:#f5f4ea}
-.about-mv-panel p{margin:0;font-size:15px;line-height:1.75;color:#c7d3c9}
+.about-mv-panel h2{margin:0 0 16px;font-size:clamp(26px,2.8vw,36px);letter-spacing:-1.2px;color:var(--ink-on-dark)}
+.about-mv-panel p{margin:0;font-size:15px;line-height:1.75;color:var(--body-on-dark)}
 
 /* ============================================================
    Services
@@ -399,17 +403,17 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .service-list article>svg{color:var(--green-500)}
 .service-list h3{font-size:25px;margin:0 0 6px;letter-spacing:-.8px}
 .service-list p{margin:0;color:var(--muted);font-size:13px}
-.service-list button{border:0;background:var(--lime);width:39px;height:39px;border-radius:50%;display:grid;place-items:center;transition:transform .3s var(--ease)}
+.service-list button{border:0;background:var(--green-600);color:var(--on-green);width:39px;height:39px;border-radius:50%;display:grid;place-items:center;transition:transform .3s var(--ease)}
 .service-list article:hover button{transform:rotate(45deg)}
 
-.supply-cta{background:var(--deep);color:#f5f4ea}
+.supply-cta{background:var(--deep);color:var(--ink-on-dark)}
 .supply-cta-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:10%;align-items:center}
 .supply-cta-grid .eyebrow{color:var(--green-on-dark)}
-.supply-cta-grid h2 em{color:var(--lime)}
-.supply-cta-grid p{color:#c7d3c9;font-size:14px;line-height:1.75;max-width:420px;margin:20px 0 28px}
+.supply-cta-grid h2 em{color:var(--green-on-dark)}
+.supply-cta-grid p{color:var(--body-on-dark);font-size:14px;line-height:1.75;max-width:420px;margin:20px 0 28px}
 .supply-cta-list{list-style:none;margin:0;padding:0;display:grid;gap:14px}
 .supply-cta-list li{display:flex;align-items:center;gap:12px;font-size:13px;padding:16px 18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14)}
-.supply-cta-list svg{color:var(--lime);flex-shrink:0}
+.supply-cta-list svg{color:var(--green-on-dark);flex-shrink:0}
 
 .process{background:var(--surface)}
 .process-list{border-top:1px solid var(--line)}
@@ -435,7 +439,7 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 
 .service-callout{background:var(--deep);color:#fff;padding:92px 0}
 .service-callout .eyebrow{color:var(--green-on-dark)}
-.service-callout h2 em{color:var(--lime)}
+.service-callout h2 em{color:var(--green-on-dark)}
 
 /* ============================================================
    Products list & detail
@@ -550,7 +554,7 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .meta-icon{width:44px;height:44px;border-radius:50%;background:color-mix(in srgb,var(--green-500) 14%,transparent);display:grid;place-items:center;color:var(--green-600);flex-shrink:0}
 .meta-card b{display:block;font-size:15px;font-weight:600;margin-bottom:5px}
 .meta-card span{font-size:12px;line-height:1.55;color:var(--muted)}
-.detail-note{background:var(--lime);padding:23px 0}
+.detail-note{background:var(--green-050);padding:23px 0}
 .detail-note>div{display:flex;align-items:center;gap:15px}
 .detail-note svg{color:#16412e}
 .detail-note p{margin:0;color:#254634;font-size:12px;line-height:1.5}
@@ -565,7 +569,7 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .related-card:hover .related-image{transform:scale(1.05)}
 .related-card>span{display:block;margin:16px 16px 0;color:var(--green-600);font:9px 'DM Mono';letter-spacing:.9px;text-transform:uppercase}
 .related-card h3{margin:8px 16px 16px;font-size:19px;letter-spacing:-.5px}
-.related-card .card-cue{position:absolute;right:14px;bottom:14px;width:32px;height:32px;border:0;border-radius:50%;background:var(--lime);display:grid;place-items:center;color:#143426;transition:transform .3s var(--ease)}
+.related-card .card-cue{position:absolute;right:14px;bottom:14px;width:32px;height:32px;border:0;border-radius:50%;background:var(--green-600);display:grid;place-items:center;color:var(--on-green);transition:transform .3s var(--ease)}
 .related-card:hover .card-cue{transform:rotate(45deg)}
 
 /* ============================================================
@@ -879,7 +883,7 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 /* The scrim is what makes the text legible over ANY image, rather than hoping
    the artwork happens to be dark where the words fall. Weighted to the left,
    because that is where the copy sits and the right of the frame should stay
-   readable as picture. Measured on the darkest stop: #f5f4ea on the composited
+   readable as picture. Measured on the darkest stop: var(--ink-on-dark) on the composited
    left edge holds well past 4.5:1. */
 
 

@@ -11,7 +11,12 @@
 .primary.sent{background:var(--green-600);color:var(--on-green)}
 .outline{background:transparent;border:1px solid var(--ink);color:var(--ink)}
 .outline:hover{background:var(--ink);color:var(--bg)}
-.lime{background:var(--lime);color:#153828}
+/* Kept as a variant NAME so no component has to change, but it is now the
+   brand green. Six closing CTAs used it, which made lime rather than the logo
+   colour the thing a buyer associated with acting. White on --green-600
+   measures 6.71:1 light; the dark theme flips to mint with --on-green ink. */
+.lime{background:var(--green-600);color:var(--on-green)}
+.lime:hover{background:var(--green-700)}
 .lime:hover{box-shadow:0 14px 30px rgba(180,200,60,.35)}
 /* These are standalone controls, not links inside a sentence, so SC 2.5.8's
    24px minimum applies. At 12px with zero padding the hit area was ~16px. */

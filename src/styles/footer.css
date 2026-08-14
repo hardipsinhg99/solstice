@@ -1,11 +1,11 @@
 /* ============================================================
    Footer & chat
    ============================================================ */
-footer{background:var(--deep);color:#d8e2da}
+footer{background:var(--deep);color:var(--body-on-dark)}
 /* The headline was invisible in LIGHT mode and fine in dark, which is exactly
    what a missing colour looks like: base.css sets `h1,h2,h3,h4,h5,h6{color:
    var(--ink)}` as an ELEMENT selector, and any specificity beats the
-   `color:#d8e2da` inherited from <footer>. --ink is near-black on light and
+   `color:var(--body-on-dark)` inherited from <footer>. --ink is near-black on light and
    near-white on dark, so on this permanently-dark band it measured 1.24:1
    light and 16.55:1 dark. The band does not invert with the theme, so its ink
    must not either - stated once, explicitly.
@@ -18,12 +18,12 @@ footer{background:var(--deep);color:#d8e2da}
   background:radial-gradient(120% 140% at 12% 50%,color-mix(in srgb,var(--green-500) 16%,transparent) 0%,transparent 62%)}
 .footer-cta-inner{display:flex;align-items:center;justify-content:space-between;gap:clamp(28px,4vw,56px);padding:clamp(52px,7vw,72px) 0}
 .footer-cta-inner .eyebrow{color:var(--green-on-dark);margin-bottom:14px;display:block}
-.footer-cta-inner h3{color:#f5f4ea;font-size:clamp(25px,3.4vw,40px);line-height:1.14;letter-spacing:-1.1px;margin:0;max-width:19ch;font-weight:700;text-wrap:balance}
+.footer-cta-inner h3{color:var(--ink-on-dark);font-size:clamp(25px,3.4vw,40px);line-height:1.14;letter-spacing:-1.1px;margin:0;max-width:19ch;font-weight:700;text-wrap:balance}
 /* The accent names what we actually sell, so it carries the emphasis. --lime
    measures 10.40:1 on this band; the serif treatment is the same one h1/h2 em
    already uses across the site, so this is the existing rule rather than a new
    one. */
-.footer-cta-inner h3 em{font-family:'Playfair Display',Georgia,serif;font-style:normal;font-weight:500;color:var(--lime)}
+.footer-cta-inner h3 em{font-family:'Playfair Display',Georgia,serif;font-style:normal;font-weight:500;color:var(--green-on-dark)}
 /* The button is the point of the band, so it does not shrink into the gap. */
 .footer-cta-inner .button{flex:0 0 auto;padding:16px 26px;font-size:13px}
 .footer-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1.1fr;gap:30px;align-items:start;padding:48px 0}
@@ -33,16 +33,16 @@ footer{background:var(--deep);color:#d8e2da}
 .footer-grid p,.footer-grid span,.footer-grid a,.footer-grid button{font-size:11px;line-height:1.6;color:#b8c6bd;margin:0}
 .footer-brand,.footer-col{display:grid;gap:9px}
 .footer-brand p{margin-top:5px}
-.footer-col>.footer-heading{display:block;font:500 10px 'DM Mono';letter-spacing:1.1px;color:var(--lime);text-transform:uppercase;margin-bottom:3px}
-.footer-col .footer-note{color:#8ba296}
+.footer-col>.footer-heading{display:block;font:500 10px 'DM Mono';letter-spacing:1.1px;color:var(--green-on-dark);text-transform:uppercase;margin-bottom:3px}
+.footer-col .footer-note{color:var(--muted-on-dark)}
 .footer-grid button,.footer-grid a{display:inline-flex;align-items:center;min-height:24px}
 .footer-grid button{background:none;border:0;padding:0;text-align:left;transition:color .2s}
 .footer-grid button:hover{color:#fff}
 /* Same SC 1.4.1 fix as the contact address: --lime against the footer's body
    grey was a colour-only distinction. */
-.footer-grid a{color:var(--lime);transition:opacity .2s;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.footer-grid a{color:var(--green-on-dark);transition:opacity .2s;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
 .footer-grid a:hover{opacity:.8}
-.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:22px 0;border-top:1px solid rgba(255,255,255,.12);font-size:10px;color:#8ba296}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:22px 0;border-top:1px solid rgba(255,255,255,.12);font-size:10px;color:var(--muted-on-dark)}
 .chat-button{position:fixed;right:21px;bottom:20px;z-index:120;width:51px;height:51px;border:0;border-radius:50%;background:var(--green-600);color:var(--on-green);box-shadow:0 10px 25px rgba(13,43,27,.3);display:grid;place-items:center;transition:transform .25s var(--ease)}
 .chat-button:hover{transform:scale(1.08)}
 /* visibility - not just opacity - is what removes the closed panel from the
