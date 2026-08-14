@@ -500,10 +500,14 @@ const NETWORK = [
   },
   {
     key: 'cta', type: 'network.cta', label: 'Closing call to action',
+    help: 'The enquiry form itself sits under this copy - there is no button to configure. Write the copy as the introduction to a form the buyer can fill in without leaving the page.',
     fields: [
       f('eyebrow', 'Eyebrow'), f('headingLine1', 'Heading, first line'),
-      f('headingAccent', 'Heading, accent'), f('body', 'Copy', 'textarea'),
-      f('ctaLabel', 'Button'), f('ctaRoute', 'Button goes to')
+      f('headingAccent', 'Heading, accent'), f('body', 'Copy', 'textarea')
+      // ctaLabel and ctaRoute were removed when the form replaced the button.
+      // Leaving them would have given an operator two fields that changed
+      // nothing on the page - the worst kind of CMS control. Any values already
+      // stored stay in the row untouched and are simply not read.
     ]
   }
 ]

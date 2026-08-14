@@ -654,16 +654,20 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .contact-points{display:grid;gap:10px;margin-top:38px}
 .contact-points span{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--muted)}
 .contact-points svg{color:var(--green-500)}
-.contact-page form{background:var(--surface);border:1px solid var(--line);padding:29px;display:grid;gap:14px}
+/* Scoped to the form, not to .contact-page. It was only ever reachable as a
+   descendant of the contact page, so mounting it anywhere else - the GTN closing
+   CTA - produced browser-default inputs. A feature component should not depend on
+   which page happens to be its ancestor for its own appearance. */
+.enquiry-form{background:var(--surface);border:1px solid var(--line);padding:29px;display:grid;gap:14px}
 /* 10px labels on the site's single conversion surface. Nudged to 12px: still
    the quiet, monospaced-adjacent register the form was designed in, but
    legible enough to scan a fourteen-field enquiry without leaning in. */
-.contact-page label{font-size:12px;color:var(--muted)}
-.contact-page input,.contact-page select,.contact-page textarea{width:100%;border:1px solid var(--line-strong);background:transparent;color:var(--ink);padding:12px;margin-top:6px;border-radius:0;outline:0;font-size:12px;transition:border-color .2s,box-shadow .2s}
-.contact-page input:focus,.contact-page select:focus,.contact-page textarea:focus{border-color:var(--green-600);box-shadow:0 0 0 3px color-mix(in srgb,var(--green-600) 20%,transparent)}
-.contact-page textarea{height:90px;resize:vertical}
-.contact-page form .button{justify-content:space-between;margin-top:4px}
-.contact-page form .button[disabled]{opacity:.7;cursor:progress}
+.enquiry-form label{font-size:12px;color:var(--muted)}
+.enquiry-form input,.enquiry-form select,.enquiry-form textarea{width:100%;border:1px solid var(--line-strong);background:transparent;color:var(--ink);padding:12px;margin-top:6px;border-radius:0;outline:0;font-size:12px;transition:border-color .2s,box-shadow .2s}
+.enquiry-form input:focus,.enquiry-form select:focus,.enquiry-form textarea:focus{border-color:var(--green-600);box-shadow:0 0 0 3px color-mix(in srgb,var(--green-600) 20%,transparent)}
+.enquiry-form textarea{height:90px;resize:vertical}
+.enquiry-form .button{justify-content:space-between;margin-top:4px}
+.enquiry-form .button[disabled]{opacity:.7;cursor:progress}
 .consent-field{display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:start;line-height:1.5}
 .consent-field input{width:16px;height:16px;margin-top:1px;accent-color:var(--green-600)}
 .hp-field{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
@@ -810,6 +814,10 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .network-cta h2{color:#fff;font-size:clamp(30px,4vw,50px);line-height:1.08;letter-spacing:-1.3px;margin:10px 0 14px}
 .network-cta h2 em{font-style:normal;color:var(--green-on-dark)}
 .network-cta p{max-width:56ch;margin:0 auto 26px;color:rgba(255,255,255,.84);line-height:1.7}
+/* A reading-width column on a full-bleed band, so the card is capped and centred
+   rather than spanning the container. text-align resets to left because the band
+   centres its copy and form labels must not inherit that. */
+.network-cta-form{max-width:560px;margin:0 auto;text-align:left}
 
 /* The shared unpublished-page state. */
 .page-unavailable{text-align:center;padding:clamp(80px,12vw,150px) 0}

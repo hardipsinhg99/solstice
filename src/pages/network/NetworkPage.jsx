@@ -3,6 +3,7 @@ import { Icon } from '../../components/ui/Icon.jsx'
 import { Button } from '../../components/ui/Button.jsx'
 import { Eyebrow } from '../../components/ui/Eyebrow.jsx'
 import { visibleImage } from '../../features/pages/index.js'
+import { EnquiryForm } from '../../features/enquiry/index.js'
 import { Reveal } from '../../components/motion/Reveal.jsx'
 import { PageUnavailable } from '../../components/layout/PageUnavailable.jsx'
 import { useNavigate } from '../../app/navigation.js'
@@ -298,8 +299,18 @@ export default function NetworkPage() {
         <Eyebrow>{cta.eyebrow}</Eyebrow>
         <h2>{cta.headingLine1}<br/><em>{cta.headingAccent}</em></h2>
         {cta.body && <p>{cta.body}</p>}
-        {cta.ctaLabel &&
-          <Button variant="lime" onClick={() => navigate(cta.ctaRoute)}>{cta.ctaLabel}</Button>}
+        {/* The form itself, not a button to the form. This section's whole job is
+            to collect an enquiry, and a buyer who has read this far should not
+            have to make one more click and lose the thread. The button that used
+            to sit here is gone rather than kept beside it: two enquiry CTAs
+            stacked compete with each other, and the house rule is one primary
+            action per viewport.
+            Same component and same white card as the contact page - reused, not
+            restyled - so the contrast is the pairing that was already measured
+            rather than a new one invented for a green band. */}
+        <div className="network-cta-form">
+          <EnquiryForm/>
+        </div>
       </Reveal>
     </section>
     )}

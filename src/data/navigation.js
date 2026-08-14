@@ -32,7 +32,7 @@ export const navItems = [
     ]
   },
   { route: 'about', label: 'About us', group: 'explore' },
-  { route: 'network', label: 'GTM', group: 'company' },
+  { route: 'network', label: 'GTN', group: 'company' },
   { route: 'services', label: 'Services', group: 'explore' },
   // Team is deliberately absent. It is not merely unpublished - it is removed
   // from discovery entirely, so it appears in neither the header nor the
