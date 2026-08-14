@@ -217,16 +217,27 @@ body:has(.lightbox) .back-to-top{opacity:0;visibility:hidden;transform:scale(.9)
    hidden states and all three scale on hover. Writing `transform` here would
    overwrite those; `translate` is its own property and composes with them.
 
-   Desktop is untouched - there is room beside a 1180px container, and a control
-   that moves out from under the pointer is worse than one that sits still. */
-@media(max-width:960px){
-  .chat-button,.whatsapp-fab,.back-to-top{transition:translate .28s var(--ease),opacity .25s var(--ease),transform .25s var(--ease),background-color .25s var(--ease),box-shadow .25s var(--ease)}
-  /* calc(100% + inset) clears the button's own width AND the gutter it sits in,
-     so no edge peeks back over the side. */
-  body[data-corner-stack='away'] .chat-button,
-  body[data-corner-stack='away'] .whatsapp-fab,
-  body[data-corner-stack='away'] .back-to-top{translate:calc(100% + var(--chat-launcher-inset)) 0}
-}
+   This used to be capped at max-width:960px, on the reasoning that a desktop has
+   room beside a 1180px container and a control that moves out from under the
+   pointer is worse than one that sits still. That reasoning is sound, and it is
+   overridden here deliberately: the behaviour was asked for at every width. The
+   consequence to know about is that a desktop user reaching for WhatsApp mid
+   scroll-down now has to stop or scroll up first - which is the trade the cap
+   existed to avoid.
+
+   The JS hook already ran at every width; only this CSS was gated, so the
+   attribute was being set on desktop with nothing listening. */
+.chat-button,.whatsapp-fab,.back-to-top{transition:translate .28s var(--ease),opacity .25s var(--ease),transform .25s var(--ease),background-color .25s var(--ease),box-shadow .25s var(--ease)}
+/* Slide AND fade, per the brief. calc(100% + inset) clears the button's own
+   width and the gutter it sits in, so no edge peeks back over the side - and
+   because it is a translate off-screen rather than display:none, nothing
+   reflows and no horizontal scrollbar can appear.
+   pointer-events:none so an off-screen button cannot be tabbed to or tapped
+   through; visibility is left alone because it would kill the transition. */
+body[data-corner-stack='away'] .chat-button,
+body[data-corner-stack='away'] .whatsapp-fab,
+body[data-corner-stack='away'] .back-to-top{
+  translate:calc(100% + var(--chat-launcher-inset)) 0;opacity:0;pointer-events:none}
 
 /* ============================================================
    Floating action buttons: attention animation
