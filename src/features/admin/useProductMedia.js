@@ -9,15 +9,54 @@ export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024
 export const MAX_GALLERY_IMAGES = 6
 export const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
-export function preflight(file) {
+/* Video has its own caps, mirrored from VIDEO in media.constants.ts. They are
+   separate from the image ones on purpose: 8MB is a sane ceiling for a
+   photograph and is cleared by the first two seconds of a phone clip. */
+export const MAX_VIDEO_BYTES = 200 * 1024 * 1024
+export const ACCEPTED_VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/webm', 'video/x-msvideo']
+export const MAX_VIDEO_SECONDS = 60
+
+/**
+ * @param {File} file
+ * @param {{ allowVideo?: boolean }} opts
+ *
+ * Kind-aware. It used to be images-only, which was correct when it was written -
+ * it serves the PRODUCT media form, where video has never been allowed. The
+ * gallery then grew video support: its file input accepts video/mp4 and the
+ * server transcodes it, but this pre-check still rejected every clip in the
+ * browser, so the file never reached the endpoint that would have taken it.
+ * The picker offering a format the validator refuses is the bug.
+ *
+ * Callers opt IN to video. Product media keeps the images-only behaviour by
+ * default rather than inheriting a widening it never asked for.
+ */
+export function preflight(file, { allowVideo = false } = {}) {
   if (!file) return 'No file selected.'
+
+  // The browser derives type from the extension, so this is a courtesy check.
+  // The server reads magic bytes and is the authority for both kinds.
+  const isVideo = allowVideo && file.type && file.type.startsWith('video/')
+
+  if (isVideo) {
+    if (!ACCEPTED_VIDEO_TYPES.includes(file.type)) {
+      return 'Video must be MP4, MOV, WebM or AVI.'
+    }
+    if (file.size > MAX_VIDEO_BYTES) {
+      return `That clip is ${(file.size / 1024 / 1024).toFixed(0)} MB. The limit is ${MAX_VIDEO_BYTES / 1024 / 1024} MB.`
+    }
+    // Duration cannot be read here without decoding the file, so the server
+    // rejects anything over MAX_VIDEO_SECONDS after probing it. Saying so up
+    // front means a two-minute clip is not a surprise after the upload.
+    return null
+  }
+
   if (file.size > MAX_UPLOAD_BYTES) {
     return `That file is ${(file.size / 1024 / 1024).toFixed(1)} MB. The limit is ${MAX_UPLOAD_BYTES / 1024 / 1024} MB.`
   }
-  // A hint only. The browser's type comes from the file extension, which is why
-  // the server reads magic bytes and does not trust this.
   if (file.type && !ACCEPTED_TYPES.includes(file.type)) {
-    return 'Images only - JPEG, PNG or WebP.'
+    return allowVideo
+      ? 'Use a JPEG, PNG or WebP image, or an MP4, MOV, WebM or AVI video.'
+      : 'Images only - JPEG, PNG or WebP.'
   }
   return null
 }

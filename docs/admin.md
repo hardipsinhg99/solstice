@@ -590,13 +590,50 @@ be inventing content.
 and are now the **fallback** in `features/settings/useSiteSettings.js`. If the API is
 unreachable the footer still renders a real address instead of `mailto:undefined`.
 
-### The WhatsApp FAB hides itself
+### Placeholder values never render as a live control
 
-`WhatsAppFab` renders `null` unless the saved number passes the same digits-only test the
-server applies. The seeded value is the literal string `[WHATSAPP_NUMBER]`, so **the FAB
-does not appear until a real number is saved at `#admin/settings`.** That is deliberate:
-the previous behaviour handed every buyer a link that WhatsApp answers with "phone number
-shared via url is invalid".
+Seed data marks anything not yet real with a bracketed marker - `[WHATSAPP_NUMBER]`,
+`[PRE_FILLED_MESSAGE]`, `[CONFIRM]`, `[REWRITE]`, `[VERIFY]` - rather than leaving the
+field empty, so a plain emptiness check misses it. `src/lib/placeholder.js` exports
+`isPlaceholder(value)`, true for empty **and** for the bracketed convention, and it is
+mirrored server-side in `server/src/common/placeholder.ts`.
+
+**Every consumer of a contact value goes through a helper that applies it**, rather than
+interpolating the setting into an href:
+
+| Helper | Returns null when | Used by |
+|---|---|---|
+| `isUsableWhatsappNumber` | placeholder, or not 8-15 digits | the FAB |
+| `mailtoHref` | placeholder, or not a valid address | footer, contact page, enquiry-form fallback |
+| `telHref` | placeholder, or under 6 digits | footer, contact page |
+
+Placeholder detection and format validation are **separate checks and both must pass** -
+one answers "has anyone filled this in", the other "is what they typed usable". A control
+whose value fails either renders nothing at all. No dead link, no broken action: a button
+that produces an error on a buyer's phone is worse than an absent one, and the enquiry
+form is always one tap away regardless.
+
+The footer/contact rows additionally honour `contactEmailEnabled` / `contactPhoneEnabled`,
+which is a *third*, different question - see the schema note on `contactPhoneEnabled`.
+
+**Phase 1c claimed this and only delivered it for the FAB.** The guard was real and was
+never removed; it simply lived inside `WhatsAppFab` instead of in the value layer, so the
+footer, the contact page and the enquiry-form fallback each interpolated the raw setting
+and were never covered. Anything asserted "verified" in that phase is worth re-checking
+against every consumer, not just the one named in the report.
+
+### The dashboard surfaces what is still a placeholder
+
+`#admin` carries two banners in the same `.admin-danger-panel` language as the
+unverifiable-certification one: **which settings still hold a placeholder**, and **which
+live page sections are flagged `unresolvedCopy` / `unresolvedScope`**. Both read from
+`GET /api/dashboard` (`placeholderSettings`, `unresolvedPageSections`) and both disappear
+once the values are real. The section scan walks `publishedData`, not `draftData` - it
+reports what a buyer can read right now, not what an editor is still working on.
+
+`contactPhone` is deliberately excluded from the *emptiness* half of the settings check:
+"leave empty to show no phone number at all" is documented, legitimate configuration for
+that one field, so it is flagged only if it holds a literal bracket marker.
 
 ---
 

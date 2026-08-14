@@ -121,10 +121,12 @@ export default function AdminDashboardPage({ dashboard }) {
             {placeholderSettings.length} {placeholderSettings.length === 1 ? 'setting still contains' : 'settings still contain'} a placeholder value
           </h3>
           <p>Not yet configured, so the matching public control renders nothing until it is:</p>
-          <ul>
+          <ul className="admin-danger-list">
             {placeholderSettings.map((f) => <li key={f.field}>{f.label}</li>)}
           </ul>
-          <button className="admin-btn" onClick={() => goTo('admin/settings')}>Open settings</button>
+          <div className="admin-danger-actions">
+            <button className="admin-btn" onClick={() => goTo('admin/settings')}>Open settings</button>
+          </div>
         </div>
       )}
 
@@ -134,15 +136,18 @@ export default function AdminDashboardPage({ dashboard }) {
           <div className="admin-danger-panel" role="note">
             <h3>{count} live section{count === 1 ? '' : 's'} {count === 1 ? 'carries' : 'carry'} placeholder copy</h3>
             <p>Flagged draft or unverified wording that is currently live on the public site:</p>
-            <ul>
+            <ul className="admin-danger-list">
               {unresolvedPageSections.map((p) => (
-                <li key={p.slug}>
-                  <button className="admin-btn" onClick={() => goTo(`admin/page-${p.slug}`)}>
-                    {p.title} - {p.sections.join(', ')}
-                  </button>
-                </li>
+                <li key={p.slug}><strong>{p.title}</strong> - {p.sections.join(', ')}</li>
               ))}
             </ul>
+            <div className="admin-danger-actions">
+              {unresolvedPageSections.map((p) => (
+                <button key={p.slug} className="admin-btn" onClick={() => goTo(`admin/page-${p.slug}`)}>
+                  Open {p.title}
+                </button>
+              ))}
+            </div>
           </div>
         )
       })()}

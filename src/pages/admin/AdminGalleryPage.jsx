@@ -57,7 +57,8 @@ export default function AdminGalleryPage() {
 
   const pick = (file) => {
     if (!file) return
-    const problem = preflight(file)
+    // The gallery is the one surface that takes video; product media does not.
+    const problem = preflight(file, { allowVideo: true })
     if (problem) return setActionError(problem)
     if (images.length >= MAX_GALLERY_IMAGES) {
       return setActionError(`The gallery holds at most ${MAX_GALLERY_IMAGES} images.`)
@@ -130,7 +131,7 @@ export default function AdminGalleryPage() {
     nothing is. A always-on interval against an idle admin is a request every
     few seconds for no reason. */}
       <fieldset className="admin-fieldset admin-upload-panel">
-        <legend>Add an image</legend>
+        <legend>Add an image or video</legend>
 
         <label className="admin-field" htmlFor="gallery-alt">
           <span>Alt text</span>
@@ -146,13 +147,17 @@ export default function AdminGalleryPage() {
         </label>
 
         <label className="admin-field" htmlFor="gallery-file">
-          <span>Image file</span>
+          <span>Image or video file</span>
           <input ref={fileRef} id="gallery-file" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm,video/x-msvideo"
                  disabled={busy || images.length >= MAX_GALLERY_IMAGES}
                  onChange={(e) => pick(e.target.files?.[0])}/>
           <small className="admin-hint">
-            JPEG, PNG or WebP, up to 8 MB. Resized to 1600px, converted to WebP and stripped of EXIF on
-            upload - the same pipeline product images use.
+            <strong>Images</strong> - JPEG, PNG or WebP, up to 8 MB. Resized to 1600px, converted to
+            WebP and stripped of EXIF on upload, the same pipeline product images use.
+            <br/>
+            <strong>Video</strong> - MP4, MOV, WebM or AVI, up to 200 MB and 60 seconds. Downscaled
+            to 1080p, re-encoded to MP4, audio stripped. Transcoding runs one clip at a time, so a
+            long upload can sit at 100% for a minute while the server works.
           </small>
         </label>
 
