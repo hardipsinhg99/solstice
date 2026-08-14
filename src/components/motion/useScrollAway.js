@@ -24,7 +24,16 @@ import { useEffect } from 'react'
  * the stack simply moves instantly. Gating the behaviour itself would leave the
  * overlap in place for exactly the users least able to tolerate it.
  */
-const THRESHOLD_PX = 8      // ignore sub-pixel and rubber-band jitter
+/* ASYMMETRIC on purpose. Hiding is cheap to be wrong about - the stack comes
+   straight back - so 8px is enough to catch a deliberate downward scroll.
+   Showing is expensive to be wrong about: on a touch screen a thumb produces
+   small upward twitches constantly while reading, and at 8px every one of them
+   popped the buttons back over the text they had just moved out of. Coming back
+   therefore needs a movement large enough to read as intent.
+   Cumulative within a direction, not per-event: a slow deliberate scroll up
+   arrives as many small deltas and must still add up. */
+const HIDE_AFTER_PX = 8
+const SHOW_AFTER_PX = 56
 const ARM_AFTER_PX = 240    // never hide while still near the top of the page
 
 export function useScrollAway() {
@@ -32,22 +41,41 @@ export function useScrollAway() {
     const root = document.body
     let last = window.scrollY
     let frame = 0
+    let travel = 0        // distance covered in the current direction
+    let state = 'near'    // mirrors the attribute so it is only written on change
 
     const apply = () => {
       frame = 0
       const y = window.scrollY
       const delta = y - last
-      if (Math.abs(delta) < THRESHOLD_PX) return
-      // Scrolling down and clear of the top: stand aside. Anything else: return.
-      root.dataset.cornerStack = delta > 0 && y > ARM_AFTER_PX ? 'away' : 'near'
+      if (delta === 0) return
+
+      // Reset the run when the direction flips, so the distances measure travel
+      // in ONE direction rather than net displacement.
+      if ((delta > 0) !== (travel > 0)) travel = 0
+      travel += delta
       last = y
+
+      // Above the arming line there is nothing to stand aside from.
+      const next = y <= ARM_AFTER_PX ? 'near'
+        : travel >= HIDE_AFTER_PX ? 'away'
+          : travel <= -SHOW_AFTER_PX ? 'near'
+            : state
+
+      // The attribute used to be written on EVERY scroll frame - 19 writes in a
+      // single flick, each invalidating style for every rule that matches body.
+      // It now changes only when the state actually does.
+      if (next === state) return
+      state = next
+      travel = 0
+      root.dataset.cornerStack = state
     }
 
     // rAF-coalesced: scroll fires far more often than the compositor paints, and
     // this only ever writes one attribute.
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(apply) }
 
-    root.dataset.cornerStack = 'near'
+    root.dataset.cornerStack = state
     addEventListener('scroll', onScroll, { passive: true })
     return () => {
       removeEventListener('scroll', onScroll)
