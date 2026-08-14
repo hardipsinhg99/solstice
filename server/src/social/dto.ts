@@ -20,7 +20,11 @@ export type SocialPlatform = (typeof SOCIAL_PLATFORMS)[number];
  * Empty is allowed and means "not configured yet" - that is the seeded state,
  * and a row with no URL is never rendered.
  */
-export const SOCIAL_URL_PATTERN = /^https:\/\/[^\s<>"']+$/;
+/* The empty alternative is load-bearing. @IsOptional() only skips validation for
+   undefined and null, so an empty string - which is how the admin CLEARS a link,
+   and the state every row is seeded in - would otherwise fail the pattern and
+   400. Empty is a valid value here, not a missing one. */
+export const SOCIAL_URL_PATTERN = /^(|https:\/\/[^\s<>"']+)$/;
 
 export class UpsertSocialLinkDto {
   @IsIn(SOCIAL_PLATFORMS as unknown as string[], {
