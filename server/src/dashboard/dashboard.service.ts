@@ -1,6 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { EnquiryStatus, ProductStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { isBracketPlaceholder, isPlaceholder } from '../common/placeholder';
+
+/** Field name -> the label an operator sees on the settings form. */
+const SETTINGS_FIELDS: Array<{ key: 'whatsappNumber' | 'whatsappMessage' | 'contactEmail' | 'contactPhone'; label: string }> = [
+  { key: 'whatsappNumber', label: 'WhatsApp number' },
+  { key: 'whatsappMessage', label: 'WhatsApp pre-filled message' },
+  { key: 'contactEmail', label: 'Public enquiry email' },
+];
+
+/**
+ * Walks a section's JSON looking for the `unresolvedCopy` / `unresolvedScope`
+ * flags the page editor writes onto placeholder content (see
+ * sectionTypes.js). The shape differs per section type, so this recurses
+ * through arrays and objects rather than assuming a fixed structure.
+ */
+function findUnresolvedFlags(node: unknown, path: string[] = []): string[] {
+  if (Array.isArray(node)) {
+    return node.flatMap((item, i) => findUnresolvedFlags(item, [...path, String(i)]));
+  }
+  if (node && typeof node === 'object') {
+    const hits: string[] = [];
+    for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+      if ((key === 'unresolvedCopy' || key === 'unresolvedScope') && value === true) {
+        hits.push(path.join('.') || 'section');
+      } else {
+        hits.push(...findUnresolvedFlags(value, [...path, key]));
+      }
+    }
+    return hits;
+  }
+  return [];
+}
 
 @Injectable()
 export class DashboardService {
@@ -36,6 +68,48 @@ export class DashboardService {
       ]);
 
     return { totalProducts, publishedProducts, unverifiedProducts, openEnquiries, newEnquiries };
+  }
+
+  /**
+   * Settings fields still carrying the seeded bracket placeholder, or left
+   * empty where emptiness is not a valid configured state. contactPhone is
+   * deliberately excluded from the emptiness check - "Leave empty to show no
+   * phone number at all" is documented, legitimate configuration for that one
+   * field, so it is only flagged if it still holds a literal bracket marker.
+   */
+  async placeholderSettings() {
+    const settings = await this.prisma.siteSettings.findUnique({ where: { id: 'singleton' } });
+    if (!settings) return [];
+    const flagged = SETTINGS_FIELDS.filter(({ key }) => isPlaceholder(settings[key]));
+    if (isBracketPlaceholder(settings.contactPhone)) {
+      flagged.push({ key: 'contactPhone', label: 'Public phone number' });
+    }
+    return flagged.map(({ key, label }) => ({ field: key, label }));
+  }
+
+  /**
+   * Page sections still flagged unresolvedCopy/unresolvedScope in their LIVE
+   * (published) content - what a buyer can read right now, not the draft. One
+   * row per page, listing which sections, so the banner can link straight to
+   * the editor rather than making an admin hunt for it.
+   */
+  async unresolvedPageSections() {
+    const pages = await this.prisma.page.findMany({
+      select: {
+        slug: true,
+        title: true,
+        sections: { select: { key: true, publishedData: true } },
+      },
+    });
+    return pages
+      .map((page) => ({
+        slug: page.slug,
+        title: page.title,
+        sections: page.sections
+          .filter((s) => findUnresolvedFlags(s.publishedData).length > 0)
+          .map((s) => s.key),
+      }))
+      .filter((page) => page.sections.length > 0);
   }
 
   /**

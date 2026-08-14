@@ -15,12 +15,14 @@ export class DashboardController {
    */
   @Get()
   async summary() {
-    const [stats, notifications, activity] = await Promise.all([
+    const [stats, notifications, activity, placeholderSettings, unresolvedPageSections] = await Promise.all([
       this.dashboard.stats(),
       this.dashboard.notifications(),
       this.dashboard.activity(),
+      this.dashboard.placeholderSettings(),
+      this.dashboard.unresolvedPageSections(),
     ]);
-    return { stats, notifications, activity };
+    return { stats, notifications, activity, placeholderSettings, unresolvedPageSections };
   }
 
   /** The bell alone, for refreshing the badge without re-reading the page. */

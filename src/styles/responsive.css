@@ -143,8 +143,11 @@
   .footer-contact{min-width:0}
   .footer-social{gap:10px}
 
-  .home-hero{height:auto;min-height:790px}
-  .home-hero-inner{height:717px;padding-top:61px}
+  /* Trimmed from 790/717. Those numbers were set for the previous composite; the
+     current crop is 672px tall at source, and a hero that overshoots it is
+     upscaling a photograph to fill space the copy does not need. */
+  .home-hero{height:auto;min-height:660px}
+  .home-hero-inner{height:auto;min-height:660px;padding:96px 0 44px}
   .hero-copy{max-width:100%}
   .hero-copy h1{font-size:51px;max-width:330px}
   .hero-copy>p{font-size:13px;max-width:300px;margin-bottom:23px}
@@ -266,8 +269,8 @@
 
 @media(max-width:480px){
   .container{width:calc(100% - 32px)}
-  .home-hero{min-height:755px}
-  .home-hero-inner{height:683px;padding-top:48px}
+  .home-hero{min-height:600px}
+  .home-hero-inner{height:auto;min-height:600px;padding:84px 0 40px}
   .hero-copy h1{font-size:46px;letter-spacing:-2.8px;line-height:.94}
   .hero-copy>p{font-size:12px;line-height:1.62}
   .hero-buttons .button{padding:12px 13px;gap:9px}
@@ -462,6 +465,13 @@
    placement estimates stop being trustworthy. Above it the map is 733px+ and
    they hold. */
 @media(max-width:780px){
+  /* The narrow crop is 704x672; the ship and gantries sit right of its centre,
+     so a portrait frame anchored at 50% clips the bow. 60% keeps the full vessel
+     and the crane legs, which is the composition worth protecting at this size.
+     Anchored high for the same reason as desktop - the sky and crane tops carry
+     the sunset. */
+  .hero-poster{object-position:60% 34%}
+
   .worldmap-labels{display:none}
   /* Slightly larger pins to stay legible once the labels are gone. */
   .worldmap-pin{r:4}

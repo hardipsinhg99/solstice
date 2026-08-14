@@ -33,9 +33,13 @@ export default function AdminSettingsPage() {
           whatsappMessage: row.whatsappMessage ?? '',
           contactEmail: row.contactEmail ?? '',
           contactPhone: row.contactPhone ?? '',
-          // Only an explicit false turns it off, so a row saved before this
-          // column existed reads as enabled rather than silently hiding the
+          contactEmailLabel: row.contactEmailLabel ?? '',
+          contactPhoneLabel: row.contactPhoneLabel ?? '',
+          // Only an explicit false turns it off, so a row saved before these
+          // columns existed reads as enabled rather than silently hiding the
           // widget on the live site.
+          contactEmailEnabled: row.contactEmailEnabled !== false,
+          contactPhoneEnabled: row.contactPhoneEnabled !== false,
           translateEnabled: row.translateEnabled !== false
         })
         setUpdatedAt(row.updatedAt)

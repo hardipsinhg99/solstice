@@ -42,7 +42,9 @@ export function EnquiryForm() {
       {status === 'error' && (
         <p className="form-status form-error" role="alert">
           We could not send your enquiry. {errorDetail}{' '}
-          <a href={fallbackHref}>Email it to us instead</a> - your answers are already in the draft.
+          {fallbackHref
+            ? <><a href={fallbackHref}>Email it to us instead</a> - your answers are already in the draft.</>
+            : 'Please try again shortly.'}
         </p>
       )}
     </Reveal>

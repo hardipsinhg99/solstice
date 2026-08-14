@@ -3,7 +3,7 @@ import { Button } from '../ui/Button.jsx'
 import { navGroup } from '../../data/navigation.js'
 import { usePublishedPages } from '../../features/pages/index.js'
 import { useNavigate } from '../../app/navigation.js'
-import { useSiteSettings, telHref } from '../../features/settings/index.js'
+import { useSiteSettings, telHref, mailtoHref } from '../../features/settings/index.js'
 import { useSocialLinks, SOCIAL_LABELS } from '../../features/social/index.js'
 import { Icon } from '../ui/Icon.jsx'
 
@@ -11,8 +11,19 @@ export function Footer() {
   const { isPublished } = usePublishedPages()
 
   const navigate = useNavigate()
-  const { contactEmail, contactPhone } = useSiteSettings()
-    const tel = telHref(contactPhone)
+  const {
+    contactEmail, contactPhone, contactEmailEnabled, contactPhoneEnabled,
+    contactEmailLabel, contactPhoneLabel
+  } = useSiteSettings()
+  const mailto = mailtoHref(contactEmail)
+  const tel = telHref(contactPhone)
+  const social = useSocialLinks()
+
+  // Enabled is NOT the same question as "is the value usable" - disabled means
+  // the operator has a value and is choosing not to publish it. Both have to
+  // hold before a row renders; see the schema note on contactPhoneEnabled.
+  const showEmail = contactEmailEnabled !== false && Boolean(mailto)
+  const showPhone = contactPhoneEnabled !== false && Boolean(tel)
   return (
     <footer>
       <div className="footer-cta">
@@ -40,7 +51,7 @@ export function Footer() {
           <span className="footer-heading">Get in touch</span>
 
           {showEmail && (
-            <a className="footer-contact" href={`mailto:${contactEmail}`}>
+            <a className="footer-contact" href={mailto}>
               <Icon name="mail" size={16}/>
               <span>
                 {contactEmailLabel && <em className="footer-contact-label">{contactEmailLabel}</em>}

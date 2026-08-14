@@ -1,12 +1,33 @@
-// The hero composite. Three widths; the largest is the source's native 1672px -
-// anything above that would be upscaling, which invents detail and costs bytes
-// for nothing, so wide viewports scale the native file instead.
-export const HERO_IMAGE_SRC = '/hero/hero-1280.webp'
-export const HERO_IMAGE_SRCSET = [
-  '/hero/hero-960.webp 960w',
-  '/hero/hero-1280.webp 1280w',
-  '/hero/hero-1672.webp 1672w'
-].join(', ')
+// The hero photograph, art-directed into two crops rather than one file scaled
+// two ways.
+//
+// The source (public/home.png, 1584x672) is a 2.36:1 letterbox with a baked-in
+// SOLSTICE wordmark occupying its left third on a near-white wash. Neither fact
+// survives a single background-position:
+//
+//   - At 2.36:1, a portrait phone viewport showing it with `cover` displays
+//     roughly a fifth of its width. The ship - the whole point of the picture -
+//     lands outside the frame at most positions.
+//   - The wordmark sits exactly where the hero copy sits, under the darkest end
+//     of --hero-scrim. Overlaying them buries the wordmark under a 96%-opaque
+//     scrim AND collides it with the h1, and the header already carries the
+//     logo, so keeping it there would be duplicate branding that reads as a
+//     mistake.
+//
+// So the crops are taken at build time from the photographic portion: the wide
+// one keeps plane, cranes, yard, truck, ship and ocean; the narrow one is
+// squarer and centred on the ship and gantries, which is what survives a
+// portrait frame. Both drop the wordmark band.
+//
+// Regenerate with scripts/build-hero.mjs if the source changes.
+export const HERO_IMAGE_SRC = '/home-hero.webp'
+export const HERO_IMAGE_SRCSET = ''
+// Below this width the wide crop is the wrong picture, not merely a big one -
+// which is what makes this art direction (<picture> + media) rather than srcset.
+export const HERO_IMAGE_NARROW = '/home-hero-960.webp'
+export const HERO_NARROW_MEDIA = '(max-width: 780px)'
+export const HERO_IMAGE_W = 1024
+export const HERO_IMAGE_H = 672
 
 // Contact details moved into the SiteSettings row in Phase 1c and are edited at
 // #admin/settings. What is left here is the FALLBACK the site renders before the

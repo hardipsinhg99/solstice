@@ -63,7 +63,7 @@ export default function AdminDashboardPage({ dashboard }) {
     )
   }
 
-  const { stats, activity } = data
+  const { stats, activity, placeholderSettings = [], unresolvedPageSections = [] } = data
 
   return (
     <section className="admin-page">
@@ -110,6 +110,42 @@ export default function AdminDashboardPage({ dashboard }) {
           </p>
         </div>
       )}
+
+      {/* Same component, same reasoning: a bracketed placeholder that reaches a
+          public control is not a cosmetic gap either - it is the WhatsApp FAB
+          opening "[WHATSAPP_NUMBER]" on a buyer's phone. This is what makes
+          that silent long before a buyer ever finds it. */}
+      {placeholderSettings.length > 0 && (
+        <div className="admin-danger-panel" role="note">
+          <h3>
+            {placeholderSettings.length} {placeholderSettings.length === 1 ? 'setting still contains' : 'settings still contain'} a placeholder value
+          </h3>
+          <p>Not yet configured, so the matching public control renders nothing until it is:</p>
+          <ul>
+            {placeholderSettings.map((f) => <li key={f.field}>{f.label}</li>)}
+          </ul>
+          <button className="admin-btn" onClick={() => goTo('admin/settings')}>Open settings</button>
+        </div>
+      )}
+
+      {unresolvedPageSections.length > 0 && (() => {
+        const count = unresolvedPageSections.reduce((n, p) => n + p.sections.length, 0)
+        return (
+          <div className="admin-danger-panel" role="note">
+            <h3>{count} live section{count === 1 ? '' : 's'} {count === 1 ? 'carries' : 'carry'} placeholder copy</h3>
+            <p>Flagged draft or unverified wording that is currently live on the public site:</p>
+            <ul>
+              {unresolvedPageSections.map((p) => (
+                <li key={p.slug}>
+                  <button className="admin-btn" onClick={() => goTo(`admin/page-${p.slug}`)}>
+                    {p.title} - {p.sections.join(', ')}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      })()}
 
       <section aria-labelledby="activity-heading">
         <h3 className="admin-section-heading" id="activity-heading">Recent activity</h3>

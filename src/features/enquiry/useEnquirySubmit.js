@@ -1,15 +1,19 @@
 import { useState } from 'react'
-import { useSiteSettings } from '../settings/index.js'
+import { useSiteSettings, mailtoHref } from '../settings/index.js'
 
 // Failure fallback: never lose a lead to a dead endpoint - hand the buyer a
-// prefilled mail draft carrying everything they already typed.
+// prefilled mail draft carrying everything they already typed. Returns null
+// when the configured address is unset or a placeholder marker, so a failed
+// submit does not hand the buyer a second dead link on top of the first.
 function mailtoFallback(payload, address) {
+  const base = mailtoHref(address)
+  if (!base) return null
   const lines = [
     ['Name', payload.name], ['Email', payload.email],
     ['Phone', payload.phone], ['Message', payload.message]
   ].filter(([, value]) => value).map(([label, value]) => `${label}: ${value}`)
   const subject = `Enquiry from ${payload.name || 'the website'}`
-  return `mailto:${address}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`
+  return `${base}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`
 }
 
 export function useEnquirySubmit() {
@@ -20,7 +24,7 @@ export function useEnquirySubmit() {
 
   const [status, setStatus] = useState('idle') // idle | submitting | success | error
   const [errorDetail, setErrorDetail] = useState('')
-  const [fallbackHref, setFallbackHref] = useState(`mailto:${contactEmail}`)
+  const [fallbackHref, setFallbackHref] = useState(() => mailtoHref(contactEmail))
 
   // Both terminal states used to be permanent. After a success the button read
   // "Enquiry received" forever, so a buyer sending a second enquiry for another

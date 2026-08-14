@@ -1,4 +1,6 @@
-import { HERO_IMAGE_SRC, HERO_IMAGE_SRCSET } from '../../../lib/constants.js'
+import {
+  HERO_IMAGE_SRC, HERO_IMAGE_NARROW, HERO_NARROW_MEDIA, HERO_IMAGE_W, HERO_IMAGE_H
+} from '../../../lib/constants.js'
 
 // The hero visual: the branded logistics composite.
 //
@@ -24,17 +26,27 @@ import { HERO_IMAGE_SRC, HERO_IMAGE_SRCSET } from '../../../lib/constants.js'
 export function HeroMedia() {
   return (
     <div className="hero-media" aria-hidden="true">
-      <img
-        className="hero-poster"
-        src={HERO_IMAGE_SRC}
-        srcSet={HERO_IMAGE_SRCSET}
-        sizes="100vw"
-        alt=""
-        width="1672"
-        height="941"
-        fetchPriority="high"
-        decoding="async"
-      />
+      {/* <picture>, not srcset. srcset picks a SIZE of the same picture; below
+          780px this needs a different CROP, because the wide frame shows about a
+          fifth of its width in a portrait viewport and the ship falls outside it.
+          That is the definition of art direction, and <source media> is the
+          element for it.
+
+          fetchPriority stays on the <img>: it is the LCP candidate, and the
+          preload scanner reads <picture> natively - which is the whole reason
+          this was an <img> and not a CSS background in the first place. */}
+      <picture>
+        <source media={HERO_NARROW_MEDIA} srcSet={HERO_IMAGE_NARROW} width="704" height="672"/>
+        <img
+          className="hero-poster"
+          src={HERO_IMAGE_SRC}
+          alt=""
+          width={HERO_IMAGE_W}
+          height={HERO_IMAGE_H}
+          fetchPriority="high"
+          decoding="async"
+        />
+      </picture>
     </div>
   )
 }
