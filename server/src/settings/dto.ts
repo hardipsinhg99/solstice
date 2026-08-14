@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsOptional, IsString, Matches, MaxLength, MinLength, IsBoolean } from 'class-validator';
 
 /**
  * wa.me takes the number as DIGITS ONLY in international format - no leading +,
@@ -26,4 +26,8 @@ export class UpdateSettingsDto {
 
   @IsOptional() @IsEmail({}, { message: 'Contact email must be a valid address.' }) @MaxLength(200)
   contactEmail?: string;
+
+  /** Whether the header renders the Google Translate widget at all. */
+  @IsOptional() @IsBoolean()
+  translateEnabled?: boolean;
 }

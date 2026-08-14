@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { getSettings, updateSettings } from '../../features/admin/index.js'
 import { isUsableWhatsappNumber, whatsappHref } from '../../features/settings/index.js'
 
-const EMPTY = { whatsappNumber: '', whatsappMessage: '', contactEmail: '' }
+const EMPTY = { whatsappNumber: '', whatsappMessage: '', contactEmail: '', translateEnabled: true }
 
 /**
  * One record, so one form and one Save - no list, no create, no delete.
@@ -30,7 +30,11 @@ export default function AdminSettingsPage() {
         setForm({
           whatsappNumber: row.whatsappNumber ?? '',
           whatsappMessage: row.whatsappMessage ?? '',
-          contactEmail: row.contactEmail ?? ''
+          contactEmail: row.contactEmail ?? '',
+          // Only an explicit false turns it off, so a row saved before this
+          // column existed reads as enabled rather than silently hiding the
+          // widget on the live site.
+          translateEnabled: row.translateEnabled !== false
         })
         setUpdatedAt(row.updatedAt)
         setState('ready')
@@ -163,6 +167,26 @@ export default function AdminSettingsPage() {
         </div>
 
         {saveError && <p className="admin-error" role="alert">{saveError}</p>}
+        {/* A native checkbox: focusable, space-toggleable and announced as a
+            checkbox without any ARIA. The help text says what OFF actually does,
+            because "hidden" and "never loaded" are materially different for a
+            third-party script. */}
+        <label className="admin-field admin-field-toggle">
+          <span className="admin-toggle-row">
+            <input
+              type="checkbox"
+              checked={form.translateEnabled}
+              onChange={(e) => setForm((f) => ({ ...f, translateEnabled: e.target.checked }))}
+            />
+            <span>Show the language selector</span>
+          </span>
+          <span className="admin-hint">
+            Google Translate in the site header. Off removes it entirely - the
+            script is never loaded, so no request is made to translate.google.com
+            and no gap is left in the navbar.
+          </span>
+        </label>
+
       </form>
     </section>
   )

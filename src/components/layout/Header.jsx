@@ -3,13 +3,19 @@ import { Icon } from '../ui/Icon.jsx'
 import { Nav } from './Nav.jsx'
 import { useNavigate } from '../../app/navigation.js'
 import { useTranslateSlot } from './useTranslateSlot.js'
+import { useSiteSettings } from '../../features/settings/index.js'
 
 export function Header({ route, theme, setTheme }) {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const toggleRef = useRef(null)
-  const [langSlotRef, langReady] = useTranslateSlot()
+  // Fails OPEN: the fallback has translateEnabled true, so a settings fetch
+  // that has not landed - or fails - leaves the widget where it was rather than
+  // blinking it out of the header on every cold load.
+  const settings = useSiteSettings()
+  const translateOn = settings?.translateEnabled !== false
+  const [langSlotRef, langReady] = useTranslateSlot(translateOn)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10)
@@ -91,11 +97,11 @@ export function Header({ route, theme, setTheme }) {
               because anything React puts inside a translated subtree is what
               causes the removeChild crash. Collapses to zero width when the
               script is blocked, so no gap is left behind. */}
-          <div
+          {translateOn && <div
             ref={langSlotRef}
             className={langReady ? 'lang-slot is-ready' : 'lang-slot'}
             aria-hidden="true"
-          />
+            />}
           <button
             className="theme-toggle"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}

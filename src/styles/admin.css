@@ -381,3 +381,9 @@ td.admin-row-actions>*+*{margin-left:8px}
    border as well - the same rule the --danger tokens were introduced under. */
 .admin-section-card.is-hidden-section{border-left:3px solid var(--danger)}
 .admin-section-card.is-hidden-section .admin-section-head h3{color:var(--muted)}
+
+/* Settings toggle. Reuses the section-visibility control's language so the two
+   read as the same kind of switch rather than two bespoke ones. */
+.admin-field-toggle{display:grid;gap:6px}
+.admin-toggle-row{display:inline-flex;align-items:center;gap:10px;font-size:13px;color:var(--ink);cursor:pointer}
+.admin-toggle-row input{width:16px;height:16px;accent-color:var(--green-600);cursor:pointer}

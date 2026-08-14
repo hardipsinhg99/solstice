@@ -25,6 +25,7 @@ export class SettingsService {
         whatsappNumber: '',
         whatsappMessage: '',
         contactEmail: '',
+        translateEnabled: true,
       },
     });
   }
@@ -36,15 +37,19 @@ export class SettingsService {
       whatsappNumber: s.whatsappNumber,
       whatsappMessage: s.whatsappMessage,
       contactEmail: s.contactEmail,
+      translateEnabled: s.translateEnabled,
     };
   }
 
   async update(dto: UpdateSettingsDto, adminId: string): Promise<SiteSettings> {
     await this.get();
-    const data: Record<string, string> = {};
+    const data: Record<string, string | boolean> = {};
     if (dto.whatsappNumber !== undefined) data.whatsappNumber = sanitizePlainText(dto.whatsappNumber);
     if (dto.whatsappMessage !== undefined) data.whatsappMessage = sanitizePlainText(dto.whatsappMessage);
     if (dto.contactEmail !== undefined) data.contactEmail = sanitizePlainText(dto.contactEmail);
+    // Boolean, so it does not go through the text sanitizer - coerced instead,
+    // because the global ValidationPipe would reject a non-boolean anyway.
+    if (dto.translateEnabled !== undefined) data.translateEnabled = Boolean(dto.translateEnabled);
 
     const updated = await this.prisma.siteSettings.update({
       where: { id: SINGLETON },

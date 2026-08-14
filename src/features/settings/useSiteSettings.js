@@ -12,7 +12,11 @@ const KEY = 'settings'
 const FALLBACK = {
   whatsappNumber: WHATSAPP_NUMBER,
   whatsappMessage: WHATSAPP_MESSAGE,
-  contactEmail: ENQUIRY_EMAIL
+  contactEmail: ENQUIRY_EMAIL,
+  // Fails OPEN. A settings fetch that has not landed, or that failed, must not
+  // blink the language selector out of the header - the widget staying is the
+  // safe direction, and turning it off is a deliberate admin action.
+  translateEnabled: true
 }
 
 async function fetchSiteSettings() {

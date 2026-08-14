@@ -12,14 +12,44 @@ import { useEffect, useRef, useState } from 'react'
 // Returns [slotRef, ready]. `ready` stays false when the script is blocked, which
 // is common for this particular widget, and the header collapses the slot rather
 // than leaving a hole where the switcher would have been.
-export function useTranslateSlot() {
+const LOADER_ID = 'google-translate-loader'
+const LOADER_SRC = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
+
+/**
+ * Injects Google's loader once, and only when asked.
+ *
+ * index.html no longer carries the <script> tag. That is the difference between
+ * a real setting and a CSS hide: with the widget disabled the request to
+ * translate.google.com is never made, so there is no third-party script, no
+ * cookie and no widget to suppress afterwards.
+ *
+ * Idempotent by id - React may run this effect more than once, and two loaders
+ * would build two widgets into the same container.
+ */
+function ensureLoader() {
+  if (document.getElementById(LOADER_ID)) return
+  const el = document.createElement('script')
+  el.id = LOADER_ID
+  el.src = LOADER_SRC
+  el.async = true
+  document.head.appendChild(el)
+}
+
+export function useTranslateSlot(enabled = true) {
   const slotRef = useRef(null)
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
+    // Disabled: nothing is injected, nothing is positioned, and `ready` stays
+    // false so the header collapses the slot to zero width - the same path an
+    // ad blocker already produced, so there is no second layout to reason about.
+    if (!enabled) { setReady(false); return }
+
     const host = document.getElementById('google_translate_element')
     const slot = slotRef.current
     if (!host || !slot) return
+
+    ensureLoader()
 
     // SIMPLE layout renders a native <select>. Its presence is the only reliable
     // signal that the script both loaded and finished building the widget.
@@ -82,7 +112,7 @@ export function useTranslateSlot() {
       window.removeEventListener('resize', schedule)
       if (frame) cancelAnimationFrame(frame)
     }
-  }, [])
+  }, [enabled])
 
   return [slotRef, ready]
 }

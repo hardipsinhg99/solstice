@@ -133,7 +133,11 @@
         )
       }
     </script>
-    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+    <!-- The loader is deliberately NOT here. It is injected by
+         useTranslateSlot only when the admin's "Language selector" setting is
+         on, so switching it off means the request to translate.google.com is
+         never made rather than being made and then hidden. The callback above
+         stays defined either way, because Google calls it by name. -->
 
     <script type="module" src="/src/main.jsx"></script>
   </body>
