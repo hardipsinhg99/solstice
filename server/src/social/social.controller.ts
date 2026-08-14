@@ -27,21 +27,28 @@ export class SocialController {
     return this.social.findAll();
   }
 
+  /* @CurrentAdmin() takes NO argument. The decorator's signature is
+     (_data: unknown, ctx) and it ignores the first parameter entirely, always
+     returning the whole admin. Writing @CurrentAdmin('id') therefore looked
+     right, compiled, and handed Prisma the admin OBJECT where updatedById wants
+     a string - a PrismaClientValidationError surfacing as a 500 on every save.
+     Every other controller in this codebase destructures admin.id; these three
+     were the only ones that did not. */
   @Post('admin')
   @UseGuards(JwtAuthGuard)
-  upsert(@Body() dto: UpsertSocialLinkDto, @CurrentAdmin('id') adminId: string) {
-    return this.social.upsert(dto, adminId);
+  upsert(@Body() dto: UpsertSocialLinkDto, @CurrentAdmin() admin: { id: string }) {
+    return this.social.upsert(dto, admin.id);
   }
 
   @Patch('admin/reorder')
   @UseGuards(JwtAuthGuard)
-  reorder(@Body() dto: ReorderSocialDto, @CurrentAdmin('id') adminId: string) {
-    return this.social.reorder(dto, adminId);
+  reorder(@Body() dto: ReorderSocialDto, @CurrentAdmin() admin: { id: string }) {
+    return this.social.reorder(dto, admin.id);
   }
 
   @Delete('admin/:id')
   @UseGuards(JwtAuthGuard)
-  clear(@Param('id') id: string, @CurrentAdmin('id') adminId: string) {
-    return this.social.clear(id, adminId);
+  clear(@Param('id') id: string, @CurrentAdmin() admin: { id: string }) {
+    return this.social.clear(id, admin.id);
   }
 }

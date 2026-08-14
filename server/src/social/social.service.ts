@@ -39,6 +39,12 @@ export class SocialService {
    * double-clicking.
    */
   async upsert(dto: UpsertSocialLinkDto, adminId: string) {
+    // Guards the shape, not the auth - JwtAuthGuard already did that. This is
+    // what turns "somebody passed the wrong thing" into a readable 400 instead
+    // of a Prisma validation error surfacing as a 500.
+    if (typeof adminId !== 'string' || !adminId) {
+      throw new BadRequestException('Could not identify the signed-in admin. Sign out and back in.');
+    }
     const enabling = dto.enabled === true;
     const url = dto.url?.trim() ?? undefined;
 
