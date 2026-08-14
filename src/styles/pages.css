@@ -1053,3 +1053,17 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
   .certifications-marquee{overflow-x:auto}
   .certifications-run[aria-hidden]{display:none}
 }
+
+/* Gallery video tiles. The play badge sits ON the existing numbered tile rather
+   than replacing it - one tile component, one visual system, a kind badge. */
+.gallery-play{position:absolute;inset:0;z-index:2;display:grid;place-items:center;pointer-events:none}
+.gallery-play svg{width:52px;height:52px;padding:14px;border-radius:50%;color:var(--deep);
+  background:color-mix(in srgb,#fff 88%,transparent);box-shadow:var(--elev-2);
+  transition:transform .25s var(--ease),background .25s var(--ease)}
+.gallery-tile:hover .gallery-play svg,
+.gallery-tile:focus-visible .gallery-play svg{transform:scale(1.08);background:#fff}
+.gallery-video{display:block;max-width:100%;max-height:82vh;background:#000}
+@media(prefers-reduced-motion:reduce){
+  .gallery-tile:hover .gallery-play svg,
+  .gallery-tile:focus-visible .gallery-play svg{transform:none}
+}

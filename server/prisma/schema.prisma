@@ -38,12 +38,12 @@ enum Incoterm {
 /// below are captured from day one so roles can be introduced later without a
 /// data migration - backfilling who-did-what is the expensive part of RBAC.
 model Admin {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String    @id @default(cuid())
+  email        String    @unique
   passwordHash String
   name         String
   lastLoginAt  DateTime?
-  createdAt    DateTime @default(now())
+  createdAt    DateTime  @default(now())
 
   products       Product[]
   varieties      ProductVariety[]
@@ -65,6 +65,24 @@ model Admin {
 /// we only reference - the six seeded Unsplash photographs - and StorageService
 /// must never try to delete them. Adding S3 later is one more value here plus
 /// one more StorageService implementation, not a schema change.
+/// A MediaAsset is now either an image or a video. IMAGE is the default so every
+/// existing row - products, team photos, gallery - keeps its meaning without a
+/// backfill.
+enum MediaKind {
+  IMAGE
+  VIDEO
+}
+
+/// Transcoding is asynchronous, so an asset has a lifecycle. Images are created
+/// READY because sharp finishes inside the request; only video passes through
+/// QUEUED and PROCESSING.
+enum MediaStatus {
+  QUEUED
+  PROCESSING
+  READY
+  FAILED
+}
+
 enum StorageDriver {
   LOCAL
   EXTERNAL
@@ -91,8 +109,24 @@ model MediaAsset {
   /// First-class, not an afterthought: the public <img alt=""> renders this.
   altText     String?
 
+  kind          MediaKind   @default(IMAGE)
+  status        MediaStatus @default(READY)
+  /// Why a transcode failed, shown in the admin. Never rendered publicly.
+  failureReason String?
+
+  /// Video only. Source duration in whole seconds, read from ffprobe.
+  durationSeconds Int?
+
+  /// Video only, and deliberately a MediaAsset rather than a URL column: the
+  /// poster is a normal image that went through the exact same sharp/WebP
+  /// pipeline every other image uses, so it inherits the resize ladder, the
+  /// EXIF stripping and the storage abstraction for free.
+  posterAsset   MediaAsset?  @relation("VideoPoster", fields: [posterAssetId], references: [id], onDelete: SetNull)
+  posterAssetId String?
+  posterFor     MediaAsset[] @relation("VideoPoster")
+
   uploadedById String?
-  uploadedBy   Admin?  @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  uploadedBy   Admin?   @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
   createdAt    DateTime @default(now())
 
   primaryFor   Product[]      @relation("ProductPrimaryImage")
@@ -128,16 +162,16 @@ model Product {
   // Phase 1b; primaryImageId is nullable for the same reason the old `image`
   // column was - the two import placeholder records genuinely have no picture.
   type        String
-  description String  @db.Text
+  description String @db.Text
 
   /// Replaces the old `image String?`. The six seeded Unsplash URLs were migrated
   /// into MediaAsset rows with driver EXTERNAL, so nothing was lost.
   primaryImageId String?
-  primaryImage   MediaAsset? @relation("ProductPrimaryImage", fields: [primaryImageId], references: [id], onDelete: SetNull)
+  primaryImage   MediaAsset?    @relation("ProductPrimaryImage", fields: [primaryImageId], references: [id], onDelete: SetNull)
   gallery        ProductMedia[]
-  season      String
-  origin      String
-  packaging   String
+  season         String
+  origin         String
+  packaging      String
 
   /// Marks the "awaiting details" import slots. Kept because ProductCard renders
   /// a distinct placeholder card off it; dropping the flag would silently turn
@@ -147,14 +181,14 @@ model Product {
   // ── Aspirational commercial spec ────────────────────────────────────────────
   // Every one of these is nullable / empty-by-default. No product has any of
   // them yet, and requiring data nobody has would block product creation.
-  hsCode         String?
-  incoterms      Incoterm[]
-  moqValue       Decimal?   @db.Decimal(10, 2)
-  moqUnit        String?
-  shelfLifeDays  Int?
-  storageTempC   String?
+  hsCode          String?
+  incoterms       Incoterm[]
+  moqValue        Decimal?   @db.Decimal(10, 2)
+  moqUnit         String?
+  shelfLifeDays   Int?
+  storageTempC    String?
   storageHumidity String?
-  portsOfLoading String[]
+  portsOfLoading  String[]
 
   seoTitle       String?
   seoDescription String?
@@ -319,7 +353,7 @@ model PageSection {
 /// with a stock photograph of a stranger. website-strategy.md 2.5 calls that a
 /// falsifiable trust claim, and it is the longest-standing flag in the audit.
 model TeamMember {
-  id   String @id @default(cuid())
+  id   String  @id @default(cuid())
   name String
   role String
   /// Rich text (TipTap HTML), sanitized server-side against an explicit tag

@@ -1,5 +1,7 @@
+import { MediaKind, MediaStatus } from '@prisma/client';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { detectVideoContainer } from '../media/media.constants';
 import { MediaService } from '../media/media.service';
 import { sanitizeOptional } from '../common/sanitize';
 
@@ -8,7 +10,9 @@ import { sanitizeOptional } from '../common/sanitize';
  *  gallery is the one place a larger set is the point. */
 export const MAX_GALLERY_IMAGES = 24;
 
-const WITH_ASSET = { mediaAsset: true } as const;
+// posterAsset comes along for video rows. One extra join rather than a second
+// query per tile, and null for every image row.
+const WITH_ASSET = { mediaAsset: { include: { posterAsset: true } } } as const;
 
 @Injectable()
 export class GalleryService {
@@ -21,13 +25,24 @@ export class GalleryService {
   /** Public read: published rows only, and the filter lives here, never in a query param. */
   async findPublic() {
     const rows = await this.prisma.galleryImage.findMany({
-      where: { published: true },
+      where: {
+        published: true,
+        // A video that is still transcoding, or that failed, must never reach
+        // the public grid - it has no url yet. Images are created READY, so
+        // this excludes nothing that used to be included.
+        mediaAsset: { status: MediaStatus.READY },
+      },
       include: WITH_ASSET,
       orderBy: { order: 'asc' },
     });
     return rows.map((row) => ({
       id: row.id,
+      kind: row.mediaAsset.kind === MediaKind.VIDEO ? 'video' : 'image',
       url: row.mediaAsset.url,
+      // Video only. The public component branches on `kind`, and this is the
+      // still it shows before playback.
+      posterUrl: row.mediaAsset.posterAsset?.url ?? null,
+      durationSeconds: row.mediaAsset.durationSeconds ?? null,
       // Emitted only when real. The migrated Unsplash rows have 0/0 because
       // nobody measured them, and a zero attribute is worse than none.
       width: row.mediaAsset.width || null,
@@ -48,10 +63,15 @@ export class GalleryService {
   ) {
     const count = await this.prisma.galleryImage.count();
     if (count >= MAX_GALLERY_IMAGES) {
-      throw new BadRequestException(`The gallery holds at most ${MAX_GALLERY_IMAGES} images.`);
+      throw new BadRequestException(`The gallery holds at most ${MAX_GALLERY_IMAGES} items.`);
     }
 
-    const asset = await this.media.createAsset(file, body.altText ?? null, adminId);
+    // One control, two pipelines. The container sniff decides which - not the
+    // filename, and not the browser-supplied mimetype, both of which an
+    // uploader controls.
+    const asset = detectVideoContainer(file.buffer)
+      ? await this.media.createVideoAsset(file, body.altText ?? null, adminId)
+      : await this.media.createAsset(file, body.altText ?? null, adminId);
     const created = await this.prisma.galleryImage.create({
       data: {
         mediaAssetId: asset.id,

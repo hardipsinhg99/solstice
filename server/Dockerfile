@@ -71,8 +71,24 @@ WORKDIR /app
 # image the probe fails and it silently defaults to openssl-1.1.x - the wrong
 # engine for bookworm, which ships 3.x. Observed on the first real deploy as:
 #   prisma:warn Prisma failed to detect the libssl/openssl version to use
+# It warned rather than failed, which is the kind of thing that works in testing
+# and breaks under load, so it is installed explicitly.
+#
+# ffmpeg is the one genuinely new native dependency in this project, and it is
+# deliberately installed ONLY in the runtime stage - the builder never needs it,
+# and every megabyte there is a megabyte in the layer cache for nothing.
+#
+# It is a large C codebase with a real CVE history that will run directly on
+# user-supplied binary data, so the mitigations live around it rather than in
+# it: it is invoked via execFile with an argument array and no shell, under a
+# hard SIGKILL timeout, one job at a time, with -threads 1, as the non-root
+# `node` user established below. Debian's package is the security-supported
+# build, which is why this is apt rather than a static download.
+#
+# --no-install-recommends matters here: the recommends chain pulls in x11 and
+# audio libraries this container has no use for.
 RUN apt-get update \
- && apt-get install -y --no-install-recommends tini openssl ca-certificates \
+ && apt-get install -y --no-install-recommends tini openssl ca-certificates ffmpeg \
  && rm -rf /var/lib/apt/lists/*
 
 COPY server/package.json server/package-lock.json ./

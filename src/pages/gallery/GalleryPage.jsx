@@ -74,15 +74,29 @@ export default function GalleryPage() {
             className={`gallery-tile tile-${index + 1}`}
             onClick={(event) => open(index, event)}
             aria-label={image.caption
-              ? `Open image ${index + 1} of ${images.length}: ${image.caption}`
+              ? `Open ${image.kind === 'video' ? 'video' : 'image'} ${index + 1} of ${images.length}: ${image.caption}`
               : `Open image ${index + 1} of ${images.length}`}
           >
             {/* Was a CSS background-image, which no browser can lazy-load or
                 size-negotiate: all six full-width photographs were fetched
                 eagerly on page load. */}
+            {image.kind === 'video' && (
+              /* aria-hidden: the button's own aria-label already says it opens
+                 a video, so announcing the icon would repeat it. The overlay is
+                 decoration on a control that is already keyboard-reachable -
+                 the tile is a <button>, so nothing new is needed for that. */
+              <span className="gallery-play" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
+                  <path d="M8 5v14l11-7z" fill="currentColor"/>
+                </svg>
+              </span>
+            )}
             <img
-              src={unsplashAt(image.url, 800)}
-              srcSet={unsplashSrcSet(image.url)}
+              // A video tile shows its poster. unsplashAt/srcSet are skipped for
+              // it: those rewrite a remote Unsplash URL, and a poster is a local
+              // asset the pipeline already sized.
+              src={image.kind === 'video' ? (image.posterUrl || image.url) : unsplashAt(image.url, 800)}
+              srcSet={image.kind === 'video' ? undefined : unsplashSrcSet(image.url)}
               sizes="(max-width: 780px) 50vw, 33vw"
               {...(image.width && image.height ? { width: image.width, height: image.height } : {})}
               // The tile is inside a button that already announces the image and
@@ -120,13 +134,30 @@ export default function GalleryPage() {
         <button className="lightbox-close" onClick={close} aria-label="Close"><Icon name="close" size={20}/></button>
         <button className="lightbox-nav prev" onClick={event => { event.stopPropagation(); setActive(a => step(a, -1)) }} aria-label="Previous image"><Icon name="arrow" size={20}/></button>
         <figure className="lightbox-figure" onClick={event => event.stopPropagation()}>
-          <img
-            src={unsplashAt(images[active].url, 1400)}
-            // The real description now, where there is one. The generic
-            // "Fresh produce gallery 3" it used to carry told a screen-reader
-            // user nothing they could not already work out from the dialog label.
-            alt={images[active].alt || `Fresh produce gallery ${active + 1}`}
-          />
+          {images[active].kind === 'video' ? (
+            /* No autoplay, deliberately - the site's prefers-reduced-motion
+               discipline applied consistently, and simply correct for a gallery
+               a buyer may open on mobile data. preload="metadata" fetches the
+               header for the duration and nothing more. Native controls are
+               keyboard operable with no work from us. */
+            <video
+              src={images[active].url}
+              poster={images[active].posterUrl || undefined}
+              controls
+              playsInline
+              preload="metadata"
+              className="gallery-video"
+              aria-label={images[active].caption || `Gallery video ${active + 1}`}
+            />
+          ) : (
+            <img
+              src={unsplashAt(images[active].url, 1400)}
+              // The real description now, where there is one. The generic
+              // "Fresh produce gallery 3" it used to carry told a screen-reader
+              // user nothing they could not already work out from the dialog label.
+              alt={images[active].alt || `Fresh produce gallery ${active + 1}`}
+            />
+          )}
           {images[active].caption && <figcaption>{images[active].caption}</figcaption>}
         </figure>
         <button className="lightbox-nav next" onClick={event => { event.stopPropagation(); setActive(a => step(a, 1)) }} aria-label="Next image"><Icon name="arrow" size={20}/></button>

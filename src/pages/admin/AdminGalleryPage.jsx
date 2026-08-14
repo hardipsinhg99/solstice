@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { DangerConfirm } from '../../components/admin/DangerConfirm.jsx'
 import { preflight } from '../../features/admin/useProductMedia.js'
 import {
@@ -20,6 +20,18 @@ const bytes = (n) => (n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : 
  */
 export default function AdminGalleryPage() {
   const { images, status, error, reload, setImages } = useAdminGallery()
+
+  // Polls ONLY while something is actually transcoding, and stops as soon as
+  // nothing is. A permanent interval against an idle admin is a request every
+  // few seconds for no reason.
+  const transcoding = (images ?? []).some(
+    (g) => g.mediaAsset?.kind === 'VIDEO' && (g.mediaAsset.status === 'QUEUED' || g.mediaAsset.status === 'PROCESSING')
+  )
+  useEffect(() => {
+    if (!transcoding) return
+    const id = setInterval(() => { reload() }, 4000)
+    return () => clearInterval(id)
+  }, [transcoding, reload])
   const [busy, setBusy] = useState(false)
   const [progress, setProgress] = useState(0)
   const [actionError, setActionError] = useState('')
@@ -114,6 +126,9 @@ export default function AdminGalleryPage() {
         </div>
       )}
 
+      {/* Polls only while something is actually transcoding, and stops the moment
+    nothing is. A always-on interval against an idle admin is a request every
+    few seconds for no reason. */}
       <fieldset className="admin-fieldset admin-upload-panel">
         <legend>Add an image</legend>
 
@@ -132,7 +147,7 @@ export default function AdminGalleryPage() {
 
         <label className="admin-field" htmlFor="gallery-file">
           <span>Image file</span>
-          <input ref={fileRef} id="gallery-file" type="file" accept="image/jpeg,image/png,image/webp"
+          <input ref={fileRef} id="gallery-file" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm,video/x-msvideo"
                  disabled={busy || images.length >= MAX_GALLERY_IMAGES}
                  onChange={(e) => pick(e.target.files?.[0])}/>
           <small className="admin-hint">
@@ -183,9 +198,24 @@ export default function AdminGalleryPage() {
               onDrop={() => onDrop(index)}
               onDragEnd={() => { setDragIndex(null); setOverIndex(null) }}
             >
-              <img src={row.mediaAsset.url} alt={row.mediaAsset.altText || ''}/>
+              {/* Same tile, kind-aware source. A video shows its poster; while
+                  it is still transcoding there is no poster yet, so the slot
+                  carries the status instead of a broken image. */}
+              {row.mediaAsset.kind === 'VIDEO' && row.mediaAsset.status !== 'READY' ? (
+                <span className={`admin-media-pending is-${String(row.mediaAsset.status).toLowerCase()}`}>
+                  {row.mediaAsset.status === 'FAILED' ? 'Failed' : 'Processing…'}
+                </span>
+              ) : (
+                <img src={row.mediaAsset.posterAsset?.url || row.mediaAsset.url}
+                     alt={row.mediaAsset.altText || ''}/>
+              )}
+              {row.mediaAsset.kind === 'VIDEO' && (
+                <span className="admin-media-kind" aria-label="Video">▶</span>
+              )}
               <span className="admin-meta">
-                {row.mediaAsset.width && row.mediaAsset.height
+                {row.mediaAsset.kind === 'VIDEO' && row.mediaAsset.durationSeconds
+                  ? `${row.mediaAsset.width}×${row.mediaAsset.height} · ${row.mediaAsset.durationSeconds}s · ${bytes(row.mediaAsset.sizeBytes)}`
+                  : row.mediaAsset.width && row.mediaAsset.height
                   ? `${row.mediaAsset.width}×${row.mediaAsset.height} · ${bytes(row.mediaAsset.sizeBytes)}`
                   : 'External URL - not stored by this site'}
               </span>
@@ -257,7 +287,8 @@ function CaptionEditor({ row, onSaved }) {
         {state === 'saving' && 'Saving…'}
         {state === 'saved' && 'Saved'}
         {state === 'error' && 'Could not save the caption'}
-        {state === 'idle' && !row.mediaAsset.altText && 'This image still has no alt text.'}
+        {state === 'idle' && !row.mediaAsset.altText && row.mediaAsset.kind !== 'VIDEO' && 'This image still has no alt text.'}
+        {state === 'idle' && row.mediaAsset.status === 'FAILED' && (row.mediaAsset.failureReason || 'Transcode failed.')}
       </small>
     </label>
   )

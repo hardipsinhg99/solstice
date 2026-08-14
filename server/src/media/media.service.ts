@@ -1,11 +1,12 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { MediaAsset, StorageDriver } from '@prisma/client';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { MediaAsset, StorageDriver, MediaKind, MediaStatus } from '@prisma/client';
 import sharp from 'sharp';
 import type { OutputInfo } from 'sharp';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
 import { sanitizeOptional } from '../common/sanitize';
-import { MEDIA, detectImageType } from './media.constants';
+import { MEDIA, VIDEO, detectImageType, detectVideoContainer } from './media.constants';
+import { VideoService } from './video.service';
 
 export interface ProcessedImage {
   buffer: Buffer;
@@ -17,9 +18,11 @@ export interface ProcessedImage {
 
 @Injectable()
 export class MediaService {
+  private readonly logger = new Logger(MediaService.name);
   // No `fs` import, no path construction: every byte that reaches disk goes
   // through StorageService. See acceptance check 10.
-  constructor(private prisma: PrismaService, private storage: StorageService) {}
+  constructor(private readonly video: VideoService,
+    private prisma: PrismaService, private storage: StorageService) {}
 
   /**
    * Content-based validation. The claimed mimetype and the filename extension
@@ -120,6 +123,139 @@ export class MediaService {
         uploadedById: adminId,
       },
     });
+  }
+
+  /**
+   * Video upload. Returns IMMEDIATELY with a QUEUED asset; the transcode runs
+   * after the response.
+   *
+   * Synchronous transcoding was never an option: a 60s clip takes minutes on
+   * two shared cores, which is far past any sane request timeout, and raising
+   * the global timeout to accommodate it would weaken every other endpoint. The
+   * admin polls `status` instead.
+   */
+  async createVideoAsset(
+    file: { buffer: Buffer; originalname: string; size: number },
+    altText: string | null,
+    adminId: string,
+  ): Promise<MediaAsset> {
+    // Size first, before a byte is parsed - the cheapest possible rejection.
+    if (file.size > VIDEO.MAX_UPLOAD_BYTES) {
+      throw new BadRequestException(
+        `That video is ${(file.size / 1024 / 1024).toFixed(0)} MB. The limit is ${VIDEO.MAX_UPLOAD_BYTES / 1024 / 1024} MB.`,
+      );
+    }
+
+    // ffprobe BEFORE anything else touches the file. Throws on a non-video, on
+    // a missing video track, and on anything over the duration cap - so the
+    // admin gets a real error synchronously rather than a job that fails later.
+    const probe = await this.video.probe(file.buffer);
+
+    const asset = await this.prisma.mediaAsset.create({
+      data: {
+        filename: sanitizeOptional(file.originalname) ?? 'upload',
+        // Nothing is stored yet. These are placeholders the transcode replaces,
+        // and status QUEUED is what tells every consumer not to render it.
+        storagePath: '',
+        driver: StorageDriver.LOCAL,
+        url: '',
+        mimeType: VIDEO.OUTPUT_MIME,
+        width: probe.width,
+        height: probe.height,
+        sizeBytes: file.size,
+        durationSeconds: probe.durationSeconds,
+        kind: MediaKind.VIDEO,
+        status: MediaStatus.QUEUED,
+        altText: sanitizeOptional(altText),
+        uploadedById: adminId,
+      },
+    });
+
+    // Background, deliberately un-awaited. setImmediate rather than a queue
+    // library: at this volume a DB status flag and a promise chain in
+    // VideoService are the whole requirement, and a queue would be a second
+    // piece of infrastructure to run on a box that has no room for one.
+    setImmediate(() => {
+      void this.runTranscode(asset.id, file.buffer, probe, adminId);
+    });
+
+    return asset;
+  }
+
+  /**
+   * The background half. Owns its own error handling completely - nothing
+   * awaits it, so an unhandled rejection here would be an unhandled rejection
+   * in the process.
+   */
+  private async runTranscode(
+    assetId: string,
+    buffer: Buffer,
+    probe: { durationSeconds: number; width: number; height: number },
+    adminId: string,
+  ): Promise<void> {
+    try {
+      await this.prisma.mediaAsset.update({
+        where: { id: assetId },
+        data: { status: MediaStatus.PROCESSING },
+      });
+
+      const result = await this.video.transcode(buffer, probe);
+
+      // THE REUSE THAT MATTERS: the poster frame is a plain Buffer, so it goes
+      // through the same process() the whole site's imagery uses - same resize
+      // ladder, same WebP quality walk, same EXIF stripping. No second image
+      // path exists for video posters.
+      const processedPoster = await this.process(result.posterFrame);
+      const storedPoster = await this.storage.save(processedPoster.buffer, {
+        extension: MEDIA.OUTPUT_FORMAT,
+        contentType: MEDIA.OUTPUT_MIME,
+      });
+      const posterAsset = await this.prisma.mediaAsset.create({
+        data: {
+          filename: 'poster',
+          storagePath: storedPoster.storagePath,
+          driver: StorageDriver.LOCAL,
+          url: storedPoster.url,
+          mimeType: MEDIA.OUTPUT_MIME,
+          width: processedPoster.width,
+          height: processedPoster.height,
+          sizeBytes: processedPoster.sizeBytes,
+          kind: MediaKind.IMAGE,
+          status: MediaStatus.READY,
+          uploadedById: adminId,
+        },
+      });
+
+      const storedVideo = await this.storage.save(result.buffer, {
+        extension: VIDEO.OUTPUT_EXT,
+        contentType: VIDEO.OUTPUT_MIME,
+      });
+
+      await this.prisma.mediaAsset.update({
+        where: { id: assetId },
+        data: {
+          storagePath: storedVideo.storagePath,
+          url: storedVideo.url,
+          sizeBytes: result.buffer.length,
+          width: result.width,
+          height: result.height,
+          posterAssetId: posterAsset.id,
+          status: MediaStatus.READY,
+          failureReason: null,
+        },
+      });
+      this.logger.log(`Transcoded ${assetId}: ${(result.buffer.length / 1024 / 1024).toFixed(1)}MB`);
+    } catch (err) {
+      const reason = (err as Error)?.message?.slice(0, 300) ?? 'Transcode failed';
+      this.logger.error(`Transcode failed for ${assetId}: ${reason}`);
+      // FAILED, not deleted. The row is what the admin polls, so it has to
+      // survive to carry the reason; the orphaned-file question is handled by
+      // VideoService, which removes its temp directory on every exit path, and
+      // by the fact that nothing was written to storage before this point.
+      await this.prisma.mediaAsset
+        .update({ where: { id: assetId }, data: { status: MediaStatus.FAILED, failureReason: reason } })
+        .catch(() => undefined);
+    }
   }
 
   async updateAltText(id: string, altText: string | null): Promise<MediaAsset> {

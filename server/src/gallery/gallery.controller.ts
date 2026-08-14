@@ -6,13 +6,20 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentAdmin } from '../auth/current-admin.decorator';
 import { GalleryService } from './gallery.service';
-import { MEDIA } from '../media/media.constants';
+import { MEDIA, VIDEO } from '../media/media.constants';
 
 type Upload = { buffer: Buffer; originalname: string; size: number };
 
 // The same interceptor configuration MediaController uses - one file, the same
 // byte ceiling. MediaService re-checks the length independently.
-const UPLOAD = FileInterceptor('file', { limits: { fileSize: MEDIA.MAX_UPLOAD_BYTES, files: 1 } });
+// The interceptor takes the LARGER of the two caps, because it cannot know
+// which pipeline the file is headed for. The real per-kind limit is enforced in
+// MediaService - images still get MEDIA.MAX_UPLOAD_BYTES, video gets
+// VIDEO.MAX_UPLOAD_BYTES - so this widening does not let an oversized image
+// through, it just lets our own error message be the one the admin sees.
+const UPLOAD = FileInterceptor('file', {
+  limits: { fileSize: Math.max(MEDIA.MAX_UPLOAD_BYTES, VIDEO.MAX_UPLOAD_BYTES), files: 1 },
+});
 
 /** No `fs`, no path construction, no second upload pipeline. */
 @Controller('gallery')
