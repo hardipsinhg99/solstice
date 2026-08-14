@@ -483,3 +483,50 @@
   .network-flow-label{margin-left:28px;font-size:11.5px}
   .network-trust{padding-right:72px}
 }
+
+/* ── About hero: dedicated mobile composition ────────────────────────────────
+   Not a scaled-down desktop. On a wide screen the copy sits BESIDE the vessel;
+   on a phone it sits OVER it, which is a different problem and gets different
+   rules. */
+@media(max-width:960px){
+  .about-hero-copy{max-width:none}
+  .about-hero-points{max-width:none;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+  /* Portrait crops the sides away first; 72% holds the globe and ship. */
+  .about-hero-banner img{--hero-focus:72% 50%}
+  /* Vertical gradient - a left-weighted one assumes a wide frame, and here the
+     words are on top of the picture rather than next to it. */
+  .about-hero:before{background:linear-gradient(180deg,
+    color-mix(in srgb,var(--deep) 90%,transparent) 0%,
+    color-mix(in srgb,var(--deep) 74%,transparent) 46%,
+    color-mix(in srgb,var(--deep) 94%,transparent) 100%)}
+}
+
+@media(max-width:780px){
+  /* Height follows content. A viewport-height hero on a phone pushes the value
+     points - the trust signal - entirely below the fold. */
+  .about-hero{min-height:auto;padding:calc(70px + clamp(26px,7vw,44px)) 0 clamp(40px,9vw,56px)}
+  .about-hero h1{font-size:clamp(31px,8.4vw,42px);letter-spacing:-1.1px;line-height:1.08;
+    /* 16ch is a desktop measure. On a phone it is what produced the narrow
+       column, so the cap is released and the viewport does the wrapping. */
+    max-width:none}
+  .about-hero-lede{font-size:14.5px;max-width:40ch}
+  .about-hero-eyebrow{font-size:10.5px;letter-spacing:2.2px;margin-bottom:14px}
+  .about-hero-rule{width:64px;margin:20px 0}
+  .about-hero-inner{gap:clamp(30px,7vw,42px)}
+  /* Row layout: icon on a fixed rail, text beside it. Stacked-and-centred wastes
+     most of a 360px line on whitespace. */
+  .about-hero-points{grid-template-columns:1fr;gap:18px}
+  .about-hero-point{display:grid;grid-template-columns:46px minmax(0,1fr);
+    grid-template-areas:'icon title' 'icon body';column-gap:14px;row-gap:2px;align-items:center}
+  .about-hero-point-icon{grid-area:icon;width:46px;height:46px}
+  .about-hero-point strong{grid-area:title;font-size:11.5px}
+  .about-hero-point span{grid-area:body;max-width:none;font-size:12.5px}
+  /* The vertical separator only means anything in a row. */
+  .about-hero-point:not(:last-child):after{display:none}
+}
+
+@media(max-width:390px){
+  .about-hero h1{font-size:clamp(27px,8.2vw,33px);letter-spacing:-.8px}
+  .about-hero-point{grid-template-columns:40px minmax(0,1fr);column-gap:12px}
+  .about-hero-point-icon{width:40px;height:40px}
+}

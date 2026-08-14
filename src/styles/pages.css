@@ -256,16 +256,16 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 }
 
 /* -- 1. hero quote ---------------------------------------------------------- */
-.about-hero{position:relative;overflow:hidden;background:var(--deep);color:#f5f4ea;padding:clamp(96px,15vh,150px) 0 clamp(80px,12vh,120px);isolation:isolate}
+
 .about-hero .title-mark{color:transparent;-webkit-text-stroke:1px rgba(245,244,234,.13)}
 .about-hero .eyebrow{color:var(--green-on-dark);position:relative;z-index:1}
-.about-hero-stage{perspective:1100px}
-.about-hero-quote{margin:0;max-width:15ch;transform-style:preserve-3d;transform:rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg))}
-.about-hero-layer{display:block;font-size:clamp(40px,6.4vw,86px);line-height:1.02;letter-spacing:-2.4px;font-weight:600}
+
+
+
 /* Measured 12.16:1 on --deep (light theme) and 16.9:1 on the dark theme's
    --deep. The recessed layer only ever darkens the backdrop behind the face. */
-.about-hero-layer-face{position:relative;color:#f5f4ea;transform:translateZ(38px)}
-.about-hero-layer-back{position:absolute;inset:0;color:#04140d;opacity:.55;filter:blur(3px);transform:translateZ(-46px)}
+
+
 
 /* -- 2. story timeline ------------------------------------------------------ */
 .about-story-timeline{background:var(--surface)}
@@ -872,43 +872,34 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
    that untrue. `imageFit` is therefore an editorial choice in the admin rather
    than something decided here - cover is the default because a hero that
    letterboxes on a phone reads as a mistake. */
-.about-hero.has-banner{padding:clamp(110px,18vh,190px) 0 clamp(90px,14vh,140px)}
-.about-hero-banner{position:absolute;inset:0;z-index:-2;display:block}
-.about-hero-banner img{width:100%;height:100%;display:block;
-  object-fit:var(--hero-fit,cover);object-position:var(--hero-focus,66% 50%)}
+
+
+
 
 /* The scrim is what makes the text legible over ANY image, rather than hoping
    the artwork happens to be dark where the words fall. Weighted to the left,
    because that is where the copy sits and the right of the frame should stay
    readable as picture. Measured on the darkest stop: #f5f4ea on the composited
    left edge holds well past 4.5:1. */
-.about-hero.has-banner:before{content:'';position:absolute;inset:0;z-index:-1;
-  background:linear-gradient(100deg,
-    color-mix(in srgb,var(--deep) 94%,transparent) 0%,
-    color-mix(in srgb,var(--deep) 86%,transparent) 34%,
-    color-mix(in srgb,var(--deep) 55%,transparent) 62%,
-    color-mix(in srgb,var(--deep) 34%,transparent) 100%)}
+
 
 /* contain mode: the bands must be the brand colour, not black bars, or the
    "empty space" the brief warns about becomes very visible. */
-.about-hero-banner img[data-fit="contain"]{background:var(--deep)}
+
 
 @media(max-width:960px){
   /* As the viewport narrows a 1.9:1 banner loses its edges first. Holding the
      frame at 68% keeps the right-hand visual - the globe, ship and freighter -
      rather than drifting into whichever half happens to be centred. Overridden
      per-image by imageFocus in the admin. */
-  .about-hero-banner img{--hero-focus:72% 50%}
+  
 }
 @media(max-width:780px){
   /* Phone: the scrim goes near-solid top-to-bottom. A left-weighted gradient
      assumes a wide frame, and on a portrait screen the copy sits OVER the
      picture rather than beside it. */
-  .about-hero.has-banner:before{background:linear-gradient(180deg,
-    color-mix(in srgb,var(--deep) 90%,transparent) 0%,
-    color-mix(in srgb,var(--deep) 80%,transparent) 55%,
-    color-mix(in srgb,var(--deep) 92%,transparent) 100%)}
-  .about-hero.has-banner{padding:clamp(88px,14vh,120px) 0 clamp(64px,10vh,90px)}
+  
+  
 }
 
 /* ── Trade Network hero ──────────────────────────────────────────────────────
@@ -1067,3 +1058,66 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
   .gallery-tile:hover .gallery-play svg,
   .gallery-tile:focus-visible .gallery-play svg{transform:none}
 }
+
+/* ── About hero ──────────────────────────────────────────────────────────────
+   Rebuilt. The previous composition was a tilted pull-quote with a 15ch
+   measure, which is what collapsed the headline into a narrow column on a
+   phone. Nothing here inherits from it.
+
+   Left-weighted on desktop, as the reference is: the copy occupies the dark
+   left of the artwork and the globe, ship and truck stay visible on the right.
+   Below 960px the copy sits OVER the image instead of beside it, so the
+   gradient turns vertical - a left-weighted one assumes a wide frame. */
+.about-hero{position:relative;overflow:hidden;isolation:isolate;background:var(--deep);
+  display:flex;align-items:center;min-height:min(88svh,820px);
+  padding:clamp(112px,15vh,168px) 0 clamp(56px,8vh,88px)}
+.about-hero-banner{position:absolute;inset:0;z-index:-2;display:block}
+.about-hero-banner img{width:100%;height:100%;display:block;object-fit:cover;
+  object-position:var(--hero-focus,66% 50%)}
+
+/* Cinematic rather than a flat wash: a directional gradient that is dense where
+   the words are and nearly clear over the vessel, plus a slight lift from the
+   bottom so the value points sit on something. The artwork's own left third is
+   already dark, so this deepens what is there instead of covering it. */
+.about-hero:before{content:'';position:absolute;inset:0;z-index:-1;background:
+  linear-gradient(100deg,
+    color-mix(in srgb,var(--deep) 94%,transparent) 0%,
+    color-mix(in srgb,var(--deep) 82%,transparent) 32%,
+    color-mix(in srgb,var(--deep) 42%,transparent) 60%,
+    color-mix(in srgb,var(--deep) 16%,transparent) 100%),
+  linear-gradient(0deg,color-mix(in srgb,var(--deep) 66%,transparent) 0%,transparent 38%)}
+
+.about-hero-inner{display:flex;flex-direction:column;gap:clamp(40px,6vh,72px);width:100%}
+.about-hero-copy{max-width:min(42rem,50%)}
+.about-hero-eyebrow{display:flex;align-items:center;gap:12px;margin:0 0 18px;
+  font:600 12px/1 'DM Mono';letter-spacing:3px;text-transform:uppercase;color:var(--gold)}
+.about-hero-eyebrow:before{content:'';width:26px;height:1px;background:var(--gold);flex-shrink:0}
+
+/* ONE measure, no forced breaks. clamp does the scaling, so there is no
+   per-breakpoint font rule to drift, and the sentence wraps where it fits -
+   which is the actual fix for the narrow-column problem. text-wrap:balance
+   evens the lines instead of leaving one orphaned word. */
+.about-hero h1{color:#fff;margin:0;font-size:clamp(33px,5.2vw,66px);line-height:1.04;
+  letter-spacing:-1.8px;font-weight:700;text-wrap:balance;max-width:16ch}
+.about-hero-accent{color:var(--green-on-dark)}
+
+.about-hero-rule{display:block;width:88px;height:2px;margin:clamp(22px,3vw,32px) 0;
+  background:linear-gradient(90deg,var(--gold),transparent)}
+.about-hero-lede{margin:0;max-width:46ch;font-size:15px;line-height:1.75;color:rgba(255,255,255,.86)}
+
+/* Value points. auto-fit so 2, 3 or 4 all sit correctly without a count rule. */
+.about-hero-points{list-style:none;margin:0;padding:0;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:clamp(18px,2.6vw,34px);
+  max-width:min(46rem,58%)}
+.about-hero-point{display:flex;flex-direction:column;gap:8px;position:relative;min-width:0}
+/* The separator is a pseudo-element on all but the last, so it never trails off
+   the end of the row and disappears entirely once the grid wraps. */
+.about-hero-point:not(:last-child):after{content:'';position:absolute;right:calc(-1 * clamp(9px,1.3vw,17px));
+  top:6px;bottom:6px;width:1px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.22),transparent)}
+.about-hero-point-icon{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;
+  color:var(--green-on-dark);border:1px solid color-mix(in srgb,var(--green-on-dark) 38%,transparent);
+  background:color-mix(in srgb,var(--deep) 52%,transparent);backdrop-filter:blur(6px);
+  transition:transform .25s var(--ease),border-color .25s var(--ease)}
+.about-hero-point:hover .about-hero-point-icon{transform:translateY(-3px);border-color:var(--green-on-dark)}
+.about-hero-point strong{font:700 12px/1.3 'DM Sans';letter-spacing:1.2px;text-transform:uppercase;color:#fff}
+.about-hero-point span{font-size:12.5px;line-height:1.6;color:rgba(255,255,255,.78);max-width:26ch}

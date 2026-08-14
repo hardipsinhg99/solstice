@@ -169,18 +169,33 @@ const HOME = [
 // ── About ───────────────────────────────────────────────────────────────────
 const ABOUT = [
   {
-    key: 'heroQuote', type: 'about.heroQuote', label: 'Opening statement',
-    help: 'Leave the banner empty and the hero keeps its plain deep-green background.',
-    fields: [f('primary', 'Statement', 'textarea'),
-             f('alternate', 'Alternate (meta description only)', 'textarea',
-               { help: 'Not rendered on the page. Kept for the meta description and A/B use.' }),
-             f('image', 'Banner image', 'image'),
-             f('imageFit', 'How the banner fills the hero', 'text', {
-               help: 'cover (default) fills edge to edge and crops the long edge - use for photography. contain shows the WHOLE image and adds bands above/below on narrow screens - use only for artwork that must not be cropped.'
-             }),
-             f('imageFocus', 'Keep this part in frame', 'text', {
-               help: 'A CSS object-position, e.g. "70% 50%" to hold the right of the image as the screen narrows. Default 50% 50%.'
-             })]
+    key: 'heroQuote', type: 'about.heroQuote', label: 'Hero',
+    help: 'The banner, the headline and the three value points. Leave the banner empty and the hero falls back to the plain deep-green background.',
+    fields: [
+      f('eyebrow', 'Eyebrow'),
+      // Deliberately TWO fields, not four lines. Hard line breaks are what
+      // produced the narrow vertical column on a phone - the copy could not
+      // reflow because it had been told exactly where to break. The heading
+      // wraps naturally at every width instead.
+      f('headingLead', 'Heading', 'textarea', { help: 'Wraps naturally. Do not add line breaks - the layout handles them at every screen size.' }),
+      f('headingAccent', 'Heading, highlighted part', 'text', { help: 'Rendered in the brand green, continuing the same sentence.' }),
+      f('description', 'Supporting paragraph', 'textarea'),
+      f('image', 'Banner image', 'image'),
+      f('imageFocus', 'Keep this part in frame', 'text', {
+        help: 'A CSS object-position, e.g. "66% 50%" to hold the right of the image as the screen narrows.'
+      }),
+      f('points', 'Value points', 'list', {
+        itemLabel: 'Point',
+        fields: [
+          f('title', 'Title', 'text', { required: true }),
+          f('body', 'Description'),
+          f('icon', 'Icon', 'text', { help: 'A sprite name: user, award, check, globe, ship, leaf, box, chat, layers.' }),
+          f('published', 'Published', 'toggle', { default: true, help: 'Off hides this point without deleting it.' })
+        ]
+      }),
+      f('alternate', 'Alternate statement (meta description only)', 'textarea',
+        { help: 'Not rendered on the page. Kept for the meta description.' })
+    ]
   },
   {
     key: 'story', type: 'about.story', label: 'Our story',

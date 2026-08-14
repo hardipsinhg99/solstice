@@ -109,8 +109,24 @@ const HOME: Section[] = [
 
 const ABOUT: Section[] = [
   { key: 'heroQuote', type: 'about.heroQuote', data: {
-    primary: 'Building Global Trade Through Trust, Quality & Execution.',
-    alternate: 'From India to the World - Delivering Reliable Global Trade Solutions.',
+    eyebrow: 'ABOUT SOLSTICE',
+    // ONE sentence, no hard line breaks. The reference breaks it across four
+    // lines, but baking those breaks in is exactly what collapsed the heading
+    // into a narrow column on a phone - the layout wraps it instead.
+    headingLead: 'Building Global Trade Through',
+    headingAccent: 'Trust, Quality & Execution.',
+    description: 'Solstice Trading International LLP is built on the foundation of trust, driven by quality, and defined by execution. We connect markets, create opportunities, and deliver value across borders.',
+    image: null,
+    imageFocus: '66% 50%',
+    // Icons are mapped to what the sprite ACTUALLY contains. There is no
+    // handshake or target glyph, so partnerships uses `user` and execution uses
+    // `check` rather than naming icons that would render as empty boxes.
+    points: [
+      { icon: 'user',  title: 'Trusted partnerships',  body: 'Long-term relationships built on reliability.', published: true },
+      { icon: 'award', title: 'Quality assured',       body: 'Committed to delivering the highest standards.', published: true },
+      { icon: 'check', title: 'Execution that delivers', body: 'Focused on precision, efficiency & results.', published: true },
+    ],
+    alternate: 'Solstice Trading International LLP connects growers in India with buyers worldwide - sourcing, quality control, documentation and delivery, end to end.',
   } },
   { key: 'story', type: 'about.story', data: {
     eyebrow: 'OUR STORY', heading: 'From One Challenge to a Global Trading Network',
