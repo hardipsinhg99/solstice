@@ -196,3 +196,94 @@ body:has(.lightbox) .back-to-top{opacity:0;visibility:hidden;transform:scale(.9)
   body[data-corner-stack='away'] .whatsapp-fab,
   body[data-corner-stack='away'] .back-to-top{translate:calc(100% + var(--chat-launcher-inset)) 0}
 }
+
+/* ============================================================
+   Floating action buttons: attention animation
+   ============================================================
+   Two constraints decided how this is built, and both are why the obvious
+   implementation would have broken something.
+
+   1. NOT `transform`. Both launchers already use transform:scale(1.08) on
+      hover, and the hidden states below use transform:scale(.9). A keyframe
+      animation beats a normal declaration, so animating transform would have
+      silently killed the hover feedback on both buttons. The pulse uses the
+      INDEPENDENT `scale` property instead, which composes with transform rather
+      than replacing it. `translate` is likewise left alone - the corner-stack
+      away-slide owns it.
+
+   2. NOT box-shadow on the button. .whatsapp-fab spends its box-shadow three
+      times over: resting elevation, hover elevation, and the focus-visible halo
+      that base.css would otherwise lose to. The ring is therefore a ::after
+      pseudo-element with its own shadow, so the focus ring stays intact.
+
+   The ring spread is bounded by --fab-gap, not chosen by eye. The launchers sit
+   14px apart, so an 11px ring stops 3px short of its neighbour and the two can
+   never touch. Horizontally the button sits 21px from the edge, so an 11px ring
+   still clears it by 10px - no overflow, and nothing here affects layout: a
+   pseudo-element's box-shadow and an independent scale both paint outside flow.
+
+   The two animations are deliberately different. WhatsApp is the primary
+   channel, so it breathes continuously but slowly. The chat launcher is
+   secondary and gets an OCCASIONAL cue: a 9s cycle that is idle for the first
+   three quarters of it, then gives two small taps. Continuous motion on both
+   would read as two things competing for attention, which is the opposite of
+   premium. */
+
+@keyframes fab-breathe{0%,100%{scale:1}50%{scale:1.05}}
+@keyframes fab-ring{
+  0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--whatsapp) 48%,transparent)}
+  70%{box-shadow:0 0 0 11px color-mix(in srgb,var(--whatsapp) 0%,transparent)}
+  100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--whatsapp) 0%,transparent)}
+}
+/* Idle 0-72%, then two taps. The second is smaller than the first so it reads
+   as a settling gesture rather than a bounce. */
+@keyframes fab-attention{0%,72%,86%,100%{scale:1}79%{scale:1.045}93%{scale:1.025}}
+@keyframes fab-glow{
+  0%,72%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--green-500) 0%,transparent)}
+  79%{box-shadow:0 0 9px 4px color-mix(in srgb,var(--green-500) 42%,transparent)}
+  86%{box-shadow:0 0 0 0 color-mix(in srgb,var(--green-500) 0%,transparent)}
+}
+
+.whatsapp-fab{animation:fab-breathe 3.4s var(--ease) infinite}
+.chat-button{animation:fab-attention 9s var(--ease) infinite}
+
+/* inset:0 so the ring tracks the circle exactly; pointer-events:none so it can
+   never intercept the click the button exists for. */
+.whatsapp-fab::after,.chat-button::after{
+  content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none}
+.whatsapp-fab::after{animation:fab-ring 3.4s var(--ease) infinite}
+.chat-button::after{animation:fab-glow 9s var(--ease) infinite}
+
+/* On interaction the cue has done its job and hover takes over. `animation:none`
+   rather than paused: pausing freezes `scale` at whatever the tween had reached,
+   so the button would hover from a random size. Removing the animation lets the
+   scale:1 below actually apply. */
+.whatsapp-fab:hover,.whatsapp-fab:focus-visible,
+.chat-button:hover,.chat-button:focus-visible{animation:none;scale:1}
+.whatsapp-fab:hover::after,.whatsapp-fab:focus-visible::after,
+.chat-button:hover::after,.chat-button:focus-visible::after{animation:none;box-shadow:none}
+
+/* While a launcher is hidden - chat panel open, mobile nav open, lightbox up -
+   it must not keep animating offscreen. */
+body:has(.chat-panel.visible) .whatsapp-fab,
+body:has(.nav-links.open) .whatsapp-fab,
+body:has(.lightbox) .whatsapp-fab,
+body:has(.nav-links.open) .chat-button,
+body:has(.lightbox) .chat-button{animation:none;scale:1}
+body:has(.chat-panel.visible) .whatsapp-fab::after,
+body:has(.nav-links.open) .whatsapp-fab::after,
+body:has(.lightbox) .whatsapp-fab::after,
+body:has(.nav-links.open) .chat-button::after,
+body:has(.lightbox) .chat-button::after{animation:none;box-shadow:none}
+
+/* Continuous motion is exactly what this preference is about. Hover and focus
+   transitions are untouched - they are a response to the user's own action, not
+   an ambient loop. */
+@media(prefers-reduced-motion:reduce){
+  .whatsapp-fab,.chat-button{animation:none;scale:1}
+  /* box-shadow is cleared on the PSEUDO-ELEMENT only. The buttons spend theirs
+     on resting elevation, hover and the focus halo - clearing it there and
+     restating it would put this block in the business of maintaining three
+     values it does not own. */
+  .whatsapp-fab::after,.chat-button::after{animation:none;box-shadow:none}
+}

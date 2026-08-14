@@ -295,6 +295,24 @@
      44px floor of SC 2.5.5 and the 24px floor of SC 2.5.8. */
   .chat-button{width:47px;height:47px}
   :root{--chat-launcher-size:47px}
+  /* Gentler on a phone, and the ring is re-bounded: the buttons sit 15px from
+     the edge here rather than 21px, so an 11px ring would leave only 4px of
+     clearance. 8px keeps it comfortably inside and still clear of --fab-gap. */
+  @keyframes fab-ring{
+    0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--whatsapp) 44%,transparent)}
+    70%{box-shadow:0 0 0 8px color-mix(in srgb,var(--whatsapp) 0%,transparent)}
+    100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--whatsapp) 0%,transparent)}
+  }
+  /* The glow needs the same bound as the ring: 9px blur + 4px spread reaches
+     ~13px, which at this size leaves 1px between it and the WhatsApp button
+     above. 6px + 2px reaches 8px, matching the ring's clearance. */
+  @keyframes fab-glow{
+    0%,72%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--green-500) 0%,transparent)}
+    79%{box-shadow:0 0 6px 2px color-mix(in srgb,var(--green-500) 38%,transparent)}
+    86%{box-shadow:0 0 0 0 color-mix(in srgb,var(--green-500) 0%,transparent)}
+  }
+  @keyframes fab-breathe{0%,100%{scale:1}50%{scale:1.035}}
+  @keyframes fab-attention{0%,72%,86%,100%{scale:1}79%{scale:1.03}93%{scale:1.018}}
 }
 
 @media(max-width:390px){
