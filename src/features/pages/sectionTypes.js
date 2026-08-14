@@ -489,8 +489,12 @@ const NETWORK = [
   },
   {
     key: 'why', type: 'network.why', label: 'Why work with us',
+    help: 'The approach block. Its photograph is optional - with none set the points render full width rather than leaving a hole where the image would be.',
     fields: [
       f('heading', 'Heading'), f('intro', 'Intro', 'textarea'),
+      f('image', 'Approach photograph', 'image', {
+        help: 'Optional. Shown beside the points on desktop and above them on a phone. Unpublish to hide it without losing it.'
+      }),
       f('points', 'Points', 'list', { itemLabel: 'Point', fields: [f('text', 'Text')] })
     ]
   },

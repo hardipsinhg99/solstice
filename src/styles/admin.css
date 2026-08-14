@@ -13,10 +13,30 @@
    ============================================================ */
 /* The sidebar width is a custom property so collapsing it is one value change
    rather than a second grid definition to keep in sync. */
-.admin-shell{--admin-rail:236px;display:grid;grid-template-columns:var(--admin-rail) 1fr;min-height:100vh;background:var(--bg);color:var(--body);font-size:13px}
+/* HEIGHT, not min-height, and that distinction is the whole app-shell.
+   The shell is a grid with one auto-sized row, so the row grows to the
+   MAX-content height of its items. `overflow-y:auto` on .admin-main zeroes its
+   min-content contribution but not its max-content one, so a long admin page
+   sized the row to the full page height while .admin-frame stayed capped at
+   100vh - a tall empty row with the frame stranded at the top of it, the body
+   scrolling behind .admin-main's own scrollbar. That was the blank dead zone at
+   the bottom of every long admin page.
+   A definite height makes the row definite, so it cannot grow, so there is
+   exactly one scroll container: .admin-main.
+   dvh, not vh: on mobile 100vh is the LARGE viewport, which is taller than what
+   is actually visible while the URL bar is showing, and the bottom of the page
+   would sit underneath it. vh first as the fallback for anything without dvh. */
+.admin-shell{--admin-rail:236px;display:grid;grid-template-columns:var(--admin-rail) 1fr;
+  height:100vh;height:100dvh;overflow:hidden;
+  background:var(--bg);color:var(--body);font-size:13px}
 .admin-shell:has(.admin-nav.is-collapsed){--admin-rail:64px}
-.admin-frame{display:flex;flex-direction:column;min-width:0;max-height:100vh}
-.admin-main{padding:24px 32px 40px;overflow-y:auto;flex:1;min-height:0}
+/* min-height:0 on both axes of the chain is what actually lets a flex child
+   scroll: the default min-height:auto refuses to shrink below content, which
+   pushes the overflow back out to the shell. */
+.admin-frame{display:flex;flex-direction:column;min-width:0;min-height:0;height:100%}
+/* The one scroll container on desktop. overscroll-behavior stops a flick at the
+   end of the list from chaining out and rubber-banding the document behind it. */
+.admin-main{padding:24px 32px 40px;overflow-y:auto;overscroll-behavior:contain;flex:1;min-height:0}
 .admin-page{max-width:920px;display:grid;gap:24px}
 .admin-page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .admin-page-head h1{font-size:26px;letter-spacing:-.6px;margin:6px 0 0;color:var(--ink)}
@@ -29,7 +49,7 @@
 /* ── Sidebar ───────────────────────────────────────────────────────────────
    Grouped, not a flat list: MAIN is what you open the panel to do, CONTENT is
    what you edit occasionally, SETTINGS is what you touch twice a year. ───── */
-.admin-nav{background:var(--surface);border-right:1px solid var(--border);padding:18px 12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;max-height:100vh}
+.admin-nav{background:var(--surface);border-right:1px solid var(--border);padding:18px 12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;min-height:0;height:100%}
 .admin-nav-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;min-height:32px}
 .admin-brand{font-weight:700;font-size:14px;letter-spacing:-.3px;color:var(--ink)}
 .admin-nav-toggle{border:1px solid transparent;background:none;color:var(--muted);border-radius:8px;padding:6px;display:grid;place-items:center;transition:color .2s,border-color .2s}
@@ -139,7 +159,7 @@
 @keyframes adminDots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
 
 /* ── Login ─────────────────────────────────────────────────────────────────── */
-.admin-auth{min-height:100vh;display:grid;place-items:center;background:var(--bg);padding:24px}
+.admin-auth{min-height:100vh;min-height:100dvh;display:grid;place-items:center;background:var(--bg);padding:24px}
 .admin-auth-card{width:min(380px,100%);background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;box-shadow:var(--elev-1)}
 .admin-auth-card h1{margin:0;font-size:22px;letter-spacing:-.5px;color:var(--ink)}
 .admin-auth-lede{margin:6px 0 20px;color:var(--muted);font-size:12.5px}
@@ -149,9 +169,15 @@
   /* Below this width the rail is a horizontal strip above the content, so the
      grouped columns collapse into one scrolling row and the collapse toggle
      stops applying - there is no rail left to narrow. */
+  /* Below this width the shell stops being an app frame and becomes an ordinary
+     document. The rail is a horizontal bar here, so pinning the shell to the
+     viewport height would leave a phone scrolling content in the sliver left
+     under it. Height goes back to auto and the DOCUMENT becomes the single
+     scroller - which is also what lets the address bar collapse on scroll. */
   .admin-shell,.admin-shell:has(.admin-nav.is-collapsed){grid-template-columns:1fr}
-  .admin-frame{max-height:none}
-  .admin-nav,.admin-nav.is-collapsed{flex-direction:row;align-items:center;flex-wrap:wrap;gap:8px;border-right:0;border-bottom:1px solid var(--border);max-height:none;padding:12px 16px}
+  .admin-shell{height:auto;min-height:100dvh;overflow:visible}
+  .admin-frame{height:auto;min-height:0}
+  .admin-nav,.admin-nav.is-collapsed{flex-direction:row;align-items:center;flex-wrap:wrap;gap:8px;border-right:0;border-bottom:1px solid var(--border);height:auto;overflow:visible;padding:12px 16px}
   .admin-nav.is-collapsed .admin-nav-text{position:static;width:auto;height:auto;margin:0;clip:auto;white-space:normal}
   .admin-nav.is-collapsed .admin-nav-link,.admin-nav.is-collapsed .admin-nav-action{justify-content:flex-start;padding:8px 12px}
   .admin-nav-head{margin:0}
@@ -161,10 +187,23 @@
   .admin-nav-list{display:flex;gap:4px}
   .admin-nav-sub{margin:0;padding:0;border-left:0}
   .admin-nav-foot{margin:0 0 0 auto;display:flex;padding-top:0;border-top:0}
-  .admin-topbar{padding:12px 16px}
+  /* Sticky HERE and only here. On desktop the topbar's containing block does
+     not scroll, so sticky was inert; on mobile the document is the scroller, so
+     it is what keeps the bar in view - which was the existing behaviour and is
+     worth keeping. */
+  .admin-topbar{padding:12px 16px;position:sticky;top:0}
   .admin-topbar-title{font-size:17px}
   .admin-profile-name{display:none}
-  .admin-main{padding:20px 16px 32px;max-height:none}
+  /* overflow:visible, not auto - a second scroller nested inside the document
+     scroller is exactly what made the bottom unreachable on a phone. */
+  .admin-main{padding:20px 16px 32px;overflow:visible;overscroll-behavior:auto}
+  /* A products or enquiries table is wider than a phone. base.css sets
+     html,body{overflow-x:clip}, so without this the extra columns are CLIPPED -
+     silently unreachable rather than scrollable. display:block lets the table
+     box scroll horizontally while its rows keep laying out as table internals;
+     overflow-x:auto overrides the rounded-corner overflow:hidden above. The
+     scroll is scoped to the table, so the page itself still has none. */
+  .admin-table{display:block;overflow-x:auto;overflow-y:hidden;max-width:100%}
   .admin-row-actions{justify-content:flex-start}
   td.admin-row-actions{text-align:left}
 }
@@ -234,7 +273,12 @@ td.admin-row-actions>*+*{margin-left:8px}
    does not navigate to the public About page from here, and reproducing the
    marketing nav would be a second navigation model to keep in sync with
    data/navigation.js for a workflow nobody has. */
-.admin-topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 32px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
+/* Not sticky. Its scroll container is .admin-frame, which does not scroll - the
+   sticky never did anything here, and only came alive in the broken state where
+   the document scrolled, sticking the bar to the viewport instead of the frame.
+   As a flex sibling of the scrolling .admin-main it is permanently in view,
+   which is what sticky was reaching for. */
+.admin-topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 32px;background:var(--surface);border-bottom:1px solid var(--border);z-index:5;flex:none}
 .admin-topbar-title{margin:0;font-size:20px;letter-spacing:-.4px;color:var(--ink)}
 .admin-topbar-actions{display:flex;align-items:center;gap:10px}
 
@@ -333,6 +377,12 @@ td.admin-row-actions>*+*{margin-left:8px}
 .admin-image-field input[type=file]{background:var(--bg)}
 .admin-image-preview{margin:0 0 10px;display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:start;border:1px solid var(--border);border-radius:10px;padding:12px;background:var(--bg)}
 .admin-image-preview img{width:100%;height:auto;border-radius:8px;display:block;background:var(--soft)}
+/* An unpublished image is dimmed, not hidden: the operator needs to see WHAT
+   is hidden to decide whether to restore it. Desaturated rather than
+   low-opacity so it stays legible against either theme's surface. */
+.admin-image-preview[data-hidden] img{filter:grayscale(1);opacity:.55}
+.admin-image-preview[data-hidden]{outline:1px dashed var(--line-strong);outline-offset:3px}
+.admin-ok{color:var(--green-600)}
 .admin-image-preview figcaption{display:grid;gap:8px;justify-items:start}
 .admin-image-preview input{background:var(--bg);border:1px solid var(--line-strong);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:12.5px;width:100%}
 .admin-optional{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)}

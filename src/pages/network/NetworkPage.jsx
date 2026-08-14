@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Icon } from '../../components/ui/Icon.jsx'
 import { Button } from '../../components/ui/Button.jsx'
 import { Eyebrow } from '../../components/ui/Eyebrow.jsx'
+import { visibleImage } from '../../features/pages/index.js'
 import { Reveal } from '../../components/motion/Reveal.jsx'
 import { PageUnavailable } from '../../components/layout/PageUnavailable.jsx'
 import { useNavigate } from '../../app/navigation.js'
@@ -31,6 +32,11 @@ export default function NetworkPage() {
   const categories = section('categories')
   const voices = section('voices')
   const why = section('why')
+
+  // Resolved through visibleImage so an unpublished or removed asset degrades to
+  // null here, once, rather than each render site testing a different condition.
+  const heroImage = visibleImage(hero.image)
+  const whyImage = visibleImage(why.image)
   const cta = section('cta')
 
   // Tiles from the catalogue, not a hardcoded list. Grouped by the product's
@@ -59,8 +65,14 @@ export default function NetworkPage() {
           below is real HTML, which is what keeps the hero readable at 390px,
           indexable, translatable and reachable by a screen reader. */}
       <picture className="network-hero-art">
-        <source media="(max-width: 780px)" srcSet="/trade-network-hero-960.webp"/>
-        <img src={hero.image?.url || '/trade-network-hero.webp'}
+        {/* The phone-sized <source> may only be offered for the BUILT-IN artwork.
+            It used to be unconditional, and <source> beats <img src>, so on a
+            phone an uploaded hero was silently ignored and the bundled file
+            rendered instead - an upload that appeared to do nothing below
+            780px. An uploaded asset is already capped at 1600px by the media
+            pipeline, so it needs no second source. */}
+        {!heroImage && <source media="(max-width: 780px)" srcSet="/trade-network-hero-960.webp"/>}
+        <img src={heroImage?.url || '/trade-network-hero.webp'}
              alt="" aria-hidden="true" fetchPriority="high" decoding="async"/>
       </picture>
 
@@ -248,13 +260,28 @@ export default function NetworkPage() {
             <h2>{why.heading}</h2>
             {why.intro && <p className="network-lede">{why.intro}</p>}
           </Reveal>
-          <ul className="network-why-list">
-            {why.points.map((p, i) => (
-              <Reveal as="li" key={p.text ?? i} delay={i * 50}>
-                <Icon name="check" size={16}/> {p.text}
+          {/* data-has-image drives the columns from CSS rather than swapping
+              class names in JS, so with no image - never set, unpublished, or
+              removed - this collapses to the single-column layout that existed
+              before the image did. No empty cell, no reserved gap. */}
+          <div className="network-why-body" data-has-image={whyImage ? '' : undefined}>
+            {whyImage && (
+              <Reveal as="figure" className="network-why-figure">
+                {/* width/height are the asset's real intrinsic size, so the box
+                    is reserved before the file arrives and nothing jumps. */}
+                <img src={whyImage.url} alt={whyImage.alt || ''}
+                     width={whyImage.width || undefined} height={whyImage.height || undefined}
+                     loading="lazy" decoding="async"/>
               </Reveal>
-            ))}
-          </ul>
+            )}
+            <ul className="network-why-list">
+              {why.points.map((p, i) => (
+                <Reveal as="li" key={p.text ?? i} delay={i * 50}>
+                  <Icon name="check" size={16}/> {p.text}
+                </Reveal>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
     )}

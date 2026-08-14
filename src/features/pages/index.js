@@ -4,3 +4,4 @@ export {
   useAdminTeam, usePublicTeam, createMember, updateMember, removeMember,
   reorderMembers, setMemberPhoto, clearMemberPhoto
 } from './useTeamApi.js'
+export { visibleImage } from './visibleImage.js'

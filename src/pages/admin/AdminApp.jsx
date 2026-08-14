@@ -50,7 +50,15 @@ export default function AdminApp({ route }) {
   const firstRender = useRef(true)
   useEffect(() => {
     if (firstRender.current) { firstRender.current = false; return }
-    mainRef.current?.focus()
+    // preventScroll, then reset explicitly: focus() on its own scrolls the
+    // element into view, which is not the same as returning to the top.
+    mainRef.current?.focus({ preventScroll: true })
+    // Which element scrolls depends on the breakpoint - .admin-main on desktop,
+    // the document on mobile (see admin.css). Reset both rather than guess.
+    // 'instant' because html{scroll-behavior:smooth} would otherwise animate a
+    // navigation the operator did not ask to watch.
+    mainRef.current?.scrollTo({ top: 0, behavior: 'instant' })
+    window.scrollTo({ top: 0, behavior: 'instant' })
   }, [section, param])
 
   if (auth.state === 'checking') {

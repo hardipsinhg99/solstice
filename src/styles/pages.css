@@ -777,6 +777,21 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .network-category-meta strong{display:block;font-size:17px;letter-spacing:-.4px;color:var(--ink)}
 .network-category-meta span{display:block;margin-top:4px;font-size:12px;color:var(--muted)}
 
+/* One column by default - that is the no-image case, and it is the case that
+   must survive an admin unpublishing the photograph. The two-column rule is
+   additive and keyed on the attribute, so removing the image cannot leave a
+   dead track behind. */
+.network-why-body{display:grid;gap:28px}
+@media(min-width:900px){
+  .network-why-body[data-has-image]{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:center;gap:40px}
+  /* Inside the narrower column the points stack rather than trying to hold a
+     260px minimum they no longer have room for. */
+  .network-why-body[data-has-image] .network-why-list{grid-template-columns:1fr;margin-top:0}
+}
+.network-why-figure{margin:0;border-radius:14px;overflow:hidden;background:var(--soft);border:1px solid var(--border)}
+/* aspect-ratio + object-fit means any shape an admin uploads is cropped to the
+   same professional frame instead of dictating the section's height. */
+.network-why-figure img{display:block;width:100%;height:100%;aspect-ratio:4/3;object-fit:cover}
 .network-why-list{list-style:none;margin:32px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
 .network-why-list li{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--body)}
 .network-why-list svg{flex-shrink:0;color:var(--green-600)}

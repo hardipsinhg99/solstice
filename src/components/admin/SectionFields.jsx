@@ -12,18 +12,57 @@ import { uploadAsset } from '../../features/admin/useMediaAssets.js'
 
 const setIn = (obj, name, value) => ({ ...obj, [name]: value })
 
+/* Mirrors server/src/media/media.constants.ts. Duplicated deliberately: the
+   server still validates by CONTENT, which is the check that matters and the
+   one a browser cannot be trusted to do. This copy exists only so an operator
+   who picks a 30MB camera JPEG gets told immediately instead of waiting for the
+   upload to reach a 413. If the server cap moves, this is cosmetic drift, not a
+   hole. */
+const MAX_UPLOAD_BYTES = 8 * 1024 * 1024
+const ACCEPT = 'image/jpeg,image/png,image/webp'
+
 function ImageField({ field, value, onChange, id }) {
   const inputRef = useRef(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
+  const [confirming, setConfirming] = useState(false)
+
+  // Absent flag = published. See visibleImage() - images stored before this
+  // toggle existed must not vanish the moment it ships.
+  const published = value?.published !== false
 
   const pick = async (file) => {
     if (!file) return
-    setBusy(true); setError('')
+    setError(''); setNotice('')
+
+    if (!ACCEPT.split(',').includes(file.type)) {
+      setError('That file is not a JPG, PNG or WebP. Pick one of those.')
+      if (inputRef.current) inputRef.current.value = ''
+      return
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      const mb = (file.size / 1024 / 1024).toFixed(1)
+      setError(`That image is ${mb}MB. The limit is 8MB - export it smaller and try again.`)
+      if (inputRef.current) inputRef.current.value = ''
+      return
+    }
+
+    const replacing = Boolean(value?.url)
+    setBusy(true)
     try {
       // Same pipeline as every other upload on this site.
       const asset = await uploadAsset(file, '')
-      onChange({ id: asset.id, url: asset.url, alt: asset.altText || '', width: asset.width, height: asset.height })
+      onChange({
+        id: asset.id, url: asset.url, alt: asset.altText || '',
+        width: asset.width, height: asset.height,
+        // A replacement inherits the visibility of what it replaced; a first
+        // upload is visible. Uploading a picture and having nothing appear
+        // would read as a broken uploader.
+        published: replacing ? published : true
+      })
+      setNotice(replacing ? 'Image replaced. Save the section to publish it.'
+                          : 'Image uploaded. Save the section to publish it.')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -35,8 +74,9 @@ function ImageField({ field, value, onChange, id }) {
   return (
     <div className="admin-field admin-image-field">
       <span id={`${id}-label`}>{field.label}</span>
+
       {value?.url && (
-        <figure className="admin-image-preview">
+        <figure className="admin-image-preview" data-hidden={!published || undefined}>
           <img src={value.url} alt={value.alt || ''}/>
           <figcaption>
             <input
@@ -44,15 +84,44 @@ function ImageField({ field, value, onChange, id }) {
               aria-label={`Alt text for ${field.label}`}
               onChange={(e) => onChange({ ...value, alt: e.target.value })}
             />
-            <button type="button" className="admin-btn admin-btn-danger-quiet"
-                    onClick={() => onChange(null)}>Remove</button>
+
+            {/* Publish state is stored ON the image rather than as a sibling
+                field, so it travels with the value through the repeater, the
+                draft/publish round-trip and Remove - there is no way to leave
+                an orphan flag behind pointing at an image that is gone. */}
+            <label className="admin-toggle-row">
+              <input type="checkbox" checked={published}
+                     onChange={(e) => onChange({ ...value, published: e.target.checked })}/>
+              <span>{published ? 'Published - visible on the site' : 'Unpublished - hidden from the site'}</span>
+            </label>
+
+            {confirming ? (
+              <span className="admin-verify-cell">
+                <span className="admin-hint">Remove this image from the section?</span>
+                <button type="button" className="admin-btn admin-btn-danger-quiet"
+                        onClick={() => { setConfirming(false); setNotice(''); onChange(null) }}>
+                  Yes, remove
+                </button>
+                <button type="button" className="admin-btn"
+                        onClick={() => setConfirming(false)}>Cancel</button>
+              </span>
+            ) : (
+              <button type="button" className="admin-btn admin-btn-danger-quiet"
+                      onClick={() => setConfirming(true)}>Remove</button>
+            )}
           </figcaption>
         </figure>
       )}
-      <input ref={inputRef} id={id} type="file" accept="image/jpeg,image/png,image/webp"
+
+      {/* Replacing is not destructive - the previous asset stays in the media
+          library and can be picked again - so it gets a plain control while
+          Remove gets the confirmation. */}
+      <input ref={inputRef} id={id} type="file" accept={ACCEPT}
              disabled={busy} aria-labelledby={`${id}-label`}
              onChange={(e) => pick(e.target.files?.[0])}/>
-      {busy && <span className="admin-hint" role="status">Uploading…</span>}
+
+      {busy && <span className="admin-hint" role="status">Uploading and converting…</span>}
+      {notice && !busy && <span className="admin-hint admin-ok" role="status">{notice}</span>}
       {error && <p className="admin-error" role="alert">{error}</p>}
       {field.help && <small className="admin-hint">{field.help}</small>}
     </div>
