@@ -517,7 +517,7 @@
     grid-template-areas:'icon title' 'icon body';column-gap:14px;row-gap:2px;align-items:center}
   .about-hero-point-icon{grid-area:icon;width:46px;height:46px}
   .about-hero-point strong{grid-area:title;font-size:11.5px}
-  .about-hero-point span{grid-area:body;max-width:none;font-size:12.5px}
+  .about-hero-point-body{grid-area:body;max-width:none;font-size:12.5px}
   /* The vertical separator only means anything in a row. */
   .about-hero-point:not(:last-child):after{display:none}
 }

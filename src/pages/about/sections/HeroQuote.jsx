@@ -72,7 +72,7 @@ export function HeroQuote({ data }) {
                   <Icon name={p.icon || 'check'} size={22}/>
                 </span>
                 <strong>{p.title}</strong>
-                {p.body && <span>{p.body}</span>}
+                {p.body && <span className="about-hero-point-body">{p.body}</span>}
               </li>
             ))}
           </Reveal>
