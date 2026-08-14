@@ -343,8 +343,6 @@
    ============================================================ */
 @media(max-width:780px){
   .about-hero{padding:72px 0 60px}
-  .about-hero-quote{max-width:100%}
-  .about-hero-layer{font-size:clamp(32px,8.4vw,44px);letter-spacing:-1.6px}
   .about-section-head{margin-bottom:32px}
   .about-lede{font-size:14px}
 
@@ -382,7 +380,6 @@
 }
 
 @media(max-width:480px){
-  .about-hero-layer{font-size:33px;letter-spacing:-1.3px}
   .about-stat-grid{grid-template-columns:1fr}
   .about-stat{min-height:0}
   .about-industry-grid{grid-template-columns:1fr}
