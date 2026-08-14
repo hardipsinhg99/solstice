@@ -103,11 +103,35 @@
   .nav-links>button:after{display:none}
   /* In the drawer the panel expands inline instead of floating - a positioned
      overlay inside a vertical menu would cover the items beneath it. */
-  .nav-dropdown{display:block;position:static}
-  .nav-dropdown-trigger{width:100%;justify-content:space-between;text-align:left;margin:0;padding:12px 4px;border-radius:0;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
-  .nav-dropdown-trigger:hover{background:none;color:var(--green-600)}
-  .nav-dropdown-trigger:after{display:none}
-  .nav-dropdown-panel{position:static;min-width:0;border:0;box-shadow:none;background:transparent;animation:none;margin:2px 0 8px}
+  /* The row is a FLEX row, and the caret is its second child. It used to be
+     display:block, which stacked the two buttons and dropped the chevron onto its
+     own line under "Products" - the reported bug.
+
+     The three rules that used to live here targeted .nav-dropdown-trigger, a
+     class this component stopped rendering when the control was split into a
+     label (navigates) and a caret (expands). They had been styling nothing since,
+     which is why the mobile row lost the divider and the alignment the other nav
+     items have. */
+  .nav-dropdown{display:flex;align-items:center;justify-content:space-between;gap:8px;
+    position:static;flex-wrap:nowrap;
+    border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+  /* The label takes the row so the caret is pushed to the right edge and the two
+     share one baseline. Padding matches .nav-links>button exactly, so this row
+     sits on the same rhythm as Home, About us and the rest. */
+  .nav-dropdown-label{flex:1 1 auto;min-width:0;text-align:left;margin:0;padding:12px 4px;
+    border-radius:0;border-bottom:0}
+  .nav-dropdown-label:hover{background:none;color:var(--green-600)}
+  .nav-dropdown-label:after{display:none}
+  /* 44px square: the smallest target in the drawer and the one hit with a thumb,
+     so it clears the 24px floor the rest of the site uses with room to spare.
+     margin-right pulls it flush with the row's right edge rather than the
+     desktop's -8px nudge. */
+  .nav-dropdown-caret{flex:0 0 auto;width:44px;height:44px;margin:0 -4px 0 0;padding:0;
+    display:grid;place-items:center;border-radius:8px;color:var(--muted)}
+  .nav-dropdown-caret:hover{background:color-mix(in srgb,var(--green-500) 10%,transparent);color:var(--ink)}
+
+  .nav-dropdown-panel{position:static;min-width:0;border:0;box-shadow:none;background:transparent;
+    margin:2px 0 8px;overflow:hidden;animation:nav-sub-open .22s var(--ease)}
   .nav-dropdown-panel ul{padding:0}
   .nav-dropdown-item{padding:10px 4px 10px 16px;font-size:13px;border-left:2px solid var(--line)}
   .nav-dropdown-item.active{border-left-color:var(--green-600)}

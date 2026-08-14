@@ -36,7 +36,19 @@
 .nav-dropdown-caret{border:0;background:transparent;color:var(--muted);padding:8px 6px;margin-left:-8px;border-radius:20px;display:grid;place-items:center;transition:color .2s,background .25s,transform .25s var(--ease)}
 .nav-dropdown-caret:hover{background:color-mix(in srgb,var(--green-500) 10%,transparent);color:var(--ink)}
 .nav-dropdown-caret.active{color:var(--ink)}
+/* Rotates to point up when the panel is open. The transition lives on the base
+   rule so it applies in both directions, not just on the way open. */
+.nav-dropdown-caret{transition:transform .25s var(--ease),background .2s,color .2s}
 .nav-dropdown-caret[aria-expanded=true]{transform:rotate(180deg)}
+/* The panel is conditionally rendered, so there is no element to transition from
+   - it animates in on mount instead. Height is not animated: the panel has no
+   fixed height and animating to auto does not work without measuring it in JS,
+   which is not worth a script for a 220ms reveal. */
+@keyframes nav-sub-open{from{opacity:0;transform:translateY(-6px)}}
+@media(prefers-reduced-motion:reduce){
+  .nav-dropdown-caret{transition:none}
+  .nav-dropdown-panel{animation:none}
+}
 .nav-cta{background:var(--deep)!important;color:#fff!important;padding:11px 14px!important;display:flex;align-items:center;gap:7px;margin-left:19px;position:relative;transition:background .25s}
 .nav-cta:before{content:'';position:absolute;left:-16px;top:50%;transform:translateY(-50%);width:1px;height:18px;background:var(--line)}
 .nav-cta:hover{background:var(--green-600)!important;color:var(--on-green)!important}
