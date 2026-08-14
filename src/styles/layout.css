@@ -33,7 +33,11 @@
    navigates to the whole catalogue, the caret opens the two directions. It sits
    tight against the label so the pair still reads as one nav item, and it keeps
    a 24px hit area of its own. */
-.nav-dropdown-caret{border:0;background:transparent;color:var(--muted);padding:8px 6px;margin-left:-8px;border-radius:20px;display:grid;place-items:center;transition:color .2s,background .25s,transform .25s var(--ease)}
+/* margin-left was -8px, which pulled the caret into the word it sits beside and
+   left the hover pill overlapping the label's last letter. A small positive gap
+   instead, and a square box so the hover state reads as a round target rather
+   than a clipped lozenge. */
+.nav-dropdown-caret{border:0;background:transparent;color:var(--muted);width:26px;height:26px;padding:0;margin-left:5px;border-radius:50%;display:grid;place-items:center;transition:color .2s,background .25s,transform .25s var(--ease)}
 .nav-dropdown-caret:hover{background:color-mix(in srgb,var(--green-500) 10%,transparent);color:var(--ink)}
 .nav-dropdown-caret.active{color:var(--ink)}
 /* Rotates to point up when the panel is open. The transition lives on the base
@@ -57,7 +61,7 @@
    Click-triggered disclosure. The panel is only in the DOM while open (see
    NavDropdown.jsx), so there is no hidden-but-focusable state to defend against
    and the entrance can be a plain animation with nothing to reverse. */
-.nav-dropdown{position:relative;display:flex;align-items:center}
+.nav-dropdown{position:relative;display:flex;align-items:center;gap:1px}
 .nav-dropdown-label{display:inline-flex;align-items:center}
 
 .nav-dropdown-panel{position:absolute;top:calc(100% + 14px);left:-14px;z-index:110;min-width:290px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);animation:navMenuIn .18s var(--ease) both}
