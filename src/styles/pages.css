@@ -986,9 +986,37 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 
 /* Glass secondary. Border rather than fill, so it reads as the quieter of the
    two without disappearing into the artwork behind it. */
-.button.glass{background:rgba(255,255,255,.07);color:#fff;border:1px solid rgba(255,255,255,.42);backdrop-filter:blur(6px)}
-.button.glass:hover{background:rgba(255,255,255,.14);border-color:#fff}
+/* .42 alpha measured 2.73:1 against the hero band - under SC 1.4.11's 3:1 for a
+   control boundary, which is why this button read as barely there rather than as
+   deliberately quiet. .72 measures 5.01:1 and still looks like glass. */
+.button.glass{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.72);backdrop-filter:blur(6px)}
+.button.glass:hover{background:rgba(255,255,255,.2);border-color:#fff}
 .button.glass:active{transform:translateY(1px)}
+
+/* --- GTN hero CTAs ---------------------------------------------------------
+   Scoped to this hero rather than changed globally: .primary is background:
+   var(--deep), and --deep is #0B5C36 - the SAME green as the band behind it. A
+   green button on a green hero is why these disappeared. Elsewhere .primary sits
+   on white or on photography, where it is correct, so the fix belongs here.
+
+   The primary inverts to a white surface: 8.08:1 against the band, so the button
+   reads as an object before any text is parsed, and --green-700 on white gives
+   the label 8.84:1. White-on-green is also the identity the rest of the site
+   uses, so this is the palette, not a new colour.
+
+   One primary, one secondary: the filled white plate is unmistakably the main
+   action, and the outlined glass beside it is clearly the lesser one. Neither
+   changes size, position or behaviour. */
+.network-hero-actions .button.primary{background:#fff;color:var(--green-700)}
+.network-hero-actions .button.primary:hover{background:var(--green-050);color:var(--green-700)}
+.network-hero-actions .button.primary:active{transform:scale(.97)}
+/* The arrow draws in currentColor, so it tracks the label in both variants
+   instead of needing its own rule. */
+.network-hero-actions .button.primary svg{color:var(--green-700)}
+/* Dual-tone ring: the white halo reads on the photograph, the green core reads
+   against the white plate. The global focus style assumes a light page. */
+.network-hero-actions .button:focus-visible{outline:2px solid #fff;outline-offset:3px;
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--green-700) 55%,transparent)}
 
 /* ── Process flow ──────────────────────────────────────────────────────────── */
 .network-hero-foot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(20px,3vw,40px);align-items:center}
