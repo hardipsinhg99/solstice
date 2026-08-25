@@ -1,18 +1,33 @@
-import { Fragment, useMemo } from 'react'
+import { Fragment, lazy, Suspense, useMemo } from 'react'
 import { PageUnavailable } from '../../components/layout/PageUnavailable.jsx'
 import { Button } from '../../components/ui/Button.jsx'
 import { Eyebrow } from '../../components/ui/Eyebrow.jsx'
 import { Icon } from '../../components/ui/Icon.jsx'
 import { cardProps } from '../../components/ui/Card.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
-import { WorldMap, mapFromLocations } from '../../features/worldmap/index.js'
+// NOT the barrel. The barrel re-exports WorldMap.jsx, which imports gsap, so
+// importing mapFromLocations through it drags a 6.4MB animation library into the
+// entry chunk for every page - including the ones with no map and no animation.
+// The transform is tiny and eager; the component is lazy, below.
+import { mapFromLocations } from '../../features/worldmap/fromLocations.js'
 import { useProductCatalogue } from '../../features/products/index.js'
 import { HOME_MAP_FALLBACK } from '../../data/globe.js'
 import { useNavigate } from '../../app/navigation.js'
 import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
 import { usePage } from '../../features/pages/index.js'
 import { HeroMedia } from './sections/HeroMedia.jsx'
-import { JourneyScroll } from './sections/JourneyScroll.jsx'
+
+/* Split out of the entry chunk. Both of these are the only gsap consumers on the
+   site, and neither is above the fold:
+   - JourneyScroll is currently HIDDEN by the CMS, so it never renders at all,
+     yet its code shipped to every visitor.
+   - WorldMap sits mid-page on Home and About.
+   Measured before this change: one 896KB bundle whose parse produced long tasks
+   of 86/71/82/53ms right after FCP - the stutter this fixes. */
+const JourneyScroll = lazy(() =>
+  import('./sections/JourneyScroll.jsx').then((m) => ({ default: m.JourneyScroll })))
+const WorldMap = lazy(() =>
+  import('../../features/worldmap/WorldMap.jsx').then((m) => ({ default: m.WorldMap })))
 import { Certifications } from './sections/Certifications.jsx'
 import { HOME_FALLBACK } from './homeFallback.js'
 
@@ -129,7 +144,11 @@ export default function HomePage({ selectProduct, theme }) {
           </Reveal>
           <div className="globe-layout">
             <Reveal as="div" delay={100} className="globe-stage">
-              <WorldMap markers={plot.markers} arcs={plot.arcs}/>
+              {/* The fallback carries .worldmap, which is aspect-ratio 2/1, so the box is
+                  reserved at exactly the map size and the chunk arriving shifts nothing. */}
+              <Suspense fallback={<div className="worldmap" aria-hidden="true"/>}>
+                <WorldMap markers={plot.markers} arcs={plot.arcs}/>
+              </Suspense>
             </Reveal>
             <Reveal as="div" delay={160} className="globe-legend">
               <ul>
@@ -177,7 +196,9 @@ export default function HomePage({ selectProduct, theme }) {
     {/* Not display:none. A hidden section is absent from the API payload, so
         the component never mounts, no ScrollTrigger is created and none of the
         fourteen /journey/*.webp files are requested. */}
-    {shows('journey') && <JourneyScroll/>}
+    {/* null fallback: this section is hidden in the CMS so it never mounts. If
+        switched on it streams in below the fold instead of blocking paint. */}
+    {shows('journey') && <Suspense fallback={null}><JourneyScroll/></Suspense>}
 
     {/* Hidden by the section visibility toggle like any other section, and it
         renders nothing on its own when no certificate is published. */}

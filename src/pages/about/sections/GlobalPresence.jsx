@@ -1,7 +1,10 @@
 import { Eyebrow } from '../../../components/ui/Eyebrow.jsx'
 import { Reveal } from '../../../components/motion/Reveal.jsx'
-import { useMemo } from 'react'
-import { WorldMap, mapFromLocations } from '../../../features/worldmap/index.js'
+import { Suspense, lazy, useMemo } from 'react'
+// Same split as HomePage: the transform eager, the gsap-bearing component lazy.
+import { mapFromLocations } from '../../../features/worldmap/fromLocations.js'
+const WorldMap = lazy(() =>
+  import('../../../features/worldmap/WorldMap.jsx').then((m) => ({ default: m.WorldMap })))
 import { ABOUT_MAP_FALLBACK } from '../../../data/globe.js'
 
 // Wraps the dotted world map with the About page's office data. It does not
@@ -43,7 +46,9 @@ export function GlobalPresence({ data }) {
             {/* aria-hidden: the canvas carries no text alternative that the
                 adjacent list does not already provide in full. */}
             <div aria-hidden="true">
-              <WorldMap markers={plot.markers} arcs={plot.arcs}/>
+              <Suspense fallback={<div className="worldmap" aria-hidden="true"/>}>
+                <WorldMap markers={plot.markers} arcs={plot.arcs}/>
+              </Suspense>
             </div>
           </Reveal>
 
