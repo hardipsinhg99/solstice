@@ -10,6 +10,7 @@ export function Header({ route, theme, setTheme }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const toggleRef = useRef(null)
+  const settings = useSiteSettings()
   // Waits for a DEFINITIVE answer before loading Google's script. `resolved`
   // is what separates "the admin turned it off" from "settings have not landed
   // yet" - and only the first of those is knowable at first paint. Injecting on
