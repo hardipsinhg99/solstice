@@ -21,10 +21,23 @@ const FALLBACK = {
   contactPhoneEnabled: true,
   contactEmailLabel: '',
   contactPhoneLabel: '',
-  // Fails OPEN. A settings fetch that has not landed, or that failed, must not
-  // blink the language selector out of the header - the widget staying is the
-  // safe direction, and turning it off is a deliberate admin action.
-  translateEnabled: true
+  // Fails CLOSED, and this one is deliberately the opposite of the two above.
+  //
+  // It used to be `true`, reasoning that the selector must not blink out of the
+  // header while the fetch was in flight. That is right for a value we render
+  // and wrong for a THIRD-PARTY SCRIPT: for the ~100ms before /api/settings
+  // lands, the fallback said "enabled", so Google's translate loader was
+  // injected on a guess - and a <script> cannot be un-injected. The setting then
+  // read false, the effect re-ran, and nothing could be done: Google had already
+  // loaded, rewritten text nodes and inserted its <select> into the header.
+  //
+  // So the admin toggle was inoperative for every visitor, and the injection
+  // itself was the flicker - head, nav-tools and #text all mutating 450-1050ms
+  // after paint, with the navbar reflowing around a control that appeared late.
+  //
+  // Never load someone else's script because a default said so. The header now
+  // waits for a definitive answer; see `resolved` below.
+  translateEnabled: false
 }
 
 async function fetchSiteSettings() {
@@ -49,8 +62,13 @@ export function clearSiteSettings() {
  * value arrives, and swaps silently.
  */
 export function useSiteSettings() {
-  const [data] = useApiResource(KEY, fetchSiteSettings, FALLBACK)
-  return data ?? FALLBACK
+  const [data, status] = useApiResource(KEY, fetchSiteSettings, FALLBACK)
+  // `resolved` distinguishes "the server said false" from "we do not know yet".
+  // Every other field is safe to read optimistically from the fallback; anything
+  // with a side effect beyond rendering - loading a third-party script - must
+  // wait for this. Added as a field rather than a second return value so the
+  // four existing callers, which all destructure an object, keep working.
+  return { ...(data ?? FALLBACK), resolved: status === 'ready' }
 }
 
 /**

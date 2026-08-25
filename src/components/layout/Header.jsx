@@ -10,11 +10,12 @@ export function Header({ route, theme, setTheme }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const toggleRef = useRef(null)
-  // Fails OPEN: the fallback has translateEnabled true, so a settings fetch
-  // that has not landed - or fails - leaves the widget where it was rather than
-  // blinking it out of the header on every cold load.
-  const settings = useSiteSettings()
-  const translateOn = settings?.translateEnabled !== false
+  // Waits for a DEFINITIVE answer before loading Google's script. `resolved`
+  // is what separates "the admin turned it off" from "settings have not landed
+  // yet" - and only the first of those is knowable at first paint. Injecting on
+  // the optimistic default is what made the toggle inoperative and put a late
+  // <select> into the navbar, reflowing it ~500ms after paint.
+  const translateOn = settings.resolved && settings.translateEnabled !== false
   const [langSlotRef, langReady] = useTranslateSlot(translateOn)
 
   useEffect(() => {
