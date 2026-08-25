@@ -616,6 +616,15 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .gallery-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .gallery-tile:before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(0deg,#0007,transparent 40%);opacity:0;transition:opacity .3s}
 .gallery-tile:hover:before{opacity:1}
+/* Loading placeholders. Same grid, same row height, same tile spans - the point
+   is that the box the real tile will occupy already exists, so nothing moves
+   when it arrives. Colour only, no dimensions of their own. */
+.gallery-tile.is-skeleton{background:color-mix(in srgb,var(--ink) 7%,var(--surface));
+  border-radius:inherit;pointer-events:none}
+@media(prefers-reduced-motion:no-preference){
+  .gallery-tile.is-skeleton{animation:gallery-skeleton 1.4s ease-in-out infinite}
+}
+@keyframes gallery-skeleton{50%{background:color-mix(in srgb,var(--ink) 12%,var(--surface))}}
 /* The index badge carries a class now that the tile can also hold a caption -
    an unqualified `.gallery-tile span` would absolutely-position both into the
    same corner. */

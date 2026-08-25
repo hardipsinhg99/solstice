@@ -112,8 +112,27 @@ export default function GalleryPage() {
         ))}
       </div>
 
+      {/* A skeleton GRID, not a one-line "Loading..." paragraph.
+      
+          The paragraph left the page ~575px tall, so the footer sat in the
+          viewport; when 21 tiles arrived at grid-auto-rows:216px the page jumped
+          to ~2373px and shoved the footer 1800px down while it was still on
+          screen. Measured CLS 0.49 - five times the 0.1 "good" threshold, and the
+          fluctuation reported on this page.
+      
+          Nine tiles is three rows, which with the page title puts the footer
+          below the fold during load. Content that arrives below the fold does not
+          count as a layout shift and, more to the point, nobody sees it move. The
+          real remaining growth is off-screen. */}
       {status === 'loading' && images.length === 0 && (
-        <p className="container gallery-status" role="status">Loading the gallery…</p>
+        <>
+          <div className="container gallery-grid" aria-hidden="true">
+            {Array.from({ length: 9 }, (_, i) => (
+              <div className={`gallery-tile is-skeleton tile-${(i % 5) + 1}`} key={i}/>
+            ))}
+          </div>
+          <p className="visually-hidden" role="status">Loading the gallery…</p>
+        </>
       )}
       {status === 'error' && (
         <p className="container gallery-status" role="status">

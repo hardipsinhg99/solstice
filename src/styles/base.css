@@ -107,3 +107,9 @@ h2{font-size:clamp(41px,4.6vw,65px)}
     scroll-behavior:auto!important;
   }
 }
+
+/* Announced to screen readers, invisible on screen. The gallery uses it for its
+   loading status now that the visible text has been replaced by a skeleton -
+   the status still needs to be spoken, it just must not occupy layout. */
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
