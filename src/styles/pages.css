@@ -215,7 +215,10 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .buyer-path-grid h3{font-size:20px;letter-spacing:-.6px;margin:40px 0 9px}
 .buyer-path-grid p{font-size:12px;line-height:1.65;color:var(--muted);max-width:240px}
 
-.home-manifesto{background:var(--deep);color:var(--ink-on-dark);padding:113px 0}
+.home-manifesto{background:var(--deep);color:var(--ink-on-dark);padding:clamp(72px,7vw,104px) 0}
+/* align-items:center was already right; the imbalance was vertical padding on a
+   section whose two columns differ a lot in height. Trimmed so the block does
+   not end in ~200px of empty green. */
 .manifesto-grid{display:grid;grid-template-columns:45% 1fr;gap:13%;align-items:center}
 .manifesto-visual{position:relative}
 .manifesto-image{height:440px;background:linear-gradient(#0c2d1e25,#0c2d1e6b),url('https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=1000&q=85') center/cover;border-radius:0 150px 0 0}
@@ -223,6 +226,12 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .manifesto-stat{background:var(--surface);color:var(--ink);padding:16px 20px;box-shadow:var(--shadow);display:flex;align-items:baseline;gap:11px;min-width:230px}
 .manifesto-stat b{font-size:26px;font-family:'Playfair Display',Georgia,serif;font-weight:500;color:var(--green-500);letter-spacing:-1px}
 .manifesto-stat span{font-size:11px;line-height:1.4;color:var(--muted)}
+/* base.css sets h1..h6{color:var(--ink)} as an ELEMENT selector, which beats
+   the color inherited from .home-manifesto - so this section's own headline
+   rendered --ink on --deep and measured 2.09:1. Invisible, and the reason the
+   section looked broken rather than merely plain. Stated explicitly here, the
+   same fix the About and Network heroes already carry. */
+.home-manifesto h2{color:var(--ink-on-dark)}
 .home-manifesto .eyebrow{color:var(--green-on-dark)}
 .home-manifesto h2 em{color:var(--green-on-dark)}
 .home-manifesto p{max-width:370px;color:#c1cec5;font-size:14px;line-height:1.75;margin:25px 0}

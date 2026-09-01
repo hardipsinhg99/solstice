@@ -1,7 +1,7 @@
 /* ============================================================
    Footer & chat
    ============================================================ */
-footer{background:var(--deep);color:var(--body-on-dark)}
+footer{background:var(--deep-3);color:var(--body-on-dark)}
 /* The headline was invisible in LIGHT mode and fine in dark, which is exactly
    what a missing colour looks like: base.css sets `h1,h2,h3,h4,h5,h6{color:
    var(--ink)}` as an ELEMENT selector, and any specificity beats the
@@ -10,13 +10,24 @@ footer{background:var(--deep);color:var(--body-on-dark)}
    light and 16.55:1 dark. The band does not invert with the theme, so its ink
    must not either - stated once, explicitly.
    Measured now: 12.16:1 light, 16.86:1 dark. */
-.footer-cta{border-bottom:1px solid rgba(255,255,255,.12);position:relative;isolation:isolate}
+/* Its own step in the ladder, between the manifesto above and the footer below,
+   so the CTA reads as a distinct band rather than the top of the footer. */
+.footer-cta{background:var(--deep-2);border-bottom:1px solid rgba(255,255,255,.12);position:relative;isolation:isolate}
 /* A single wide glow behind the copy rather than a panel or a border. It lifts
    the band off the footer beneath without introducing a second surface colour
    to keep in step with the palette. */
 .footer-cta:before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
   background:radial-gradient(120% 140% at 12% 50%,color-mix(in srgb,var(--green-500) 16%,transparent) 0%,transparent 62%)}
-.footer-cta-inner{display:flex;align-items:center;justify-content:space-between;gap:clamp(28px,4vw,56px);padding:clamp(52px,7vw,72px) 0}
+/* max-width, so the button sits in conversation with the heading instead of
+   being flung to the far edge of a 1180px container - at desktop the two were
+   ~600px apart with nothing between them. */
+/* flex-start with a bounded gap, not space-between. .footer-cta-inner IS the
+   .container, so capping its width or its margins moves the whole row off the
+   page's left edge - the CTA has to keep the gutter the manifesto above and the
+   footer columns below use. Constraining the LAYOUT instead of the box keeps
+   that edge and still stops the button being flung ~600px away from the heading
+   it belongs to. */
+.footer-cta-inner{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:clamp(28px,4vw,64px);padding:clamp(52px,7vw,72px) 0}
 .footer-cta-inner .eyebrow{color:var(--green-on-dark);margin-bottom:14px;display:block}
 .footer-cta-inner h3{color:var(--ink-on-dark);font-size:clamp(25px,3.4vw,40px);line-height:1.14;letter-spacing:-1.1px;margin:0;max-width:19ch;font-weight:700;text-wrap:balance}
 /* The accent names what we actually sell, so it carries the emphasis. --lime

@@ -98,7 +98,7 @@ export function Footer() {
             without it hands the opened page a reference to this window. */}
         <a className="footer-credit" href="https://ivisioncraft.dev/"
            target="_blank" rel="noopener noreferrer">
-          Made by <strong>iVisionCraft</strong>
+          Made by{' '}<strong>iVisionCraft</strong>
         </a>
       </div>
     </footer>
