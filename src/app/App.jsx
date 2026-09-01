@@ -20,6 +20,9 @@ import { useTheme } from './ThemeProvider.jsx'
 import { goTo, useHashRoute, isProductRoute, productSlug, isProductsRoute, productsTrade, isAdminRoute } from './router.js'
 import AdminApp from '../pages/admin/AdminApp.jsx'
 
+// Routes whose first section is a dark full-bleed hero.
+const HERO_ROUTES = new Set(['home', 'about', 'network'])
+
 export function App() {
   // Keeps the fixed corner stack from sitting on headings mid-scroll. See the
   // hook for why this is behaviour rather than a layout inset.
@@ -75,7 +78,17 @@ export function App() {
         route and bounce the user to the home page. */}
     <button className="skip-link" onClick={() => mainRef.current?.focus()}>Skip to content</button>
     <Header route={onProduct ? 'products' : route} theme={theme} setTheme={setTheme}/>
-    <main id="main-content" ref={mainRef} tabIndex={-1}>
+    {/* data-hero says whether this route paints a dark hero behind the fixed
+        header, deciding both the header's transparency and whether <main>
+        offsets the header height.
+    
+        It comes from the ROUTE, which is known at first paint. The CSS used
+        :has(.network-hero), and that hero renders only once its CMS section
+        arrives - so <main> started at padding-top:82px and dropped to 0 when the
+        data landed. An 82px shift every load: measured CLS 0.70 on GTN against
+        0.05 before. Layout must never depend on content still in flight. */}
+    <main id="main-content" ref={mainRef} tabIndex={-1}
+          data-hero={HERO_ROUTES.has(route) ? '' : undefined}>
       {onProduct
         ? <ProductDetailPage product={product} selectProduct={selectProduct}/>
         : onProducts

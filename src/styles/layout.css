@@ -31,12 +31,12 @@
    <main>, because the page components already tell us which hero they render and
    adding a prop through App.jsx to say the same thing would be duplicate state. */
 main{padding-top:var(--header-h)}
-main:has(>.home-hero),main:has(>.network-hero),main:has(.about-hero){padding-top:0}
+main[data-hero]{padding-top:0}
 
 /* At the top of a hero page the bar dissolves into the artwork. Only there:
    Products, Contact, Gallery and Services open on a light background, where a
    transparent bar would be light-on-light and unreadable. */
-body[data-scroll='top']:has(.home-hero,.network-hero,.about-hero) .site-header{
+body[data-scroll='top']:has(main[data-hero]) .site-header{
   /* Not background:transparent. Measured on the Home hero, white nav text scored
      9.24 at the left of the bar and 3.72 by "Contact us" - the artwork lightens
      toward the right, so the last items dropped under AA. A top-down scrim keeps
@@ -45,9 +45,9 @@ body[data-scroll='top']:has(.home-hero,.network-hero,.about-hero) .site-header{
   background:linear-gradient(180deg,rgba(6,18,12,.66),rgba(6,18,12,.38) 58%,transparent);
   backdrop-filter:none;border-color:transparent;box-shadow:none}
 /* The hero art is dark, so the nav must go light while it sits on it. */
-body[data-scroll='top']:has(.home-hero,.network-hero,.about-hero) .site-header .nav-links>button,
-body[data-scroll='top']:has(.home-hero,.network-hero,.about-hero) .site-header .nav-dropdown-label,
-body[data-scroll='top']:has(.home-hero,.network-hero,.about-hero) .site-header .nav-dropdown-caret{color:#fff}
+body[data-scroll='top']:has(main[data-hero]) .site-header .nav-links>button,
+body[data-scroll='top']:has(main[data-hero]) .site-header .nav-dropdown-label,
+body[data-scroll='top']:has(main[data-hero]) .site-header .nav-dropdown-caret{color:#fff}
 
 /* The bar STAYS. An earlier revision slid it away on downward scroll; that was
    asked for and then reversed, and permanently visible is the safer default -
