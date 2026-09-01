@@ -161,6 +161,11 @@
 
 @media(max-width:780px){
   .container{width:min(100% - 40px,560px)}
+  /* The clamp floor is 41px, so h2 never got smaller than that no matter how
+     narrow the screen - identical type at 390px and at 320px. A 41px display
+     heading in a 288px container leaves almost no margin and forces awkward
+     wraps. Scales with the viewport here and keeps the desktop clamp intact. */
+  h2{font-size:clamp(27px,7.4vw,38px)}
   .footer-logo img{width:180px}
   /* min-width:0 so a long email address wraps inside its column instead of
      widening the grid track and taking the page with it. */

@@ -62,7 +62,17 @@ h1,h2,h3,p{margin-top:0}
 /* Headings take --ink, body copy --body: the two were a single token, so every
    heading and every paragraph carried identical weight on the page. */
 h1,h2,h3,h4,h5,h6{color:var(--ink)}
-h1,h2{letter-spacing:-2.6px;line-height:.98}
+/* Tracking in em, not px, and leading above 1.
+   -2.6px was applied at every size. At the 65px desktop maximum that is -4%,
+   which is correct display tracking; at the 41px mobile floor it is -6.3%, tight
+   enough that adjacent words visually merge - "Supplier to shipment," read as one
+   blob on a phone. -0.04em is the same -2.6px at 65px and scales down with the
+   type instead of staying put.
+   line-height:.98 put the leading BELOW the glyph size, so any heading that
+   wrapped had its lines physically collide. That was not a mobile bug - it hit
+   every wrapped heading at every width; small screens just wrap more. 1.05 is
+   still tight display leading and cannot overlap. */
+h1,h2{letter-spacing:-0.04em;line-height:1.05}
 /* The accent words - "your table.", "footprint.", "growth partner." - are the
    one editorial gesture in the headline. They were Playfair Display ITALIC,
    which at 65px reads as script and undercut the corporate register the rest of
