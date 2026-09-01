@@ -35,6 +35,11 @@ import { useEffect } from 'react'
 const HIDE_AFTER_PX = 8
 const SHOW_AFTER_PX = 56
 const ARM_AFTER_PX = 240    // never hide while still near the top of the page
+/* The header is "at the top" - and therefore transparent over a hero - only
+   within this band. Kept small and separate from ARM_AFTER_PX: the corner stack
+   may stay put for 240px, but the navbar must go solid as soon as the hero
+   starts moving under it, or it reads as a floating bar over content. */
+const TOP_BAND_PX = 24
 
 export function useScrollAway() {
   useEffect(() => {
@@ -43,6 +48,7 @@ export function useScrollAway() {
     let frame = 0
     let travel = 0        // distance covered in the current direction
     let state = 'near'    // mirrors the attribute so it is only written on change
+    let published = null  // last data-scroll value, same write-on-change rule
 
     const apply = () => {
       frame = 0
@@ -65,6 +71,18 @@ export function useScrollAway() {
       // The attribute used to be written on EVERY scroll frame - 19 writes in a
       // single flick, each invalidating style for every rule that matches body.
       // It now changes only when the state actually does.
+      // ONE listener drives both the corner stack and the header. The header
+      // used to run its own scroll handler for a `scrolled` boolean; two
+      // handlers reading window.scrollY on the same frame is two chances to
+      // disagree, and this one already computes direction with thresholds the
+      // header needs anyway.
+      const atTop = y <= TOP_BAND_PX
+      const scroll = atTop ? 'top' : next === 'away' ? 'down' : 'up'
+      if (scroll !== published) {
+        published = scroll
+        root.dataset.scroll = scroll
+      }
+
       if (next === state) return
       state = next
       travel = 0
@@ -76,11 +94,14 @@ export function useScrollAway() {
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(apply) }
 
     root.dataset.cornerStack = state
+    published = window.scrollY <= TOP_BAND_PX ? 'top' : 'up'
+    root.dataset.scroll = published
     addEventListener('scroll', onScroll, { passive: true })
     return () => {
       removeEventListener('scroll', onScroll)
       if (frame) cancelAnimationFrame(frame)
       delete root.dataset.cornerStack
+      delete root.dataset.scroll
     }
   }, [])
 }

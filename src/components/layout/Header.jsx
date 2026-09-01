@@ -8,7 +8,6 @@ import { useSiteSettings } from '../../features/settings/index.js'
 export function Header({ route, theme, setTheme }) {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
   const toggleRef = useRef(null)
   const settings = useSiteSettings()
   // Waits for a DEFINITIVE answer before loading Google's script. `resolved`
@@ -19,12 +18,13 @@ export function Header({ route, theme, setTheme }) {
   const translateOn = settings.resolved && settings.translateEnabled !== false
   const [langSlotRef, langReady] = useTranslateSlot(translateOn)
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  /* The `scrolled` boolean and its listener are gone. useScrollAway already runs
+     one rAF-coalesced scroll handler and now publishes body[data-scroll] as
+     top | up | down, which is a superset of what this computed - so the header
+     is driven from CSS instead.
+
+     Two handlers reading window.scrollY on the same frame is two chances to
+     disagree, and the site had three listeners before this. It has two now. */
 
   // Scroll lock, plus the two things the drawer was missing: Escape to dismiss
   // (SC 2.1.2 - a keyboard user who opened it had no way out but tabbing through
@@ -84,7 +84,7 @@ export function Header({ route, theme, setTheme }) {
     // scrolled), so it computed to ~12px tall - or zero - instead of covering
     // the viewport. Outside it, `fixed` means fixed to the viewport again.
     <>
-    <header className={scrolled ? 'site-header scrolled' : 'site-header'}>
+    <header className="site-header">
       <div className="container nav">
         <button className="brand brand-logo notranslate" translate="no" onClick={() => onNavigate('home')} aria-label="Solstice home">
           {/* Intrinsic dimensions, not the rendered 145px: they give the browser
