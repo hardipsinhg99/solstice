@@ -17,8 +17,9 @@ import GalleryPage from '../pages/gallery/GalleryPage.jsx'
 import ContactPage from '../pages/contact/ContactPage.jsx'
 import { NavigationProvider } from './navigation.js'
 import { useTheme } from './ThemeProvider.jsx'
-import { goTo, useHashRoute, isProductRoute, productSlug, isProductsRoute, productsTrade, productsCategory, isAdminRoute } from './router.js'
+import { goTo, usePathRoute, isKnownRoute, isProductRoute, productSlug, isProductsRoute, productsTrade, productsCategory, isAdminRoute } from './router.js'
 import AdminApp from '../pages/admin/AdminApp.jsx'
+import { NotFound } from '../components/layout/NotFound.jsx'
 
 // Routes whose first section is a dark full-bleed hero.
 const HERO_ROUTES = new Set(['home', 'about', 'network'])
@@ -29,7 +30,7 @@ export function App() {
   useScrollAway()
 
   const { theme, setTheme } = useTheme()
-  const route = useHashRoute()
+  const route = usePathRoute()
   const [products] = useProductCatalogue()
   const mainRef = useRef(null)
   const firstRender = useRef(true)
@@ -103,7 +104,7 @@ export function App() {
           // category is in the key too, so arriving from a Home card at a
           // different category applies it rather than keeping the old chip.
           ? <ProductsPage key={`${trade ?? 'all'}/${category ?? ''}`} trade={trade} category={category} selectProduct={selectProduct}/>
-          : (pages[route] || pages.home)}
+          : (pages[route] ?? <NotFound/>)}
     </main>
     <Footer/>
     <ChatWidget/>
