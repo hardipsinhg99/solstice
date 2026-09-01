@@ -93,6 +93,13 @@ export function Footer() {
       <div className="container footer-bottom">
         <span>© {new Date().getFullYear()} Solstice Trading International LLP</span>
         <span>Fresh produce export, from India to your market.</span>
+        {/* Build credit. A real external link, so it carries the same
+            noopener/noreferrer the footer's social marks do - target=_blank
+            without it hands the opened page a reference to this window. */}
+        <a className="footer-credit" href="https://ivisioncraft.dev/"
+           target="_blank" rel="noopener noreferrer">
+          Made by <strong>iVisionCraft</strong>
+        </a>
       </div>
     </footer>
   )

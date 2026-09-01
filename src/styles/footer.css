@@ -74,6 +74,19 @@ footer{background:var(--deep);color:var(--body-on-dark)}
    footer's dark band rather than inheriting a light-theme halo. */
 .footer-social a:focus-visible{outline:2px solid var(--green-on-dark);outline-offset:2px}
 .footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:22px 0;border-top:1px solid rgba(255,255,255,.12);font-size:10px;color:var(--muted-on-dark)}
+/* The credit sits with the other two lines in the same flex row, so it inherits
+   the row's wrapping and needs no layout of its own. Muted by default and
+   brightening on hover: it is a credit, not a call to action, and should not
+   compete with the footer's own links.
+   Underlined, not colour-only - SC 1.4.1, the same rule the footer's contact
+   links follow. */
+.footer-credit{display:inline-flex;align-items:center;min-height:24px;
+  color:var(--muted-on-dark);text-decoration:underline;
+  text-underline-offset:3px;text-decoration-thickness:1px;
+  transition:color .2s var(--ease)}
+.footer-credit strong{font-weight:600;color:var(--body-on-dark)}
+.footer-credit:hover,.footer-credit:focus-visible{color:var(--ink-on-dark)}
+.footer-credit:hover strong{color:#fff}
 .chat-button{position:fixed;right:21px;bottom:20px;z-index:120;width:51px;height:51px;border:0;border-radius:50%;background:var(--green-600);color:var(--on-green);box-shadow:0 10px 25px rgba(13,43,27,.3);display:grid;place-items:center;transition:transform .25s var(--ease)}
 .chat-button:hover{transform:scale(1.08)}
 /* visibility - not just opacity - is what removes the closed panel from the
