@@ -31,6 +31,21 @@
    <main>, because the page components already tell us which hero they render and
    adding a prop through App.jsx to say the same thing would be duplicate state. */
 main{padding-top:var(--header-h)}
+/* The page must never be shorter than the viewport before its content arrives.
+   Every CMS page paints a hero (or nothing) first and mounts its sections when
+   the API answers; if the document is short at that moment the FOOTER sits on
+   screen, and pushing it down as sections land is counted - and seen - as a
+   large layout shift.
+
+   Measured on GTN: one 0.7033 shift at +497ms, the footer moving 828px. It read
+   as 0.0487 before the header stopped taking 82px of flow, because those 82px
+   were just enough to keep the footer below the fold. The 82px were never the
+   fix, they were luck.
+
+   100svh guarantees the fold is past the footer at first paint, so the growth
+   happens off-screen. Same class of bug the gallery skeleton solved locally;
+   this solves it for every page at once. */
+main{min-height:100svh}
 main[data-hero]{padding-top:0}
 
 /* At the top of a hero page the bar dissolves into the artwork. Only there:
