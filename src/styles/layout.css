@@ -23,14 +23,14 @@
 
    Transitions name their properties rather than `all`: background, blur, shadow
    and translate are cheap; height is not, and it is already here from before. */
-.site-header{height:82px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(16px);border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent);position:fixed;top:0;left:0;right:0;z-index:100;isolation:isolate;
+.site-header{height:var(--header-h);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(16px);border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent);position:fixed;top:0;left:0;right:0;z-index:100;isolation:isolate;
   transition:height .3s var(--ease),box-shadow .4s var(--ease),background-color .4s var(--ease),backdrop-filter .4s var(--ease),border-color .4s var(--ease),translate .34s var(--ease)}
 
 /* The header is out of flow, so <main> carries its height. Hero pages opt OUT -
    that is precisely where the bar should overlay. :has() rather than a class on
    <main>, because the page components already tell us which hero they render and
    adding a prop through App.jsx to say the same thing would be duplicate state. */
-main{padding-top:82px}
+main{padding-top:var(--header-h)}
 main:has(>.home-hero),main:has(>.network-hero),main:has(.about-hero){padding-top:0}
 
 /* At the top of a hero page the bar dissolves into the artwork. Only there:
@@ -49,11 +49,13 @@ body[data-scroll='top']:has(.home-hero,.network-hero,.about-hero) .site-header .
 body[data-scroll='top']:has(.home-hero,.network-hero,.about-hero) .site-header .nav-dropdown-label,
 body[data-scroll='top']:has(.home-hero,.network-hero,.about-hero) .site-header .nav-dropdown-caret{color:#fff}
 
-/* Away on the way down, back on the way up. translate, not top/height - it is
-   composited, so this costs no layout. The thresholds live in useScrollAway:
-   8px to hide, 56px to show, which is what stops trackpad jitter flapping it. */
-body[data-scroll='down'] .site-header{translate:0 -100%}
-body[data-scroll='up'] .site-header,body[data-scroll='top'] .site-header{translate:0 0}
+/* The bar STAYS. An earlier revision slid it away on downward scroll; that was
+   asked for and then reversed, and permanently visible is the safer default -
+   a nav that leaves cannot flicker, cannot be mid-transition when the user
+   reaches for it, and needs no direction detection to be correct.
+   data-scroll is still published and still drives the transparent -> solid
+   transition below; only the translate is gone. */
+.site-header{translate:0 0}
 .site-header:before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green-500),var(--lime) 45%,var(--gold));opacity:.8}
 body[data-scroll='up'] .site-header,body[data-scroll='down'] .site-header{height:68px;box-shadow:0 10px 30px rgba(10,30,20,.08)}
 body[data-scroll='up'] .site-header .brand-logo img,body[data-scroll='down'] .site-header .brand-logo img{transform:scale(.92)}

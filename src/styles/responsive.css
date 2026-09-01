@@ -73,7 +73,10 @@
  * answer different questions and are only coincidentally near each other.
  */
 @media(max-width:960px){
-  .site-header{height:70px}
+  :root{--header-h:70px}
+  /* height now comes from the token above; kept so the selector still documents
+     that this breakpoint shortens the bar. */
+  .site-header{height:var(--header-h)}
   .nav{gap:10px}
   .nav-tools{margin-left:auto}
   .theme-toggle,.menu-toggle{width:33px;height:33px;flex:0 0 33px}
@@ -96,7 +99,7 @@
      and since it is stuck to the viewport top, that resolves to the same
      place. max-height + overflow-y means a long menu on a short phone scrolls
      inside itself instead of running off the bottom. */
-  .nav-links{position:fixed;top:70px;max-height:calc(100dvh - 70px);overflow-y:auto;overscroll-behavior:contain;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--line);padding:19px 20px;box-shadow:var(--shadow);flex-direction:column;align-items:stretch;gap:6px;opacity:0;visibility:hidden;transform:translateY(-10px);pointer-events:none;transition:opacity .25s var(--ease),transform .25s var(--ease),visibility 0s linear .25s}
+  .nav-links{position:fixed;top:var(--header-h);max-height:calc(100dvh - var(--header-h));overflow-y:auto;overscroll-behavior:contain;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--line);padding:19px 20px;box-shadow:var(--shadow);flex-direction:column;align-items:stretch;gap:6px;opacity:0;visibility:hidden;transform:translateY(-10px);pointer-events:none;transition:opacity .25s var(--ease),transform .25s var(--ease),visibility 0s linear .25s}
   .nav-links.open{opacity:1;visibility:visible;transform:none;pointer-events:auto;transition:opacity .25s var(--ease),transform .25s var(--ease),visibility 0s linear 0s}
   .nav-links>button{text-align:left;margin:0;padding:12px 4px;border-radius:0;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
   .nav-links>button:hover{background:none;color:var(--green-600)}
