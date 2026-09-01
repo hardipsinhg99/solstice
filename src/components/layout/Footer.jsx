@@ -91,15 +91,20 @@ export function Footer() {
         </div>
       </div>
       <div className="container footer-bottom">
-        <span>© {new Date().getFullYear()} Solstice Trading International LLP</span>
+        {/* Copyright and build credit are ONE flex item, so the credit sits with
+            the line it belongs to instead of being pushed to the opposite corner
+            by justify-content:space-between. They wrap together on a phone. */}
+        <span className="footer-legal">
+          <span>© {new Date().getFullYear()} Solstice Trading International LLP</span>
+          {/* A real external link, so it carries the same noopener/noreferrer the
+              footer's social marks do - target=_blank without it hands the opened
+              page a reference to this window. */}
+          <a className="footer-credit" href="https://ivisioncraft.dev/"
+             target="_blank" rel="noopener noreferrer">
+            Made by{' '}<strong>iVisionCraft</strong>
+          </a>
+        </span>
         <span>Fresh produce export, from India to your market.</span>
-        {/* Build credit. A real external link, so it carries the same
-            noopener/noreferrer the footer's social marks do - target=_blank
-            without it hands the opened page a reference to this window. */}
-        <a className="footer-credit" href="https://ivisioncraft.dev/"
-           target="_blank" rel="noopener noreferrer">
-          Made by{' '}<strong>iVisionCraft</strong>
-        </a>
       </div>
     </footer>
   )

@@ -91,11 +91,18 @@ footer{background:var(--deep-3);color:var(--body-on-dark)}
    compete with the footer's own links.
    Underlined, not colour-only - SC 1.4.1, the same rule the footer's contact
    links follow. */
+/* The pair sits as one item on the left. column-gap is generous enough to read
+   as two separate statements rather than one run-on line; row-gap covers the
+   phone, where they stack. */
+.footer-legal{display:flex;align-items:center;flex-wrap:wrap;column-gap:22px;row-gap:4px}
 .footer-credit{display:inline-flex;align-items:center;min-height:24px;
   color:var(--muted-on-dark);text-decoration:underline;
   text-underline-offset:3px;text-decoration-thickness:1px;
   transition:color .2s var(--ease)}
-.footer-credit strong{font-weight:600;color:var(--body-on-dark)}
+/* A rendered space is only ~3px at this size and the underline runs straight
+   through it, so "Made by iVisionCraft" read as one word. The margin separates
+   the name optically rather than relying on the space character alone. */
+.footer-credit strong{font-weight:600;color:var(--body-on-dark);margin-left:.5em}
 .footer-credit:hover,.footer-credit:focus-visible{color:var(--ink-on-dark)}
 .footer-credit:hover strong{color:#fff}
 .chat-button{position:fixed;right:21px;bottom:20px;z-index:120;width:51px;height:51px;border:0;border-radius:50%;background:var(--green-600);color:var(--on-green);box-shadow:0 10px 25px rgba(13,43,27,.3);display:grid;place-items:center;transition:transform .25s var(--ease)}
