@@ -13,7 +13,7 @@
    Measured light: 4.85:1 on --surface, 4.56:1 on --bg, 4.29:1 on --soft.
    Dark stays #d9bb74, which already measures 8.17:1 on --surface. */
 /* GREEN RAMP.
-   The brand green is #058A4B, sampled from the master artwork. It measures
+   The brand green is #00894D, sampled from the logo artwork. It measures
    4.43:1 on white - which clears SC 1.4.11's 3:1 for graphics and AA for large
    text, but misses the 4.5:1 that normal-size text needs, and white on it is the
    same 4.43:1, so it cannot carry a small white button label either. It is
@@ -37,9 +37,9 @@
    Its consumers are split across -500 and -600 by role, not by appearance. */
 :root{
   color-scheme:light;
-  --green-500:#058A4B;
-  --green-600:#046A3A;
-  --green-700:#03562F;
+  --green-500:#00894D;
+  --green-600:#006B3D;
+  --green-700:#005731;
   --green-050:#EEF6F1;
   /* The label that sits ON a green fill. White is correct on the light theme's
      -600/-700 (6.71:1 / 8.84:1) but wrong on the dark theme's mint, where white
@@ -101,7 +101,7 @@
      measured 1.87:1 in dark, where the green becomes a light mint; pinned to
      literal values the worst point of the gradient holds 4.92:1 against the
      monogram's #f2f6ec in both themes. */
-  --monogram-plate:linear-gradient(150deg,#0B5C36,#058A4B);
+  --monogram-plate:linear-gradient(150deg,#0B5C36,#00894D);
   /* Green text on a section that is dark in BOTH themes - the hero, the
      manifesto, the about hero, the journey captions, the footer CTA. These
      surfaces do not invert, so the ramp cannot serve them: --green-600 measured
@@ -126,7 +126,7 @@
      Frozen at the light ramp's -700, same precedent as --monogram-plate above.
      On the composited scrim it measures 5.87:1 light / 5.58:1 dark; -600 would
      have been 4.46:1 / 4.24:1, i.e. under AA in both. */
-  --green-on-scrim:#03562F;
+  --green-on-scrim:#005731;
   /* WhatsApp's own green, darkened. Declared once and deliberately NOT
      overridden in the dark block - it identifies a third-party service, and a
      brand mark that flips with the theme stops being a brand mark (same
@@ -191,7 +191,7 @@
    stay light-on-light while the page is dark. */
 /* The green ramp INVERTS here: on a dark surface a higher step must be lighter,
    not darker, so -700 (the hover/focus step) is the lightest value rather than
-   the deepest. The light ramp is not reusable - #046A3A measures 2.04:1 on
+   the deepest. The light ramp is not reusable - #006B3D measures ~2.0:1 on
    --soft. Measured on the dark surfaces:
 
                     --bg    --surface  --soft   --deep
@@ -203,9 +203,9 @@
    --green-500 is 2.05:1. Dark ink on them measures 8.12:1 to 11.70:1. */
 html[data-theme='dark']{
   color-scheme:dark;
-  --green-500:#6CC793;
-  --green-600:#8AD6AB;
-  --green-700:#ABE5C4;
+  --green-500:#6BC79F;
+  --green-600:#89D2B2;
+  --green-700:#A6DDC5;
   /* Keeps the dark theme's existing tinted-surface value rather than inventing a
      second one next to it; --soft still aliases onto it, as in the light block. */
   --green-050:#1b3226;

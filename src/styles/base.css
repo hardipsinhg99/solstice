@@ -37,7 +37,7 @@ main:focus{outline:none}
    the reason the ramp has a working step at all. --on-green is the token that
    already exists for "the label that sits on a green fill", so the pair flips
    with the theme on its own.
-   Measured: light #ffffff on #046A3A 6.71:1, dark #12211B on #8AD6AB 9.76:1. */
+   Measured: light #ffffff on #006B3D 6.62:1, dark #12211B on #89D2B2 9.47:1. */
 ::selection{background:var(--green-600);color:var(--on-green)}
 /* Dual-tone focus ring, so at least one edge clears 3:1 on any backdrop -
    including the photographic hero and the deep-green footer. SC 2.4.11 / 2.4.13.
