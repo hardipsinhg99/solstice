@@ -497,15 +497,49 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 
 /* -- 6. journey stats ------------------------------------------------------- */
 .about-stats{background:var(--surface)}
-/* Fixed grid tracks + a reserved min-height: the counter changes glyphs inside
-   a box whose dimensions were settled at first paint, so counting 0 -> 350
-   cannot move anything on the page. */
-.about-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.about-stat{background:var(--bg);border:1px solid var(--line);padding:26px 22px;min-height:150px;display:flex;flex-direction:column;justify-content:center;position:relative}
-.about-stat b{display:block;font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:clamp(34px,3.6vw,46px);line-height:1;letter-spacing:-.0326em;color:var(--green-500);font-variant-numeric:tabular-nums;margin-bottom:10px}
-.about-stat-static b{font-size:clamp(19px,2vw,24px);letter-spacing:-.025em;line-height:1.25;color:var(--gold-text)}
-.about-stat-label{font-size:12px;color:var(--muted)}
-.about-stat-unit{font:500 10px 'DM Mono';letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:5px}
+/* Figures as a grid of compact mint cards on the section's white - the reverse
+   of "What we do" above (white cards on mint), so the two read as a pair.
+   Columns: 2 on every phone; from 768px and 1200px the counts come from the
+   number of visible figures (--stat-cols-tab / --stat-cols-desk, set by
+   JourneyStats.jsx) so rows stay balanced as figures are added or hidden.
+   No layout shift while counting: rows stretch, each card reserves its height
+   and the numerals are tabular, so 0 -> 350 only changes glyphs. */
+.about-stat-grid{list-style:none;margin:0;padding:0;display:grid;gap:clamp(10px,1.4vw,16px);
+  grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(min-width:768px){.about-stat-grid{grid-template-columns:repeat(var(--stat-cols-tab,3),minmax(0,1fr))}}
+@media(min-width:1200px){.about-stat-grid{grid-template-columns:repeat(var(--stat-cols-desk,6),minmax(0,1fr))}}
+/* Size container: number and text sizes follow the CARD's width (cqi). */
+.about-stat-item{display:flex;min-width:0;container-type:inline-size}
+.about-stat{position:relative;flex:1;min-width:0;min-height:120px;display:flex;flex-direction:column;gap:6px;
+  padding:clamp(14px,9cqi,22px);overflow:hidden;
+  background:linear-gradient(160deg,color-mix(in srgb,var(--soft) 90%,var(--surface)) 0%,color-mix(in srgb,var(--soft) 55%,var(--surface)) 100%);
+  border:1px solid var(--border);border-radius:clamp(14px,1.4vw,18px);
+  transition:transform .25s var(--ease),border-color .25s var(--ease),box-shadow .25s var(--ease)}
+.about-stat:after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;
+  background:linear-gradient(90deg,var(--green-500),var(--green-600));transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
+/* Value and icon share the top row; the value takes the room, the icon never
+   overlaps it (flex, with the icon fixed-size and the value allowed to wrap). */
+.about-stat-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px}
+.about-stat b{display:block;min-width:0;font-family:'Playfair Display',Georgia,serif;font-weight:500;
+  font-size:clamp(28px,22cqi,46px);line-height:1;letter-spacing:-.0326em;color:var(--green-600);font-variant-numeric:tabular-nums}
+/* Text values ("2023", "Agro, FMCG, Ceramics & Plastics"). Brand green, not
+   --gold-text: gold measures 4.29:1 on mint, under AA at this size. */
+.about-stat-static b{font-size:clamp(15px,10cqi,20px);letter-spacing:-.025em;line-height:1.25;overflow-wrap:anywhere}
+.about-stat-icon{width:30px;height:30px;flex:none;border-radius:9px;display:grid;place-items:center;
+  background:var(--surface);color:var(--green-600);border:1px solid var(--border);
+  transition:background-color .25s var(--ease),color .25s var(--ease),transform .25s var(--ease)}
+.about-stat-label{font-size:14px;font-weight:600;line-height:1.3;color:var(--ink);overflow-wrap:anywhere}
+.about-stat-unit{font:500 11px/1.3 'DM Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.about-stat-note{font-size:13px;line-height:1.5;color:var(--muted)}
+@media(hover:hover) and (pointer:fine){
+  .about-stat:hover{transform:translateY(-3px);box-shadow:var(--elev-1);border-color:color-mix(in srgb,var(--green-500) 38%,var(--border))}
+  .about-stat:hover:after{transform:scaleX(1)}
+  .about-stat:hover .about-stat-icon{background:var(--green-600);color:var(--on-green);border-color:var(--green-600);transform:rotate(-6deg)}
+}
+@media(prefers-reduced-motion:reduce){
+  .about-stat,.about-stat:after,.about-stat-icon{transition:none}
+  .about-stat:hover,.about-stat:hover .about-stat-icon{transform:none}
+}
 
 /* -- 7. why choose us ------------------------------------------------------- */
 .about-why{background:var(--soft)}

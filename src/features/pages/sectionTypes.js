@@ -295,11 +295,18 @@ const ABOUT = [
     key: 'journeyStats', type: 'about.journeyStats', label: 'Journey in numbers',
     help: 'A figure entered here is a public claim. Leave `value` empty and enter `text` for anything that is not a countable number.',
     fields: [
+      f('eyebrow', 'Section label', 'text', {
+        help: 'The small label above the heading, e.g. THE RECORD SO FAR. Leave empty to hide it.'
+      }),
       f('heading', 'Heading'),
       f('stats', 'Statistics', 'list', {
         itemLabel: 'Statistic',
-        fields: [f('label', 'Label'), f('value', 'Number', 'number'), f('text', 'Text instead of a number'),
+        fields: [f('label', 'Label', 'text', { required: true }),
+                 f('value', 'Number', 'number'), f('text', 'Text instead of a number'),
                  f('suffix', 'Suffix'), f('unit', 'Unit'),
+                 f('icon', 'Icon', 'text', { help: 'Optional. A sprite name: calendar, globe, ship, box, layers, grid, award, check, leaf, factory.' }),
+                 f('note', 'Supporting text', 'text', { help: 'Optional one-liner under the label.' }),
+                 f('published', 'Show on the site', 'toggle', { default: true, help: 'Off hides this figure without deleting it.' }),
                  f('unresolvedScope', 'Flag as unverified', 'toggle')]
       })
     ]

@@ -437,9 +437,6 @@
   .about-presence-layout{grid-template-columns:1fr;gap:30px}
   .about-globe-stage{max-width:none}
 
-  .about-stat-grid{grid-template-columns:1fr 1fr;gap:10px}
-  .about-stat{min-height:128px;padding:20px 16px}
-
   .about-check-list,.about-recognition-list{grid-template-columns:1fr;gap:12px}
   .about-check-list li{font-size:14px}
 
@@ -448,10 +445,6 @@
   .about-mv{padding-bottom:73px}
 }
 
-@media(max-width:480px){
-  .about-stat-grid{grid-template-columns:1fr}
-  .about-stat{min-height:0}
-}
 
 /* ── Hero in landscape ───────────────────────────────────────────────────────
    .home-hero is a fixed 730px and .home-hero-inner a fixed 620px. On a phone
