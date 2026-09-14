@@ -227,7 +227,9 @@ export default function HomePage({ selectProduct, theme }) {
             {/* An uploaded image replaces the CSS plate; with none set the plate
                 stays, which is what the page has always shown. */}
             {manifesto.image?.url
-              ? <img className="manifesto-image" src={manifesto.image.url} alt={manifesto.image.alt || ''} loading="lazy" decoding="async"/>
+              ? <img className="manifesto-photo" src={manifesto.image.url} alt={manifesto.image.alt || ''}
+                     width={manifesto.image.width || undefined} height={manifesto.image.height || undefined}
+                     loading="lazy" decoding="async"/>
               : <div className="manifesto-image"/>}
             <div className="manifesto-stats">
               {(manifesto.stats ?? []).map((stat) => (

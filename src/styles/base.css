@@ -88,7 +88,12 @@ h1,h2{letter-spacing:-0.04em;line-height:1.05}
    Colour is unchanged - --green-500 is the identity green off the logo, and at
    this size it clears the 3:1 large-text bar on every surface it lands on
    (4.12:1 on --bg, 4.39:1 on --surface, 8.55:1 dark). */
-h1 em,h2 em{font-family:'Playfair Display',Georgia,serif;font-weight:500;font-style:normal;letter-spacing:-1.1px;color:var(--green-500)}
+h1 em,h2 em{font-family:'Playfair Display',Georgia,serif;font-weight:500;font-style:normal;color:var(--green-500)}
+/* Tracking in em, per heading level, at the ratio the -1.1px gave at 1280
+   (h1 84.48px, h2 58.88px) - so it scales with the heading instead of
+   tightening as the heading shrinks. */
+h1 em{letter-spacing:-.013em}
+h2 em{letter-spacing:-.0187em}
 h2{font-size:clamp(41px,4.6vw,65px)}
 
 /* ============================================================

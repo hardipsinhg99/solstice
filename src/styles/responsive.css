@@ -226,12 +226,12 @@
   .buyer-path-grid p{margin-bottom:0}
 
   .home-manifesto{padding:72px 0}
-  .manifesto-image{height:310px;width:88%;border-radius:0 100px 0 0}
+  .manifesto-image,.manifesto-photo{height:310px;width:88%;border-radius:0 100px 0 0}
   .manifesto-stats{position:static;margin-top:16px;flex-direction:column}
   .manifesto-stat{min-width:0}
 
   .page-title{padding:69px 0 56px}
-  .page-title h1{font-size:48px;letter-spacing:-3px}
+  .page-title h1{font-size:48px}
   .page-title>div>p:last-child{font-size:13px;margin-top:22px}
   .title-mark{font-size:min(46vw,220px);right:-2%}
 
@@ -302,7 +302,7 @@
   .container{width:calc(100% - 32px)}
   .home-hero{min-height:600px}
   .home-hero-inner{height:auto;min-height:600px;padding:84px 0 40px}
-  .hero-copy h1{font-size:46px;letter-spacing:-2.8px;line-height:.94}
+  .hero-copy h1{font-size:46px;line-height:.94}
   .hero-copy>p{font-size:12px;line-height:1.62}
   .hero-buttons .button{padding:12px 13px;gap:9px}
   .hero-meta{font-size:9.5px;margin-top:21px}
@@ -317,7 +317,7 @@
   .product-feature h3{font-size:22px}
   .buyer-path-grid article{padding:17px 0}
   .home-manifesto{padding:60px 0}
-  .manifesto-image{height:255px}
+  .manifesto-image,.manifesto-photo{height:255px}
   .home-manifesto h2,.home-cta h2,.service-callout h2,.team-join h2{font-size:40px}
   .detail-copy h1{font-size:45px}
   .detail-image{height:275px}
@@ -523,9 +523,9 @@
      hero on a phone pushes the process strip entirely below the fold, so the
      one thing the page exists to explain is never seen. */
   .network-hero{min-height:auto;padding:calc(70px + clamp(26px,7vw,44px)) 0 clamp(40px,9vw,60px)}
-  .network-hero h1{font-size:clamp(31px,8.6vw,42px);letter-spacing:-1.2px;line-height:1.06}
+  .network-hero h1{font-size:clamp(31px,8.6vw,42px);line-height:1.06}
   .network-hero .network-lede{font-size:14.5px;line-height:1.65;max-width:38ch;margin-top:16px}
-  .network-hero-eyebrow{font-size:10.5px;letter-spacing:2.2px}
+  .network-hero-eyebrow{font-size:10.5px;letter-spacing:.2095em}
   .network-hero-inner{gap:clamp(30px,7vw,44px)}
   /* Buttons go full width and stack. Side by side at 360px leaves each about
      150px, which is a cramped target for the page's primary action. */
@@ -543,7 +543,7 @@
   /* Number and label share a line: "QUALITY CONTROL" was wrapping mid-label
      with the description beside it, which read as two broken columns. */
   .network-flow-num{grid-area:head;display:flex;align-items:center;gap:9px;margin:0;font-size:12px}
-  .network-flow-label{grid-area:head;margin-left:30px;align-self:center;font-size:12px;letter-spacing:1px;line-height:1.25}
+  .network-flow-label{grid-area:head;margin-left:30px;align-self:center;font-size:12px;letter-spacing:.087em;line-height:1.25}
   .network-flow-body{grid-area:body;max-width:none;font-size:13px;line-height:1.55}
 
   /* The connector returns as a vertical rail through the icon column, so the
@@ -596,12 +596,12 @@
   /* Height follows content. A viewport-height hero on a phone pushes the value
      points - the trust signal - entirely below the fold. */
   .about-hero{min-height:auto;padding:calc(70px + clamp(26px,7vw,44px)) 0 clamp(40px,9vw,56px)}
-  .about-hero h1{font-size:clamp(31px,8.4vw,42px);letter-spacing:-1.1px;line-height:1.08;
+  .about-hero h1{font-size:clamp(31px,8.4vw,42px);line-height:1.08;
     /* 16ch is a desktop measure. On a phone it is what produced the narrow
        column, so the cap is released and the viewport does the wrapping. */
     max-width:none}
   .about-hero-lede{font-size:14.5px;max-width:40ch}
-  .about-hero-eyebrow{font-size:10.5px;letter-spacing:2.2px;margin-bottom:14px}
+  .about-hero-eyebrow{font-size:10.5px;letter-spacing:.2095em;margin-bottom:14px}
   .about-hero-rule{width:64px;margin:20px 0}
   .about-hero-inner{gap:clamp(30px,7vw,42px)}
   /* Row layout: icon on a fixed rail, text beside it. Stacked-and-centred wastes
@@ -617,7 +617,7 @@
 }
 
 @media(max-width:390px){
-  .about-hero h1{font-size:clamp(27px,8.2vw,33px);letter-spacing:-.8px}
+  .about-hero h1{font-size:clamp(27px,8.2vw,33px)}
   .about-hero-point{grid-template-columns:40px minmax(0,1fr);column-gap:12px}
   .about-hero-point-icon{width:40px;height:40px}
 }
