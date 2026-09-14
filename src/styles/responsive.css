@@ -28,7 +28,7 @@
   .contact-page-grid{gap:7%}
 
   /* Column counts that only ever worked at desktop width. */
-  .differentiator-grid,.trust-grid,.products-list,.team-grid{grid-template-columns:1fr 1fr}
+  .differentiator-grid,.trust-grid,.team-grid{grid-template-columns:1fr 1fr}
   .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
 
   /* The staggered feature row needs the full 1180px to read as deliberate
@@ -46,7 +46,6 @@
 
   .detail-image{height:390px}
   .team-image{height:280px}
-  .product-list-image{height:230px}
   .gallery-grid{grid-auto-rows:190px}
 
   /* Insurance for the larger nav type. This is the tightest desktop range - the
@@ -210,7 +209,7 @@
   .section-head{display:block;margin-bottom:29px}
   .section-head .quiet-link{margin-top:19px}
 
-  .product-feature-grid,.products-list,.team-grid,.related-grid{grid-template-columns:1fr;gap:13px}
+  .product-feature-grid,.team-grid,.related-grid{grid-template-columns:1fr;gap:13px}
   .detail-top{margin-bottom:32px}
   .product-feature,.product-feature-1,.product-feature-2{height:307px;margin:0;width:100%;min-width:0}
 
@@ -242,12 +241,7 @@
   .service-callout{padding:71px 0}
 
   .products-page{padding-top:40px}
-  .product-list-card,.team-grid article{min-width:0}
-  .product-list-image{height:255px}
-  .product-list-info p{min-height:0}
-  .product-filters{overflow-x:auto;padding-bottom:3px;white-space:nowrap}
-  .product-specs div{grid-template-columns:76px 1fr;gap:10px}
-  .product-filters button{flex:0 0 auto}
+  .team-grid article{min-width:0}
 
   .detail-hero{padding:50px 0 0}
   .detail-grid{gap:38px}
