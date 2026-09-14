@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { MAP_WIDTH, MAP_HEIGHT, project, projectPercent, arcPath } from './project.js'
 import { placeLabels } from './placeLabels.js'
@@ -30,6 +30,27 @@ export function WorldMap({ markers = [], arcs = [], className = '' }) {
   // omitted. ONLY the pulse: the pin underneath is always rendered.
   const [still, setStill] = useState(false)
   const [debug, setDebug] = useState(null)
+
+  // The map's rendered size, which label placement needs: label text is a fixed
+  // pixel size while the map scales, so a layout that is right at 1200px is
+  // wrong at 343px. Measured in a layout effect so the first paint already has
+  // the right sides chosen, then kept current as the box resizes.
+  const [stage, setStage] = useState(null)
+  useLayoutEffect(() => {
+    const el = root.current
+    if (!el) return
+    const read = () => {
+      const r = el.getBoundingClientRect()
+      setStage((s) => (s && Math.abs(s.width - r.width) < 1 && Math.abs(s.height - r.height) < 1 ? s : { width: r.width, height: r.height }))
+    }
+    read()
+    const ro = new ResizeObserver(read)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  // Below this the full names do not fit beside the pins - short names and
+  // smaller pills take over. The legend under the map keeps the full names.
+  const compact = Boolean(stage && stage.width < 600)
 
   useEffect(() => {
     const q = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -132,7 +153,7 @@ export function WorldMap({ markers = [], arcs = [], className = '' }) {
     .filter((m) => Number.isFinite(m.lat) && Number.isFinite(m.lng))
 
   return (
-    <div className={`worldmap ${className}`.trim()} ref={root} aria-hidden="true">
+    <div className={`worldmap${compact ? ' is-compact' : ''} ${className}`.trim()} ref={root} aria-hidden="true">
       <div className="worldmap-dots"/>
 
       {/* preserveAspectRatio is "none", not "xMidYMid meet". The land is a CSS
@@ -204,13 +225,13 @@ export function WorldMap({ markers = [], arcs = [], className = '' }) {
       </svg>
 
       <div className="worldmap-labels">
-        {placeLabels(pts).map((m) => {
+        {stage && placeLabels(pts, stage, compact).map((m) => {
           const { left, top } = projectPercent(m.lng, m.lat)
           return (
             <span key={`l-${m.id ?? m.label}`}
                   className={`worldmap-label is-${m.place}`}
                   style={{ left: `${left}%`, top: `${top}%` }}>
-              {m.label}
+              {m.text}
             </span>
           )
         })}

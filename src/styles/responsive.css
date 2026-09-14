@@ -485,21 +485,13 @@
   .hero-scroll-cue{display:none}
 }
 
-/* World map labels are dropped on phones. At 390px the map is ~390x195 and the
-   pills cannot sit on it without overlapping each other and the coastlines: the
-   pill width is set by the text, so it does NOT shrink with the map, and
-   "United Arab Emirates" alone is over a third of a 360px viewport.
-   placeLabels() reasons in viewBox units on the assumption that the stage is
-   near its 800-unit nominal width, which stops being true here - so the labels
-   are removed rather than left to be placed on bad arithmetic.
-   The names are not lost: both pages render the same locations as a real list
-   directly below the map, and that list is already the accessible source of
-   truth - so this removes a duplicate, not information. Arcs and pins stay, and
-   the pins get larger, which is what keeps the shape of the network readable.
-   The threshold is 780px because that is where .container caps at 560px: below
-   it the map is 288-560 wide, far enough from the 800-unit nominal that the
-   placement estimates stop being trustworthy. Above it the map is 733px+ and
-   they hold. */
+/* World map labels USED to be dropped on phones: placeLabels() reasoned in
+   viewBox units assuming the map was near its 800-unit nominal width, and at
+   390px that arithmetic put "United Arab Emirates" over a third of the map.
+   It now measures the rendered map and, below 600px, uses short names (India
+   HQ, UAE, UK) in smaller pills - see features/worldmap/placeLabels.js - so the
+   labels are shown at every width. The list under the map keeps the full
+   names and remains the accessible source (the map itself is aria-hidden). */
 @media(max-width:780px){
   /* The narrow crop is 704x672; the ship and gantries sit right of its centre,
      so a portrait frame anchored at 50% clips the bow. 60% keeps the full vessel
@@ -508,8 +500,9 @@
      the sunset. */
   .hero-poster{object-position:60% 34%}
 
-  .worldmap-labels{display:none}
-  /* Slightly larger pins to stay legible once the labels are gone. */
+  /* Labels stay on: placeLabels() now measures the rendered map and switches
+     to short names, so they no longer collide at this width. Pins are a touch
+     larger so a thumb-sized screen still reads them as points. */
   .worldmap-pin{r:4}
   .worldmap-pin.is-hq{r:5}
 }
