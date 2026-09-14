@@ -56,7 +56,6 @@
   .nav-links{--nav-gap:14px;--nav-cta-gap:10px}
 
   /* About: five industries and three stat columns both over-compress here. */
-  .about-industry-grid{grid-template-columns:repeat(3,1fr)}
   .about-presence-layout{gap:5%}
   .about-founder-grid{gap:18px}
 }
@@ -434,8 +433,6 @@
   .about-principle{padding:8px 0}
   .about-founder-mission{margin-top:30px;text-align:left}
 
-  .about-industry-grid{grid-template-columns:1fr 1fr;gap:10px}
-  .about-industry-card .about-tilt-inner{min-height:0;padding:20px 16px}
 
   .about-presence-layout{grid-template-columns:1fr;gap:30px}
   .about-globe-stage{max-width:none}
@@ -454,7 +451,6 @@
 @media(max-width:480px){
   .about-stat-grid{grid-template-columns:1fr}
   .about-stat{min-height:0}
-  .about-industry-grid{grid-template-columns:1fr}
 }
 
 /* ── Hero in landscape ───────────────────────────────────────────────────────

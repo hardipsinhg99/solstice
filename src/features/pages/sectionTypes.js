@@ -252,10 +252,26 @@ const ABOUT = [
   },
   {
     key: 'whatWeDo', type: 'about.whatWeDo', label: 'What we do',
+    help: 'The business-area cards. Cards are numbered automatically in the order below - use the arrows to reorder.',
     fields: [
-      f('heading', 'Heading'), f('intro', 'Intro', 'textarea'),
-      f('industries', 'Industries', 'list', {
-        itemLabel: 'Industry', fields: [f('name', 'Name'), f('icon', 'Icon')]
+      f('eyebrow', 'Section label', 'text', {
+        help: 'The small label above the heading, e.g. WHAT WE DO. Leave empty to hide it.'
+      }),
+      f('heading', 'Heading'),
+      f('headingAccent', 'Heading, highlighted part', 'text', {
+        help: 'Optional. Continues the heading in brand green - e.g. heading "Trade solutions built around" + highlight "your requirements."'
+      }),
+      f('intro', 'Supporting description', 'textarea'),
+      f('industries', 'Business areas', 'list', {
+        itemLabel: 'Business area',
+        fields: [
+          f('name', 'Name', 'text', { required: true }),
+          f('description', 'Short description', 'textarea', {
+            help: 'One or two sentences. Leave empty and the card shows the name only.'
+          }),
+          f('icon', 'Icon', 'text', { help: 'A sprite name: leaf, box, ceramic, layers, factory, globe, ship, award, check, grid.' }),
+          f('published', 'Show on the site', 'toggle', { default: true, help: 'Off hides this card without deleting it.' })
+        ]
       }),
       f('footnote', 'Footnote', 'textarea')
     ]

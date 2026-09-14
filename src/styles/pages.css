@@ -406,11 +406,41 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .about-founder-mission{margin:44px auto 0;max-width:620px;text-align:center;font-size:15px;line-height:1.75;color:var(--muted)}
 
 /* -- 4. what we do ---------------------------------------------------------- */
+/* "What we do" - numbered business-area cards, all CMS-driven (see
+   WhatWeDo.jsx). White cards on the section's mint, one green accent per card.
+   No breakpoints: the header wraps and the grid is intrinsic, so it reflows at
+   any width and at any zoom - 3 columns on desktop and a 1024 tablet, 1 on a
+   phone. */
 .about-industries{background:var(--soft)}
-.about-industry-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
-.about-industry-card .about-tilt-inner{padding:24px 20px;display:flex;flex-direction:column;gap:16px;min-height:172px}
-.about-industry-icon{color:var(--green-500)}
-.about-industry-card h3{margin:0;font-size:15px;line-height:1.35;letter-spacing:-.02em}
+.about-industries-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
+  gap:clamp(16px,3vw,56px);margin-bottom:clamp(32px,4vw,52px)}
+.about-industries-head>div{flex:1 1 30rem;min-width:0}
+.about-industries-head h2{margin:0;max-width:20ch;text-wrap:balance}
+.about-industries-accent{color:var(--green-600)}
+.about-industries-intro{flex:0 1 26rem;margin:0;font-size:15px;line-height:1.75;color:var(--muted)}
+.about-industry-grid{list-style:none;margin:0;padding:0;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(100%,19rem),1fr));gap:clamp(12px,1.6vw,20px)}
+.about-industry-item{display:flex}
+.about-industry-card{flex:1;display:flex;flex-direction:column;gap:14px;padding:clamp(22px,2.4vw,30px);
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--elev-1);
+  transition:transform .25s var(--ease),border-color .25s var(--ease),box-shadow .25s var(--ease)}
+.about-industry-number{font:500 11px/1 'DM Mono',monospace;letter-spacing:.08em;color:var(--muted)}
+.about-industry-icon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;margin-top:6px;
+  background:var(--green-050);color:var(--green-600);
+  transition:transform .25s var(--ease),background-color .25s var(--ease),color .25s var(--ease)}
+.about-industry-card h3{margin:6px 0 0;font-size:clamp(18px,1.4vw,20px);line-height:1.3;letter-spacing:-.02em}
+.about-industry-card p{margin:0;font-size:14px;line-height:1.65;color:var(--muted)}
+/* Hover is decoration, so it only exists where a pointer can hover - it must
+   not stick after a tap on a phone. 250ms, well inside the 150-300ms band. */
+@media(hover:hover) and (pointer:fine){
+  .about-industry-card:hover{transform:translateY(-4px);box-shadow:var(--elev-2);
+    border-color:color-mix(in srgb,var(--green-500) 38%,var(--border))}
+  .about-industry-card:hover .about-industry-icon{background:var(--green-600);color:var(--on-green);transform:translateY(-2px) rotate(-6deg)}
+}
+@media(prefers-reduced-motion:reduce){
+  .about-industry-card,.about-industry-icon{transition:none}
+  .about-industry-card:hover,.about-industry-card:hover .about-industry-icon{transform:none}
+}
 .about-industry-footnote{margin:32px 0 0;max-width:620px;font-size:14px;line-height:1.7;color:var(--muted)}
 
 /* -- 5. global presence ----------------------------------------------------- */

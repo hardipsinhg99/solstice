@@ -215,7 +215,11 @@ export function Field({ field, value, onChange, idBase }) {
   if (field.kind === 'toggle') {
     return (
       <label className="admin-check admin-toggle-field">
-        <input type="checkbox" checked={Boolean(value)} aria-describedby={helpId}
+        {/* An absent value means the field's DEFAULT, not false. Rows saved
+            before a toggle existed carry no value at all, and the public site
+            already reads that as "shown" - so the checkbox must too, or the
+            admin reports a live row as hidden. */}
+        <input type="checkbox" checked={value === undefined ? Boolean(field.default) : Boolean(value)} aria-describedby={helpId}
                onChange={(e) => onChange(e.target.checked)}/>
         <span>{field.label}</span>
         {field.help && <small className="admin-hint" id={helpId}>{field.help}</small>}
