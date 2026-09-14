@@ -418,27 +418,62 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .about-industries-head h2{margin:0;max-width:20ch;text-wrap:balance}
 .about-industries-accent{color:var(--green-600)}
 .about-industries-intro{flex:0 1 26rem;margin:0;font-size:15px;line-height:1.75;color:var(--muted)}
-.about-industry-grid{list-style:none;margin:0;padding:0;display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(min(100%,19rem),1fr));gap:clamp(12px,1.6vw,20px)}
-.about-industry-item{display:flex}
-.about-industry-card{flex:1;display:flex;flex-direction:column;gap:14px;padding:clamp(22px,2.4vw,30px);
-  background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--elev-1);
+.about-industry-grid{list-style:none;margin:0;padding:0;display:grid;gap:clamp(10px,1.4vw,18px);
+  grid-template-columns:repeat(2,minmax(0,1fr))}
+/* Mobile-first column count. 2 on every phone (never one card per row), then
+   3 / 4 / 5 as width allows. A card added in the admin just takes the next
+   cell; rows stretch so every card in a row shares its height. */
+@media(min-width:768px){.about-industry-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:992px){.about-industry-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:1200px){.about-industry-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+/* Each cell is a size container: whether a card is "narrow" is a question
+   about the CARD, not the viewport - 5 columns on a desktop and 2 on a phone
+   both produce ~140-230px cards, while a 768px tablet (still in the phone
+   container) produces 180px ones. */
+.about-industry-item{display:flex;min-width:0;container-type:inline-size}
+.about-industry-card{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;gap:12px;
+  padding:clamp(16px,1.7vw,24px);overflow:hidden;
+  background:linear-gradient(180deg,var(--surface) 0%,color-mix(in srgb,var(--soft) 45%,var(--surface)) 100%);
+  border:1px solid var(--border);border-radius:clamp(14px,1.4vw,20px);box-shadow:var(--elev-1);
   transition:transform .25s var(--ease),border-color .25s var(--ease),box-shadow .25s var(--ease)}
-.about-industry-number{font:500 11px/1 'DM Mono',monospace;letter-spacing:.08em;color:var(--muted)}
-.about-industry-icon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;margin-top:6px;
-  background:var(--green-050);color:var(--green-600);
+/* The accent: a green rule along the bottom edge that draws in on hover. */
+.about-industry-card:after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;
+  background:linear-gradient(90deg,var(--green-500),var(--green-600));transform:scaleX(0);transform-origin:left;
+  transition:transform .3s var(--ease)}
+/* Icon and number share one row - saves a line of height on compact cards. */
+.about-industry-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.about-industry-number{font:500 11px/1 'DM Mono',monospace;letter-spacing:.08em;color:var(--muted);padding-top:4px}
+.about-industry-icon{width:clamp(40px,3.4vw,48px);height:clamp(40px,3.4vw,48px);border-radius:12px;flex:none;
+  display:grid;place-items:center;background:var(--green-050);color:var(--green-600);
   transition:transform .25s var(--ease),background-color .25s var(--ease),color .25s var(--ease)}
-.about-industry-card h3{margin:6px 0 0;font-size:clamp(18px,1.4vw,20px);line-height:1.3;letter-spacing:-.02em}
-.about-industry-card p{margin:0;font-size:14px;line-height:1.65;color:var(--muted)}
+/* Names wrap, never truncate. */
+.about-industry-card h3{margin:4px 0 0;font-size:clamp(15px,1.2vw,18px);line-height:1.3;letter-spacing:-.02em;
+  overflow-wrap:anywhere;hyphens:auto}
+.about-industry-desc{margin:0;font-size:14px;line-height:1.6;color:var(--muted)}
+.about-industry-more{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:4px;
+  min-height:44px;padding:0;border:0;background:none;font:600 13px/1 'DM Sans',sans-serif;color:var(--green-600);cursor:pointer}
+.about-industry-more svg{transition:transform .25s var(--ease)}
+.about-industry-more[aria-expanded="true"] svg{transform:rotate(180deg)}
+.about-industry-more:focus-visible{outline:2px solid var(--green-600);outline-offset:3px;border-radius:4px}
+/* Narrow cards (under 240px, at any viewport): three lines of description,
+   the rest behind More - so no card turns into a column of text. The name,
+   icon and number are never hidden. Wider cards show the full description. */
+@container(max-width:240px){
+  .about-industry-card{gap:10px}
+  .about-industry-card h3{font-size:15px}
+  .about-industry-desc{line-height:1.55}
+  .about-industry-desc:not(.is-open){display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;overflow:hidden}
+}
 /* Hover is decoration, so it only exists where a pointer can hover - it must
-   not stick after a tap on a phone. 250ms, well inside the 150-300ms band. */
+   not stick after a tap on a phone. 250-300ms, inside the 150-300ms band. */
 @media(hover:hover) and (pointer:fine){
   .about-industry-card:hover{transform:translateY(-4px);box-shadow:var(--elev-2);
     border-color:color-mix(in srgb,var(--green-500) 38%,var(--border))}
+  .about-industry-card:hover:after{transform:scaleX(1)}
   .about-industry-card:hover .about-industry-icon{background:var(--green-600);color:var(--on-green);transform:translateY(-2px) rotate(-6deg)}
 }
 @media(prefers-reduced-motion:reduce){
-  .about-industry-card,.about-industry-icon{transition:none}
+  .about-industry-card,.about-industry-card:after,.about-industry-icon,.about-industry-more svg{transition:none}
   .about-industry-card:hover,.about-industry-card:hover .about-industry-icon{transform:none}
 }
 .about-industry-footnote{margin:32px 0 0;max-width:620px;font-size:14px;line-height:1.7;color:var(--muted)}
