@@ -61,8 +61,11 @@ function ImageField({ field, value, onChange, id }) {
         // would read as a broken uploader.
         published: replacing ? published : true
       })
-      setNotice(replacing ? 'Image replaced. Save the section to publish it.'
-                          : 'Image uploaded. Save the section to publish it.')
+      // Two steps, and the message has to say both. It used to read "Save the
+      // section to publish it" - but saving writes the DRAFT, and nothing is
+      // live until Publish page. An editor who did exactly what it said saw no
+      // change on the site and concluded the upload was broken.
+      setNotice(`Image ${replacing ? 'replaced' : 'uploaded'}. Now Save this section, then press Publish page to put it on the site.`)
     } catch (err) {
       setError(err.message)
     } finally {

@@ -616,3 +616,12 @@
   .about-hero-point{grid-template-columns:40px minmax(0,1fr);column-gap:12px}
   .about-hero-point-icon{width:40px;height:40px}
 }
+
+/* A phone image uploaded in the admin is already cut for portrait, so centre it
+   rather than applying the desktop framing - neither each hero's default
+   object-position nor the admin's "keep this part in frame", which is written
+   for the wide image. !important because that focus is an inline style (see
+   features/pages/HeroPicture.jsx); this is the one case it must yield. */
+@media(max-width:780px){
+  picture[data-phone-crop] img{object-position:50% 50%!important}
+}

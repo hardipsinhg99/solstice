@@ -1,5 +1,5 @@
 import { Icon } from '../../../components/ui/Icon.jsx'
-import { visibleImage } from '../../../features/pages/index.js'
+import { HeroPicture } from '../../../features/pages/index.js'
 import { Reveal } from '../../../components/motion/Reveal.jsx'
 
 /**
@@ -22,30 +22,29 @@ import { Reveal } from '../../../components/motion/Reveal.jsx'
  */
 export function HeroQuote({ data }) {
   const hero = data ?? {}
-  const image = visibleImage(hero.image)
 
   // Undefined counts as published: rows written before the toggle existed must
   // not silently vanish from a live page.
   const points = (hero.points ?? []).filter((p) => p && p.title && p.published !== false)
 
   return (
-    <section
-      className="about-hero"
-      style={{ '--hero-focus': hero.imageFocus || '66% 50%' }}
-    >
+    <section className="about-hero">
       {/* Two sources, so a phone never downloads the 1672px file. The artwork
           carries no headline text - only the wordmark - so the framing crops
           past it and every word below stays real HTML: readable at 360px,
           indexable, translatable, reachable by a screen reader. */}
-      <picture className="about-hero-banner">
-        {/* Only offered for the BUILT-IN artwork: <source> beats <img src>, so
-            unconditionally listing it meant an uploaded hero was ignored below
-            780px and the bundled file rendered instead. Same defect the Trade
-            Network hero had. */}
-        {!image && <source media="(max-width: 780px)" srcSet="/about-hero-960.webp"/>}
-        <img src={image?.url || '/about-hero.webp'}
-             alt="" aria-hidden="true" fetchPriority="high" decoding="async"/>
-      </picture>
+      <HeroPicture
+        image={hero.image}
+        imageMobile={hero.imageMobile}
+        // Used to be a --hero-focus variable on the section, which a phone
+        // rule in responsive.css set again on the <img> itself - so the
+        // admin's framing was silently ignored below 780px. HeroPicture
+        // applies it inline, which holds at every width.
+        focus={hero.imageFocus}
+        fallback="/about-hero.webp"
+        fallbackPhone="/about-hero-960.webp"
+        className="about-hero-banner"
+      />
 
       <div className="container about-hero-inner">
         <Reveal as="div" className="about-hero-copy">

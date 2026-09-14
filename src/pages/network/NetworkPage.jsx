@@ -7,7 +7,7 @@ import { EnquiryForm } from '../../features/enquiry/index.js'
 import { Reveal } from '../../components/motion/Reveal.jsx'
 import { PageUnavailable } from '../../components/layout/PageUnavailable.jsx'
 import { useNavigate } from '../../app/navigation.js'
-import { usePage } from '../../features/pages/index.js'
+import { usePage, HeroPicture } from '../../features/pages/index.js'
 import { useProductCatalogue } from '../../features/products/index.js'
 import { NETWORK_FALLBACK } from './networkFallback.js'
 
@@ -36,7 +36,6 @@ export default function NetworkPage() {
 
   // Resolved through visibleImage so an unpublished or removed asset degrades to
   // null here, once, rather than each render site testing a different condition.
-  const heroImage = visibleImage(hero.image)
   const whyImage = visibleImage(why.image)
   const cta = section('cta')
 
@@ -66,17 +65,18 @@ export default function NetworkPage() {
             phone never downloads the 1536px one. No baked-in text - every word
             below is real HTML, which is what keeps the hero readable at 390px,
             indexable, translatable and reachable by a screen reader. */}
-        <picture className="network-hero-art">
-          {/* The phone-sized <source> may only be offered for the BUILT-IN artwork.
-              It used to be unconditional, and <source> beats <img src>, so on a
-              phone an uploaded hero was silently ignored and the bundled file
-              rendered instead - an upload that appeared to do nothing below
-              780px. An uploaded asset is already capped at 1600px by the media
-              pipeline, so it needs no second source. */}
-          {!heroImage && <source media="(max-width: 780px)" srcSet="/trade-network-hero-960.webp"/>}
-          <img src={heroImage?.url || '/trade-network-hero.webp'}
-               alt="" aria-hidden="true" fetchPriority="high" decoding="async"/>
-        </picture>
+        {/* Decorative: alt="" keeps it out of the accessibility tree, and it
+            stays out of flow (.network-hero-art is absolutely positioned), so
+            no wrapper - an extra in-flow element would take a cell in the
+            hero's layout. */}
+        <HeroPicture
+          image={hero.image}
+          imageMobile={hero.imageMobile}
+          focus={hero.imageFocus}
+          fallback="/trade-network-hero.webp"
+          fallbackPhone="/trade-network-hero-960.webp"
+          className="network-hero-art"
+        />
 
         <div className="container network-hero-inner">
           <Reveal as="div" className="network-hero-copy">

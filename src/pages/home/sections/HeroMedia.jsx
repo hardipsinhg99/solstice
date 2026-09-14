@@ -1,8 +1,8 @@
-import {
-  HERO_IMAGE_SRC, HERO_IMAGE_NARROW, HERO_NARROW_MEDIA, HERO_IMAGE_W, HERO_IMAGE_H
-} from '../../../lib/constants.js'
+import { HERO_IMAGE_SRC, HERO_IMAGE_NARROW, HERO_IMAGE_W, HERO_IMAGE_H } from '../../../lib/constants.js'
+import { HeroPicture } from '../../../features/pages/index.js'
 
-// The hero visual: the branded logistics composite.
+// The hero visual. The admin can replace it (Pages > Home > Hero); with nothing
+// uploaded it is the branded logistics composite, exactly as before.
 //
 // A real <img>, not the CSS background-image this replaces. A background-image
 // fed through a custom property is invisible to the preload scanner and cannot
@@ -23,30 +23,24 @@ import {
 // the company name, that the business is import/export, that it moves freight -
 // is already in the adjacent h1, the eyebrow and the body copy, so describing it
 // would only make a screen reader read the hero twice.
-export function HeroMedia() {
+export function HeroMedia({ image, imageMobile, focus }) {
   return (
     <div className="hero-media" aria-hidden="true">
       {/* <picture>, not srcset. srcset picks a SIZE of the same picture; below
           780px this needs a different CROP, because the wide frame shows about a
           fifth of its width in a portrait viewport and the ship falls outside it.
-          That is the definition of art direction, and <source media> is the
-          element for it.
-
-          fetchPriority stays on the <img>: it is the LCP candidate, and the
-          preload scanner reads <picture> natively - which is the whole reason
-          this was an <img> and not a CSS background in the first place. */}
-      <picture>
-        <source media={HERO_NARROW_MEDIA} srcSet={HERO_IMAGE_NARROW} width="704" height="672"/>
-        <img
-          className="hero-poster"
-          src={HERO_IMAGE_SRC}
-          alt=""
-          width={HERO_IMAGE_W}
-          height={HERO_IMAGE_H}
-          fetchPriority="high"
-          decoding="async"
-        />
-      </picture>
+          That is art direction, and <source media> is the element for it -
+          HeroPicture decides which file each screen gets. */}
+      <HeroPicture
+        image={image}
+        imageMobile={imageMobile}
+        focus={focus}
+        fallback={HERO_IMAGE_SRC}
+        fallbackPhone={HERO_IMAGE_NARROW}
+        imgClassName="hero-poster"
+        width={HERO_IMAGE_W}
+        height={HERO_IMAGE_H}
+      />
     </div>
   )
 }

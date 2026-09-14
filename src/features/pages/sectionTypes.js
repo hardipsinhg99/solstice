@@ -29,11 +29,31 @@ const COORD_HELP =
   'Decimal degrees, e.g. 23.0225 / 72.5714 for Ahmedabad. Leave both empty and the ' +
   'location is still listed, just not plotted on the globe.'
 
+/* The three hero image controls, identical on Home, About and Trade Network so
+   an editor learns them once. Rendered by features/pages/HeroPicture.jsx, which
+   documents exactly which file each screen size receives. */
+const heroImageFields = (builtIn) => [
+  f('image', 'Hero image', 'image', {
+    help: `The background behind the heading. Leave empty to keep ${builtIn}. ` +
+          'Wide and landscape works best - about 1600 × 1000 px. The heading sits on the left, ' +
+          'so keep the subject to the right. After uploading, Save this section, then Publish page.'
+  }),
+  f('imageMobile', 'Phone image (optional)', 'image', {
+    help: 'A portrait crop for screens narrower than 780px - about 800 × 1000 px. ' +
+          'Leave empty and phones show the hero image above, framed as set below.'
+  }),
+  f('imageFocus', 'Keep this part in frame', 'text', {
+    help: 'Which part of the hero image to keep visible as the screen narrows, as two percentages: ' +
+          'across, then down. "50% 50%" is the centre, "80% 50%" holds the right side. ' +
+          'Leave empty for the default framing.'
+  })
+]
+
 // ── Home ────────────────────────────────────────────────────────────────────
 const HOME = [
   {
     key: 'hero', type: 'home.hero', label: 'Hero',
-    help: 'The first thing a buyer reads. The background composite is a fixed brand asset, not editable here.',
+    help: 'The first thing a buyer reads. The background image is editable below - with none uploaded, the branded logistics composite is shown.',
     fields: [
       f('eyebrow', 'Eyebrow'),
       f('headingLine1', 'Heading, first line'),
@@ -44,7 +64,8 @@ const HOME = [
       f('primaryCtaRoute', 'Primary button goes to', 'text', { help: 'A route: products, contact, about…' }),
       f('secondaryCtaLabel', 'Secondary link'),
       f('secondaryCtaRoute', 'Secondary link goes to'),
-      f('metaItems', 'Meta strip', 'list', { itemLabel: 'Item', fields: [f('text', 'Text')] })
+      f('metaItems', 'Meta strip', 'list', { itemLabel: 'Item', fields: [f('text', 'Text')] }),
+      ...heroImageFields('the branded logistics composite')
     ]
   },
   {
@@ -180,10 +201,7 @@ const ABOUT = [
       f('headingLead', 'Heading', 'textarea', { help: 'Wraps naturally. Do not add line breaks - the layout handles them at every screen size.' }),
       f('headingAccent', 'Heading, highlighted part', 'text', { help: 'Rendered in the brand green, continuing the same sentence.' }),
       f('description', 'Supporting paragraph', 'textarea'),
-      f('image', 'Banner image', 'image'),
-      f('imageFocus', 'Keep this part in frame', 'text', {
-        help: 'A CSS object-position, e.g. "66% 50%" to hold the right of the image as the screen narrows.'
-      }),
+      ...heroImageFields('the built-in globe-and-ship banner'),
       f('points', 'Value points', 'list', {
         itemLabel: 'Point',
         fields: [
@@ -405,7 +423,7 @@ const SERVICES = [
 const NETWORK = [
   {
     key: 'hero', type: 'network.hero', label: 'Hero',
-    help: 'Opening statement. The background image is editable - upload through the picker, same pipeline as product photography.',
+    help: 'Opening statement. The background image is editable below - with none uploaded, the built-in trade-network artwork is shown.',
     fields: [
       f('eyebrow', 'Eyebrow'),
       f('headingLine1', 'Heading, first line'),
@@ -415,9 +433,7 @@ const NETWORK = [
       f('primaryCtaRoute', 'Primary button goes to'),
       f('secondaryCtaLabel', 'Secondary button'),
       f('secondaryCtaRoute', 'Secondary button goes to'),
-      f('image', 'Background image', 'image', {
-        help: 'Leave empty to use the built-in trade-network artwork. Upload one here to replace it.'
-      }),
+      ...heroImageFields('the built-in trade-network artwork'),
       f('steps', 'Process strip', 'list', {
         itemLabel: 'Step',
         fields: [f('label', 'Label'), f('body', 'One line'),

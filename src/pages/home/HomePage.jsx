@@ -65,7 +65,7 @@ export default function HomePage({ selectProduct, theme }) {
   return <>
     {shows('hero') && (
       <section className="home-hero">
-        <HeroMedia/>
+        <HeroMedia image={hero.image} imageMobile={hero.imageMobile} focus={hero.imageFocus}/>
         <div className="hero-scroll-cue" aria-hidden="true"><span>SCROLL</span><i/></div>
         <div className="container home-hero-inner">
           <div className="hero-copy">

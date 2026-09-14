@@ -5,3 +5,4 @@ export {
   reorderMembers, setMemberPhoto, clearMemberPhoto
 } from './useTeamApi.js'
 export { visibleImage } from './visibleImage.js'
+export { HeroPicture } from './HeroPicture.jsx'
