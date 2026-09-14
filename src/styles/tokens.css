@@ -405,7 +405,11 @@ html[data-theme='dark']{
   --monogram-plate:linear-gradient(150deg,#0B5C36,#00894D);
   --monogram-ink:#f2f6ec;
   --hero-eyebrow:var(--gold);
-  --cue-bg:transparent;
+  /* The counter and scroll cue sit over bare photograph at the hero's bottom
+     edge. On a phone in dark mode the "01 - 07" counter measured 2.91:1 on the
+     live site - a failure that predates the light redesign. A dark backing,
+     the mirror of the light theme's, holds it whatever the picture does. */
+  --cue-bg:rgba(9,26,18,.78);
   --footer-bg:var(--band-3);
   --footer-line:var(--band-line);
   --footer-accent:transparent;
