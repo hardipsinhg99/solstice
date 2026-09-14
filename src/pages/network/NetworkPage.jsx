@@ -10,6 +10,19 @@ import { useNavigate } from '../../app/navigation.js'
 import { usePage, HeroPicture } from '../../features/pages/index.js'
 import { useProductCatalogue } from '../../features/products/index.js'
 import { NETWORK_FALLBACK } from './networkFallback.js'
+import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
+
+/* Category tile columns from the number of tiles, so the last row is as full
+   as the allowed counts permit - nine tiles are 3 x 3 on a tablet and 5 + 4 on
+   a desktop, not 4 + 4 + 1. Ties go to the wider count. Phones are always 2,
+   set in CSS. */
+function balancedCols(n, options) {
+  if (n <= options[0]) return Math.max(n, 1)
+  let best = options[0]
+  for (const c of options) if ((Math.ceil(n / c) * c - n) <= (Math.ceil(n / best) * best - n)) best = c
+  return best
+}
+const TILE_SIZES = '(max-width: 699px) 50vw, (max-width: 1199px) 33vw, 260px'
 
 /**
  * Global Trade Network.
@@ -47,12 +60,21 @@ export default function NetworkPage() {
     for (const p of products ?? []) {
       const type = (p.type ?? '').trim()
       if (!type || /^to be confirmed$/i.test(type)) continue
-      const row = groups.get(type) ?? { type, count: 0, image: null, trade: p.trade }
+      const row = groups.get(type) ?? { type, count: 0, image: null, cover: null, trade: p.trade }
       row.count += 1
-      row.image = row.image ?? p.image?.url ?? p.gallery?.[0]?.url ?? null
+      // A category's picture is the first gallery image found among its
+      // products - in practice the wider category shot an editor adds there.
+      // Only when no product in the category has one does a primary product
+      // photograph stand in, so a tile is never blank while a picture exists.
+      // (The catalogue's `image` is a URL string, not an object.)
+      const g = p.gallery?.[0]
+      if (!row.image && g?.url) row.image = { url: g.url, width: g.width, height: g.height }
+      if (!row.cover && p.image) row.cover = { url: p.image, width: p.imageWidth, height: p.imageHeight }
       groups.set(type, row)
     }
-    return [...groups.values()].sort((a, b) => b.count - a.count)
+    return [...groups.values()]
+      .map((row) => ({ ...row, image: row.image ?? row.cover }))
+      .sort((a, b) => b.count - a.count)
   }, [products])
 
   if (missing) return <PageUnavailable/>
@@ -206,21 +228,37 @@ export default function NetworkPage() {
             <h2>{categories.heading}</h2>
             {categories.intro && <p className="network-lede">{categories.intro}</p>}
           </Reveal>
-          <div className="network-category-grid">
+          {/* A list, so a screen reader hears how many categories there are.
+              The reveal is on the cell, the hover on the button inside it. */}
+          <ul className="network-category-grid" style={{
+            '--cat-cols-tab': balancedCols(tiles.length, [2, 3]),
+            '--cat-cols-lap': balancedCols(tiles.length, [3, 4]),
+            '--cat-cols-desk': balancedCols(tiles.length, [4, 5])
+          }}>
             {tiles.map((tile, i) => (
-              <Reveal as="div" key={tile.type} delay={i * 70}>
-                <button className="network-category" onClick={() => navigate('products')}>
-                  {tile.image
-                    ? <img src={tile.image} alt="" loading="lazy" decoding="async"/>
-                    : <span className="network-category-plate" aria-hidden="true"/>}
+              <Reveal as="li" key={tile.type} delay={Math.min(i % 5, 4) * 60} className="network-category-item">
+                <button type="button" className="network-category" onClick={() => navigate('products')}>
+                  <span className="network-category-media">
+                    {tile.image
+                      ? <img
+                          src={unsplashAt(tile.image.url, 480)}
+                          srcSet={unsplashSrcSet(tile.image.url, [320, 480, 800])}
+                          sizes={TILE_SIZES}
+                          {...(tile.image.width ? { width: tile.image.width, height: tile.image.height } : {})}
+                          alt="" loading="lazy" decoding="async"/>
+                      : <span className="network-category-plate" aria-hidden="true"/>}
+                  </span>
                   <span className="network-category-meta">
-                    <strong>{tile.type}</strong>
-                    <span>{tile.count} {tile.count === 1 ? 'product' : 'products'}</span>
+                    <span className="network-category-text">
+                      <strong>{tile.type}</strong>
+                      <span className="network-category-count">{tile.count} {tile.count === 1 ? 'product' : 'products'}</span>
+                    </span>
+                    <span className="network-category-go" aria-hidden="true"><Icon name="arrow" size={14}/></span>
                   </span>
                 </button>
               </Reveal>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
     )}
