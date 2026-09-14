@@ -4,7 +4,17 @@
 /* Viewport-based rather than a fixed 730px, but clamped at both ends: a floor so
    the copy never crowds the ship on a short laptop, a ceiling so a 1440-tall
    monitor does not scale a 672px-tall source past the point where it holds up. */
-.home-hero{height:clamp(580px,80vh,800px);position:relative;overflow:hidden;background:#0c1b13;isolation:isolate}
+/* ZOOM-SAFE HERO. It used to be a FIXED height (clamp(580px,80vh,800px)) with
+   overflow:hidden and its copy vertically centred inside. Browser zoom shrinks
+   the viewport in CSS pixels - 125% on a 1920x960 window is a 1536x768 screen,
+   150% is 1280x640 - and once the copy was taller than the box it spilled out
+   of BOTH ends: up under the fixed transparent header (the eyebrow printed
+   over the logo), and down past the bottom edge (the tags clipped away).
+   Now a MINIMUM height: the section grows to fit its content, and the copy is
+   laid out in a column that starts below the header and ends above the scroll
+   cue and the footer strip. */
+.home-hero{min-height:clamp(560px,80svh,800px);position:relative;overflow:hidden;background:var(--band);isolation:isolate;
+  display:flex;flex-direction:column}
 .hero-media{position:absolute;inset:0;z-index:0;overflow:hidden}
 /* The composite. object-fit:cover crops rather than letterboxes at every width;
    the crop is centred, which is what keeps the ship's SOLSTICE wordmark (60-68%
@@ -24,21 +34,36 @@
 /* Follows the hero instead of a second fixed number. The padding is the fixed
    header's clearance - without it the eyebrow slides under the nav as the hero
    shortens. */
-.home-hero-inner{height:100%;padding:96px 0 48px;position:relative;z-index:2;display:flex;align-items:center}
+/* Top padding clears the fixed header (--header-h) plus breathing room; bottom
+   padding keeps the copy above the scroll cue, which sits 96px from the
+   section's bottom edge (the 70px footer strip + 26px) and is ~57px tall. Both
+   scale with viewport height, so a short window gives up whitespace first.
+   flex:1 plus align-items:center still centres the copy when there is room. */
+.home-hero-inner{flex:1 0 auto;padding:calc(var(--header-h) + clamp(20px,4vh,48px)) 0 clamp(96px,11vh,120px);
+  position:relative;z-index:2;display:flex;align-items:center}
 .hero-copy{position:relative;z-index:5;max-width:600px}
 .hero-copy .eyebrow{color:var(--green-on-dark)}
-.hero-copy h1{font-size:clamp(56px,6.6vw,93px);margin:0 0 24px;color:#f9f8ef}
+/* Sized by width AND height: min(6.6vw, 10.5vh). A wide-but-short window (the
+   zoomed case) used to get the full 93px heading from its width alone. At
+   100% on a 1920x960 window this still resolves to 93px - unchanged. */
+.hero-copy h1{font-size:clamp(44px,min(6.6vw,10.5vh),93px);margin:0 0 clamp(16px,3vh,24px);color:var(--on-band)}
 .hero-copy h1 em{color:var(--green-on-dark)}
-.hero-copy>p{font-size:15px;line-height:1.72;color:#dbe1d3;max-width:430px;margin-bottom:29px}
-.hero-buttons{display:flex;align-items:center;gap:26px}
-.hero-buttons .quiet-link{color:#f2f4ea}
+.hero-copy>p{font-size:15px;line-height:1.72;color:var(--on-band-body);max-width:430px;margin-bottom:clamp(20px,3.4vh,29px)}
+/* Wraps rather than squeezing when the row runs out of width. */
+.hero-buttons{display:flex;align-items:center;flex-wrap:wrap;gap:14px 26px}
+.hero-buttons .quiet-link{color:var(--on-band)}
 .hero-buttons .quiet-link:hover{color:var(--green-on-dark)}
-.hero-meta{display:flex;align-items:center;gap:10px;margin-top:61px;color:#e7ebe0;font:9px 'DM Mono';letter-spacing:.7px}
-.hero-meta span{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);padding:7px 13px;border-radius:20px;backdrop-filter:blur(6px)}
+.hero-meta{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:clamp(24px,5.5vh,61px);color:var(--on-band-body);font:9px 'DM Mono';letter-spacing:.7px}
+.hero-meta span{border:1px solid var(--band-line);background:var(--band-card);padding:7px 13px;border-radius:20px;backdrop-filter:blur(6px)}
 .hero-meta i{display:none}
-.hero-footer{height:70px;position:relative;z-index:5;border-top:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:space-between;color:#cad3c1;font:9px 'DM Mono';letter-spacing:.8px}
-.hero-footer div{height:1px;background:rgba(255,255,255,.22);width:54%}
+.hero-footer{height:70px;position:relative;z-index:5;border-top:1px solid var(--band-line);display:flex;align-items:center;justify-content:space-between;color:var(--on-band-muted);font:9px 'DM Mono';letter-spacing:.8px}
+.hero-footer div{height:1px;background:var(--band-line);width:54%}
 .hero-footer b{font-weight:400;color:var(--ink-on-dark)}
+/* Visible on desktop now that the hero grows to fit (it was clipped off the
+   bottom of the old fixed-height box). The counter sits at the far right, over
+   the photograph where the scrim is released, so it carries the same small
+   backing as the scroll cue - transparent in dark mode, where it never needed one. */
+.hero-footer b{background:var(--cue-bg);padding:3px 7px;border-radius:999px}
 
 /* Hero entrance - plays once on load, not scroll-triggered */
 @keyframes heroUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
@@ -50,10 +75,13 @@
 .hero-scroll-cue{animation:heroUp .9s var(--ease) .48s both}
 @media(prefers-reduced-motion:reduce){.hero-copy .eyebrow,.hero-copy h1,.hero-copy>p,.hero-buttons,.hero-meta,.hero-scroll-cue{animation:none}}
 
-.hero-scroll-cue{position:absolute;left:50%;bottom:96px;transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:9px;color:#d8ded0}
+.hero-scroll-cue{position:absolute;left:50%;bottom:96px;transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:9px;color:var(--on-band-muted)}
 .hero-scroll-cue span{font:9px 'DM Mono';letter-spacing:2px}
 .hero-scroll-cue i{width:1px;height:30px;background:linear-gradient(#d8ded0,transparent);position:relative;display:block}
 .hero-scroll-cue i:after{content:'';position:absolute;left:-2px;top:0;width:5px;height:5px;border-radius:50%;background:var(--lime);animation:scrollDot 2.2s ease-in-out infinite}
+/* The cue sits dead centre over the photograph, where no scrim can protect it
+   without flattening the picture - so it carries its own small backing. */
+.hero-scroll-cue span{background:var(--cue-bg);padding:3px 7px;border-radius:999px}
 @keyframes scrollDot{0%{top:0;opacity:1}75%{opacity:1}100%{top:28px;opacity:0}}
 /* scrollDot is the only continuous loop left on this page now that heroZoom is
    retired. Continuous motion is what SC 2.3.3 is actually about, so stopping
@@ -215,13 +243,20 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .buyer-path-grid h3{font-size:20px;letter-spacing:-.6px;margin:40px 0 9px}
 .buyer-path-grid p{font-size:12px;line-height:1.65;color:var(--muted);max-width:240px}
 
-.home-manifesto{background:var(--deep);color:var(--ink-on-dark);padding:clamp(72px,7vw,104px) 0}
+/* The featured container. It used to be a full-bleed dark band; it is now a
+   rounded soft-mint panel centred on a white section, which keeps it the focal
+   point of the closing run without a dark slab. The stat cards still hang off
+   the image's lower-left corner, overlapping the panel edge on purpose - that
+   overlap is the composition the section was built around. */
+.home-manifesto{background:var(--bg);color:var(--ink-on-dark);padding:clamp(56px,6vw,88px) 0}
+.home-manifesto .manifesto-grid{background:var(--feature-fill);border:1px solid var(--band-line);
+  border-radius:28px;padding:clamp(40px,5vw,72px) clamp(28px,5vw,72px) clamp(52px,6vw,80px)}
 /* align-items:center was already right; the imbalance was vertical padding on a
    section whose two columns differ a lot in height. Trimmed so the block does
    not end in ~200px of empty green. */
 .manifesto-grid{display:grid;grid-template-columns:45% 1fr;gap:13%;align-items:center}
 .manifesto-visual{position:relative}
-.manifesto-image{height:440px;background:linear-gradient(#0c2d1e25,#0c2d1e6b),url('https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=1000&q=85') center/cover;border-radius:0 150px 0 0}
+.manifesto-image{height:440px;background:url('https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=1000&q=85') center/cover;border-radius:0 150px 0 0}
 .manifesto-stats{position:absolute;left:-8%;bottom:-28px;display:flex;flex-direction:column;gap:10px}
 .manifesto-stat{background:var(--surface);color:var(--ink);padding:16px 20px;box-shadow:var(--shadow);display:flex;align-items:baseline;gap:11px;min-width:230px}
 .manifesto-stat b{font-size:26px;font-family:'Playfair Display',Georgia,serif;font-weight:500;color:var(--green-500);letter-spacing:-1px}
@@ -234,10 +269,10 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .home-manifesto h2{color:var(--ink-on-dark)}
 .home-manifesto .eyebrow{color:var(--green-on-dark)}
 .home-manifesto h2 em{color:var(--green-on-dark)}
-.home-manifesto p{max-width:370px;color:#c1cec5;font-size:14px;line-height:1.75;margin:25px 0}
+.home-manifesto p{max-width:370px;color:var(--on-band-body);font-size:14px;line-height:1.75;margin:25px 0}
 .home-manifesto .quiet-link{color:var(--green-on-dark)}
 
-.home-cta{background:linear-gradient(100deg,#0E2B1E,var(--deep));padding:87px 0;color:var(--ink-on-dark)}
+.home-cta{background:var(--band-2);padding:87px 0;color:var(--ink-on-dark)}
 /* The band flipped from a light lime gradient to deep green, so its ink had to
    flip with it. #173529 measured 1.14:1 on the new background - invisible, the
    same failure the footer CTA and the network hero both hit. Every dark band on
@@ -339,7 +374,7 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 /* The monogram. Never an <img>, so it cannot render a broken-image icon, and
    never a stock photograph - see pages/about/sections/FounderPhoto.jsx. */
 .about-founder-photo-monogram{background:var(--monogram-plate);gap:14px}
-.about-founder-monogram{font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:clamp(48px,6vw,76px);letter-spacing:-2px;color:#f2f6ec;line-height:1}
+.about-founder-monogram{font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:clamp(48px,6vw,76px);letter-spacing:-2px;color:var(--monogram-ink);line-height:1}
 .about-founder-photo-note{font:500 10px 'DM Mono';letter-spacing:1.1px;text-transform:uppercase;color:rgba(242,246,236,.94)}
 .about-founder-meta{margin-top:18px}
 .about-founder-meta h3{margin:0 0 4px;font-size:21px;letter-spacing:-.6px}
@@ -417,7 +452,7 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 /* -- 9. mission / vision ---------------------------------------------------- */
 .about-mv{background:var(--surface);padding-bottom:112px}
 .about-mv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.about-mv-panel .about-tilt-inner{padding:36px 32px;background:var(--deep);border-color:transparent;color:#e7efe8;height:100%}
+.about-mv-panel .about-tilt-inner{padding:36px 32px;background:var(--feature-fill);border-color:var(--band-line);color:var(--on-band-body);height:100%}
 .about-mv-panel h2{margin:0 0 16px;font-size:clamp(26px,2.8vw,36px);letter-spacing:-1.2px;color:var(--ink-on-dark)}
 .about-mv-panel p{margin:0;font-size:15px;line-height:1.75;color:var(--body-on-dark)}
 
@@ -441,7 +476,7 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .supply-cta-grid h2 em{color:var(--green-on-dark)}
 .supply-cta-grid p{color:var(--body-on-dark);font-size:14px;line-height:1.75;max-width:420px;margin:20px 0 28px}
 .supply-cta-list{list-style:none;margin:0;padding:0;display:grid;gap:14px}
-.supply-cta-list li{display:flex;align-items:center;gap:12px;font-size:13px;padding:16px 18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14)}
+.supply-cta-list li{display:flex;align-items:center;gap:12px;font-size:13px;padding:16px 18px;background:var(--band-card);border:1px solid var(--band-line)}
 .supply-cta-list svg{color:var(--green-on-dark);flex-shrink:0}
 
 .process{background:var(--surface)}
@@ -466,7 +501,7 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .cert-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink);border:1px solid var(--line);background:var(--surface);padding:7px 13px;border-radius:20px}
 .cert-item svg{color:var(--gold-text)}
 
-.service-callout{background:var(--deep);color:#fff;padding:92px 0}
+.service-callout{background:var(--deep);color:var(--on-band);padding:92px 0}
 .service-callout .eyebrow{color:var(--green-on-dark)}
 .service-callout h2 em{color:var(--green-on-dark)}
 
@@ -522,7 +557,7 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .catalogue-empty p{margin:0 0 26px;max-width:52ch;font-size:14px;line-height:1.75;color:var(--muted)}
 .product-filters{display:flex;gap:8px;margin-bottom:35px}
 .product-filters button{border:1px solid var(--line);background:transparent;border-radius:22px;padding:9px 15px;font-size:11px;color:var(--muted);transition:background .2s,color .2s,border-color .2s}
-.product-filters button.active{background:var(--deep);color:#fff;border-color:var(--deep)}
+.product-filters button.active{background:var(--brand-fill);color:var(--on-brand-fill);border-color:var(--brand-fill)}
 .product-filters button:hover:not(.active){border-color:var(--green-600);color:var(--green-600)}
 .products-list{display:grid;grid-template-columns:repeat(3,1fr);gap:17px}
 .product-list-card{background:var(--surface);border:1px solid var(--line);cursor:pointer;overflow:hidden;transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s}
@@ -585,8 +620,10 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .meta-card span{font-size:12px;line-height:1.55;color:var(--muted)}
 .detail-note{background:var(--green-050);padding:23px 0}
 .detail-note>div{display:flex;align-items:center;gap:15px}
-.detail-note svg{color:#16412e}
-.detail-note p{margin:0;color:#254634;font-size:12px;line-height:1.5}
+/* Theme tokens, not literals: #254634 on a surface that turns dark in dark
+   mode measured 1.31:1 there. */
+.detail-note svg{color:var(--green-600)}
+.detail-note p{margin:0;color:var(--body);font-size:12px;line-height:1.5}
 
 /* Related products */
 .related-products{background:var(--surface)}
@@ -764,7 +801,7 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
    Tokens only, both themes. The reference's blue accent and dark-teal band are
    deliberately not carried over - the structural idea (a banded process
    section, a card grid) is reused, the palette is Solstice's. */
-.network-hero{position:relative;padding:clamp(72px,10vw,132px) 0;background:var(--deep);color:#fff;overflow:hidden;isolation:isolate}
+.network-hero{position:relative;padding:clamp(72px,10vw,132px) 0;background:var(--deep);color:var(--on-band);overflow:hidden;isolation:isolate}
 .network-hero-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.34;z-index:-1}
 .network-hero-inner{position:relative}
 /* --green-on-dark, not the ramp: these bands are dark in BOTH themes, so a
@@ -775,12 +812,12 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
    and any specificity beats inheritance, so .network-hero{color:#fff} never
    reached the heading. It rendered --ink on --deep: 1.24:1, i.e. invisible.
    Measured now: 13.44:1. Every dark band below needs the same explicit rule. */
-.network-hero h1{color:#fff;font-size:clamp(38px,5.4vw,68px);line-height:1.04;letter-spacing:-1.6px;margin:10px 0 0;max-width:14ch}
+.network-hero h1{color:var(--on-band);font-size:clamp(38px,5.4vw,68px);line-height:1.04;letter-spacing:-1.6px;margin:10px 0 0;max-width:14ch}
 /* --green-on-dark, not the ramp: this band is dark in BOTH themes, so a
    theme-flipping green would drop to ~2.6:1 here. Measured 11.78:1. */
 .network-hero h1 em{font-style:normal;color:var(--green-on-dark)}
 .network-lede{margin:18px 0 0;max-width:60ch;font-size:15px;line-height:1.75;color:var(--muted)}
-.network-hero .network-lede{color:rgba(255,255,255,.86)}
+.network-hero .network-lede{color:var(--on-band-body)}
 .network-hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px}
 
 .network-stats{background:var(--soft)}
@@ -798,14 +835,14 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .network-step svg{display:block;margin:12px 0 10px;color:var(--green-600)}
 .network-step h3{margin:0 0 8px;font-size:17px;letter-spacing:-.4px}
 
-.network-services{background:var(--deep);color:#fff}
-.network-services .section-head h2,.network-services h3{color:#fff}
-.network-services .network-lede{color:rgba(255,255,255,.82)}
+.network-services{background:var(--deep);color:var(--on-band)}
+.network-services .section-head h2,.network-services h3{color:var(--on-band)}
+.network-services .network-lede{color:var(--on-band-body)}
 .network-service-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:36px}
-.network-service{padding:26px 22px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14)}
-.network-service h3{margin:12px 0 8px;font-size:18px;letter-spacing:-.4px;color:#fff}
+.network-service{padding:26px 22px;background:var(--band-card);border:1px solid var(--band-line)}
+.network-service h3{margin:12px 0 8px;font-size:18px;letter-spacing:-.4px;color:var(--on-band)}
 .network-service svg{color:var(--green-on-dark)}
-.network-service .about-rich{color:rgba(255,255,255,.82)}
+.network-service .about-rich{color:var(--on-band-body)}
 /* Draft copy the client has not written yet. Loud on purpose - this must not
    ship unnoticed, which is why the page seeds unpublished. */
 .network-service.is-unresolved{border-color:var(--gold);border-style:dashed}
@@ -838,10 +875,10 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .network-why-list li{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--body)}
 .network-why-list svg{flex-shrink:0;color:var(--green-600)}
 
-.network-cta{background:var(--deep);color:#fff;text-align:center;padding:clamp(64px,8vw,104px) 0}
-.network-cta h2{color:#fff;font-size:clamp(30px,4vw,50px);line-height:1.08;letter-spacing:-1.3px;margin:10px 0 14px}
+.network-cta{background:var(--deep);color:var(--on-band);text-align:center;padding:clamp(64px,8vw,104px) 0}
+.network-cta h2{color:var(--on-band);font-size:clamp(30px,4vw,50px);line-height:1.08;letter-spacing:-1.3px;margin:10px 0 14px}
 .network-cta h2 em{font-style:normal;color:var(--green-on-dark)}
-.network-cta p{max-width:56ch;margin:0 auto 26px;color:rgba(255,255,255,.84);line-height:1.7}
+.network-cta p{max-width:56ch;margin:0 auto 26px;color:var(--on-band-body);line-height:1.7}
 /* A reading-width column on a full-bleed band, so the card is capped and centred
    rather than spanning the container. text-align resets to left because the band
    centres its copy and form labels must not inherit that. */
@@ -870,7 +907,7 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .network-stat,.network-step,.network-service,.network-category,.network-voice{
   transition:transform .25s var(--ease),border-color .25s var(--ease),box-shadow .25s var(--ease)}
 .network-stat:hover,.network-step:hover{transform:translateY(-4px);border-color:var(--green-600);box-shadow:var(--elev-2)}
-.network-service:hover{transform:translateY(-4px);border-color:var(--green-on-dark);background:rgba(255,255,255,.09)}
+.network-service:hover{transform:translateY(-4px);border-color:var(--green-on-dark);background:var(--band-card-hover)}
 
 /* Category tiles: the image zooms INSIDE a clipped frame, so the card's own
    box never changes size and nothing below it reflows. overflow:hidden on the
@@ -985,11 +1022,14 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
    flattened under a uniform wash. The artwork's own left third is already dark,
    so this deepens what is there instead of inventing a panel. */
 .network-hero:before{content:'';position:absolute;inset:0;z-index:-1;background:
+  /* Held at .9+ across the text column (to ~45%) so the copy keeps AA over
+     any part of the artwork, then released so the photograph reads on the
+     right. Measured from rendered pixels in both themes. */
   linear-gradient(100deg,
-    color-mix(in srgb,var(--deep) 92%,transparent) 0%,
-    color-mix(in srgb,var(--deep) 80%,transparent) 30%,
-    color-mix(in srgb,var(--deep) 40%,transparent) 58%,
-    color-mix(in srgb,var(--deep) 22%,transparent) 100%),
+    color-mix(in srgb,var(--deep) 97%,transparent) 0%,
+    color-mix(in srgb,var(--deep) 93%,transparent) 36%,
+    color-mix(in srgb,var(--deep) 58%,transparent) 58%,
+    color-mix(in srgb,var(--deep) 18%,transparent) 100%),
   linear-gradient(0deg,color-mix(in srgb,var(--deep) 72%,transparent) 0%,transparent 42%)}
 .network-hero-inner{display:flex;flex-direction:column;gap:clamp(40px,6vh,72px);width:100%}
 .network-hero-copy{max-width:min(46rem,52%)}
@@ -997,9 +1037,9 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .network-hero-eyebrow:before{content:'';width:26px;height:1px;background:var(--green-on-dark);flex-shrink:0}
 /* clamp does the responsive scaling, so there is no per-breakpoint font rule to
    drift: 34px on a phone, 76px on a wide desktop, continuous between. */
-.network-hero h1{color:#fff;font-size:clamp(34px,5.6vw,76px);line-height:1.02;letter-spacing:-2px;margin:0}
+.network-hero h1{color:var(--on-band);font-size:clamp(34px,5.6vw,76px);line-height:1.02;letter-spacing:-2px;margin:0}
 .network-hero h1 em{color:var(--green-on-dark)}
-.network-hero .network-lede{color:rgba(255,255,255,.88);margin-top:20px;max-width:44ch}
+.network-hero .network-lede{color:var(--on-band-body);margin-top:20px;max-width:44ch}
 .network-hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:32px}
 
 /* Glass secondary. Border rather than fill, so it reads as the quieter of the
@@ -1007,8 +1047,8 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 /* .42 alpha measured 2.73:1 against the hero band - under SC 1.4.11's 3:1 for a
    control boundary, which is why this button read as barely there rather than as
    deliberately quiet. .72 measures 5.01:1 and still looks like glass. */
-.button.glass{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.72);backdrop-filter:blur(6px)}
-.button.glass:hover{background:rgba(255,255,255,.2);border-color:#fff}
+.button.glass{background:var(--glass-bg);color:var(--glass-ink);border:1px solid var(--glass-border);backdrop-filter:blur(6px)}
+.button.glass:hover{background:var(--glass-bg-hover);border-color:var(--glass-ink)}
 .button.glass:active{transform:translateY(1px)}
 
 /* --- GTN hero CTAs ---------------------------------------------------------
@@ -1025,8 +1065,8 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
    One primary, one secondary: the filled white plate is unmistakably the main
    action, and the outlined glass beside it is clearly the lesser one. Neither
    changes size, position or behaviour. */
-.network-hero-actions .button.primary{background:#fff;color:var(--green-700)}
-.network-hero-actions .button.primary:hover{background:var(--green-050);color:var(--green-700)}
+.network-hero-actions .button.primary{background:var(--hero-primary-bg);color:var(--hero-primary-ink)}
+.network-hero-actions .button.primary:hover{background:var(--hero-primary-bg-hover);color:var(--hero-primary-ink)}
 .network-hero-actions .button.primary:active{transform:scale(.97)}
 /* The arrow draws in currentColor, so it tracks the label in both variants
    instead of needing its own rule. */
@@ -1038,7 +1078,13 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 
 /* ── Process flow ──────────────────────────────────────────────────────────── */
 .network-hero-foot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(20px,3vw,40px);align-items:center}
-.network-flow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(8px,1.4vw,20px)}
+/* The strip runs the full width of the hero, including the right-hand side
+   where the scrim is released so the photograph shows. On the light hero its
+   last steps would sit on bare photo, so it carries its own frosted panel
+   there; on the dark hero the tokens resolve to nothing and it is unchanged. */
+.network-flow{list-style:none;margin:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(8px,1.4vw,20px);
+  padding:var(--flow-pad);background:var(--flow-bg);border:1px solid var(--flow-border);border-radius:18px;
+  backdrop-filter:var(--flow-blur);-webkit-backdrop-filter:var(--flow-blur)}
 .network-flow-step{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;position:relative;min-width:0}
 /* The connector is a pseudo-element, not markup, so a screen reader hears five
    steps and not five arrows. :not(:last-child) keeps it from trailing off the
@@ -1046,14 +1092,14 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .network-flow-step:not(:last-child):after{content:'';position:absolute;top:26px;left:calc(50% + 32px);right:calc(-50% + 32px);height:1px;background:linear-gradient(90deg,var(--green-on-dark),transparent)}
 .network-flow-icon{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;color:var(--green-on-dark);border:1px solid color-mix(in srgb,var(--green-on-dark) 42%,transparent);background:color-mix(in srgb,var(--deep) 55%,transparent);transition:transform .25s var(--ease),border-color .25s var(--ease)}
 .network-flow-step:hover .network-flow-icon{transform:translateY(-3px);border-color:var(--green-on-dark)}
-.network-flow-num{font:500 13px/1 'DM Mono';color:rgba(255,255,255,.72);margin-top:4px}
+.network-flow-num{font:500 13px/1 'DM Mono';color:var(--on-band-body);margin-top:4px}
 .network-flow-label{font:700 12px/1.2 'DM Sans';letter-spacing:1.2px;text-transform:uppercase;color:var(--green-on-dark)}
-.network-flow-body{font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.76);max-width:20ch}
+.network-flow-body{font-size:12.5px;line-height:1.5;color:var(--on-band-body);max-width:20ch}
 
-.network-trust{display:flex;gap:14px;align-items:flex-start;max-width:330px;padding:20px 22px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);backdrop-filter:blur(8px)}
+.network-trust{display:flex;gap:14px;align-items:flex-start;max-width:330px;padding:20px 22px;border-radius:14px;border:1px solid var(--band-line);background:var(--band-card-solid);backdrop-filter:blur(8px)}
 .network-trust-mark{color:var(--green-on-dark);flex-shrink:0}
-.network-trust strong{display:block;font:700 13px/1.35 'DM Sans';letter-spacing:.6px;text-transform:uppercase;color:#fff}
-.network-trust p{margin:8px 0 0;font-size:12.5px;line-height:1.55;color:rgba(255,255,255,.78)}
+.network-trust strong{display:block;font:700 13px/1.35 'DM Sans';letter-spacing:.6px;text-transform:uppercase;color:var(--on-band)}
+.network-trust p{margin:8px 0 0;font-size:12.5px;line-height:1.55;color:var(--on-band-body)}
 
 @media(max-width:1100px){
   .network-hero-copy{max-width:min(46rem,62%)}
@@ -1074,10 +1120,13 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
   .network-hero{min-height:auto;padding:clamp(96px,13vh,124px) 0 44px}
   /* The copy now sits OVER the picture rather than beside it, so the scrim goes
      near-solid vertically. A left-weighted gradient assumes a wide frame. */
+  /* Copy covers the whole picture on a phone, so the scrim never drops below
+     .9 behind it - in the light theme that is what keeps --body at AA over the
+     darkest part of any uploaded photograph. */
   .network-hero:before{background:linear-gradient(180deg,
-    color-mix(in srgb,var(--deep) 88%,transparent) 0%,
-    color-mix(in srgb,var(--deep) 74%,transparent) 46%,
-    color-mix(in srgb,var(--deep) 93%,transparent) 100%)}
+    color-mix(in srgb,var(--deep) 94%,transparent) 0%,
+    color-mix(in srgb,var(--deep) 90%,transparent) 46%,
+    color-mix(in srgb,var(--deep) 96%,transparent) 100%)}
   .network-flow{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 12px}
   .network-flow-icon{width:46px;height:46px}
   .network-hero-actions .button{flex:1 1 auto;justify-content:center;min-height:48px}
@@ -1180,30 +1229,33 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
    bottom so the value points sit on something. The artwork's own left third is
    already dark, so this deepens what is there instead of covering it. */
 .about-hero:before{content:'';position:absolute;inset:0;z-index:-1;background:
+  /* Same rule as .network-hero:before: .9+ behind the copy, released to the
+     right. It also mutes the wordmark baked into the artwork's top-left,
+     which the light scrim otherwise lifted into view behind the eyebrow. */
   linear-gradient(100deg,
-    color-mix(in srgb,var(--deep) 94%,transparent) 0%,
-    color-mix(in srgb,var(--deep) 82%,transparent) 32%,
-    color-mix(in srgb,var(--deep) 42%,transparent) 60%,
-    color-mix(in srgb,var(--deep) 16%,transparent) 100%),
+    color-mix(in srgb,var(--deep) 97%,transparent) 0%,
+    color-mix(in srgb,var(--deep) 93%,transparent) 38%,
+    color-mix(in srgb,var(--deep) 56%,transparent) 60%,
+    color-mix(in srgb,var(--deep) 14%,transparent) 100%),
   linear-gradient(0deg,color-mix(in srgb,var(--deep) 66%,transparent) 0%,transparent 38%)}
 
 .about-hero-inner{display:flex;flex-direction:column;gap:clamp(40px,6vh,72px);width:100%}
 .about-hero-copy{max-width:min(42rem,50%)}
 .about-hero-eyebrow{display:flex;align-items:center;gap:12px;margin:0 0 18px;
-  font:600 12px/1 'DM Mono';letter-spacing:3px;text-transform:uppercase;color:var(--gold)}
+  font:600 12px/1 'DM Mono';letter-spacing:3px;text-transform:uppercase;color:var(--hero-eyebrow)}
 .about-hero-eyebrow:before{content:'';width:26px;height:1px;background:var(--gold);flex-shrink:0}
 
 /* ONE measure, no forced breaks. clamp does the scaling, so there is no
    per-breakpoint font rule to drift, and the sentence wraps where it fits -
    which is the actual fix for the narrow-column problem. text-wrap:balance
    evens the lines instead of leaving one orphaned word. */
-.about-hero h1{color:#fff;margin:0;font-size:clamp(33px,5.2vw,66px);line-height:1.04;
+.about-hero h1{color:var(--on-band);margin:0;font-size:clamp(33px,5.2vw,66px);line-height:1.04;
   letter-spacing:-1.8px;font-weight:700;text-wrap:balance;max-width:16ch}
 .about-hero-accent{color:var(--green-on-dark)}
 
 .about-hero-rule{display:block;width:88px;height:2px;margin:clamp(22px,3vw,32px) 0;
   background:linear-gradient(90deg,var(--gold),transparent)}
-.about-hero-lede{margin:0;max-width:46ch;font-size:15px;line-height:1.75;color:rgba(255,255,255,.86)}
+.about-hero-lede{margin:0;max-width:46ch;font-size:15px;line-height:1.75;color:var(--on-band-body)}
 
 /* Value points. auto-fit so 2, 3 or 4 all sit correctly without a count rule. */
 .about-hero-points{list-style:none;margin:0;padding:0;display:grid;
@@ -1213,15 +1265,15 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 /* The separator is a pseudo-element on all but the last, so it never trails off
    the end of the row and disappears entirely once the grid wraps. */
 .about-hero-point:not(:last-child):after{content:'';position:absolute;right:calc(-1 * clamp(9px,1.3vw,17px));
-  top:6px;bottom:6px;width:1px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.22),transparent)}
+  top:6px;bottom:6px;width:1px;background:linear-gradient(180deg,transparent,var(--band-line),transparent)}
 .about-hero-point-icon{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;
   color:var(--green-on-dark);border:1px solid color-mix(in srgb,var(--green-on-dark) 38%,transparent);
   background:color-mix(in srgb,var(--deep) 52%,transparent);backdrop-filter:blur(6px);
   transition:transform .25s var(--ease),border-color .25s var(--ease)}
 .about-hero-point:hover .about-hero-point-icon{transform:translateY(-3px);border-color:var(--green-on-dark)}
-.about-hero-point strong{font:700 12px/1.3 'DM Sans';letter-spacing:1.2px;text-transform:uppercase;color:#fff}
+.about-hero-point strong{font:700 12px/1.3 'DM Sans';letter-spacing:1.2px;text-transform:uppercase;color:var(--on-band)}
 /* Classed, not `.about-hero-point span`. That selector (0,1,1) also matched the
    icon's own span and OUTWEIGHED .about-hero-point-icon (0,1,0), so on mobile the
    icon inherited grid-area:body and was placed on top of the text it belonged
    beside. It was also repainting the icon, which draws in currentColor. */
-.about-hero-point-body{font-size:12.5px;line-height:1.6;color:rgba(255,255,255,.78);max-width:26ch}
+.about-hero-point-body{font-size:12.5px;line-height:1.6;color:var(--on-band-body);max-width:26ch}

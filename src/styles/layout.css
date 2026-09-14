@@ -57,12 +57,13 @@ body[data-scroll='top']:has(main[data-hero]) .site-header{
      toward the right, so the last items dropped under AA. A top-down scrim keeps
      the bar reading as transparent while putting a floor under the contrast; it
      is the gradient, not a panel, so the hero still shows through. */
-  background:linear-gradient(180deg,rgba(6,18,12,.66),rgba(6,18,12,.38) 58%,transparent);
+  background:var(--header-hero-bg);
   backdrop-filter:none;border-color:transparent;box-shadow:none}
-/* The hero art is dark, so the nav must go light while it sits on it. */
+/* Nav ink while it sits on the hero: dark on the light hero scrim, white on
+   the dark-theme one. Tokenised in tokens.css with the scrim it is measured on. */
 body[data-scroll='top']:has(main[data-hero]) .site-header .nav-links>button,
 body[data-scroll='top']:has(main[data-hero]) .site-header .nav-dropdown-label,
-body[data-scroll='top']:has(main[data-hero]) .site-header .nav-dropdown-caret{color:#fff}
+body[data-scroll='top']:has(main[data-hero]) .site-header .nav-dropdown-caret{color:var(--header-hero-ink)}
 
 /* The bar STAYS. An earlier revision slid it away on downward scroll; that was
    asked for and then reversed, and permanently visible is the safer default -
@@ -75,7 +76,9 @@ body[data-scroll='top']:has(main[data-hero]) .site-header .nav-dropdown-caret{co
 body[data-scroll='up'] .site-header,body[data-scroll='down'] .site-header{height:68px;box-shadow:0 10px 30px rgba(10,30,20,.08)}
 body[data-scroll='up'] .site-header .brand-logo img,body[data-scroll='down'] .site-header .brand-logo img{transform:scale(.92)}
 .nav{height:100%;display:flex;align-items:center;justify-content:space-between}
-.nav-links{display:flex;align-items:center;gap:22px}
+/* --nav-gap and --nav-cta-gap are variables because the CTA's separator line
+   is positioned FROM them - see .nav-cta:before. */
+.nav-links{--nav-gap:22px;--nav-cta-gap:10px;display:flex;align-items:center;gap:var(--nav-gap)}
 /* Nav type. Fluid rather than a flat bump: the bar carries seven items plus the
    CTA, the logo and the theme toggle, and at the narrow end of desktop (781px,
    where the container is only ~733px) that row is already close to full. A flat
@@ -113,9 +116,16 @@ body[data-scroll='up'] .site-header .brand-logo img,body[data-scroll='down'] .si
   .nav-dropdown-caret{transition:none}
   .nav-dropdown-panel{animation:none}
 }
-.nav-cta{background:var(--deep)!important;color:#fff!important;padding:11px 14px!important;display:flex;align-items:center;gap:7px;margin-left:19px;position:relative;transition:background .25s}
-.nav-cta:before{content:'';position:absolute;left:-16px;top:50%;transform:translateY(-50%);width:1px;height:18px;background:var(--line)}
-.nav-cta:hover{background:var(--green-600)!important;color:var(--on-green)!important}
+.nav-cta{background:var(--brand-fill)!important;color:var(--on-brand-fill)!important;padding:11px 14px!important;display:flex;align-items:center;gap:7px;margin-left:19px;position:relative;transition:background .25s}
+/* The CTA is itself a .nav-links>button, so it inherited margin:0 -12px - and
+   that selector (0,1,1) outranked .nav-cta{margin-left:19px} (0,1,0). The
+   intended 19px became -12px and this separator line landed on the last letter
+   of "Contact us" at every width. The margin is now stated at matching weight,
+   and the line sits at the exact midpoint of the space between the previous
+   item's text and the button, whatever the gap is set to. */
+.nav-links>.nav-cta{margin:0 0 0 var(--nav-cta-gap)}
+.nav-cta:before{content:'';position:absolute;left:calc((var(--nav-gap) + var(--nav-cta-gap)) / -2);top:50%;transform:translateY(-50%);width:1px;height:18px;background:var(--line)}
+.nav-cta:hover{background:var(--brand-fill-hover)!important;color:var(--on-brand-fill-hover)!important}
 .nav-cta:active{background:var(--green-700)!important;color:var(--on-green)!important}
 /* -- nav dropdown ------------------------------------------------------------
    Click-triggered disclosure. The panel is only in the DOM while open (see

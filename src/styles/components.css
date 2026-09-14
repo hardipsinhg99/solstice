@@ -5,8 +5,8 @@
 .button svg{transition:transform .35s var(--ease)}
 .button:hover svg{transform:translateX(4px)}
 .button:active{transform:scale(.97)}
-.primary{background:var(--deep);color:#fff}
-.primary:hover{background:var(--green-600);color:var(--on-green);box-shadow:0 14px 30px rgba(11,60,40,.28)}
+.primary{background:var(--brand-fill);color:var(--on-brand-fill)}
+.primary:hover{background:var(--brand-fill-hover);color:var(--on-brand-fill-hover);box-shadow:0 14px 30px rgba(11,60,40,.22)}
 .primary:active{background:var(--green-700);color:var(--on-green)}
 .primary.sent{background:var(--green-600);color:var(--on-green)}
 .outline{background:transparent;border:1px solid var(--ink);color:var(--ink)}

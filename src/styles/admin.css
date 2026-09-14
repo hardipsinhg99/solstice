@@ -459,7 +459,7 @@ td.admin-row-actions>*+*{margin-left:8px}
    status stand-in, not a second list component. */
 .admin-media-kind{position:absolute;left:6px;bottom:6px;z-index:2;width:22px;height:22px;
   border-radius:50%;display:grid;place-items:center;font-size:10px;
-  background:color-mix(in srgb,var(--deep) 82%,transparent);color:#fff}
+  background:color-mix(in srgb,var(--brand-fill) 88%,transparent);color:var(--on-brand-fill)}
 .admin-media-pending{display:grid;place-items:center;width:100%;height:100%;
   font:500 10px/1.3 'DM Mono';letter-spacing:.6px;text-transform:uppercase;
   text-align:center;color:var(--muted);background:var(--bg);border:1px dashed var(--border)}

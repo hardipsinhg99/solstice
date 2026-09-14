@@ -53,8 +53,7 @@
      container is ~733-976px and has to hold the logo, seven links, the CTA and
      the theme toggle on one row. Tightening the gutter buys back the width the
      bigger text costs, so the bar cannot wrap or overflow here. */
-  .nav-links{gap:14px}
-  .nav-cta{margin-left:14px}
+  .nav-links{--nav-gap:14px;--nav-cta-gap:10px}
 
   /* About: five industries and three stat columns both over-compress here. */
   .about-industry-grid{grid-template-columns:repeat(3,1fr)}
@@ -479,6 +478,11 @@
 @media(max-width:960px) and (orientation:landscape){
   .home-hero{height:auto;min-height:100svh}
   .home-hero-inner{height:auto;min-height:100svh;padding-top:88px;padding-bottom:36px}
+  /* This range keeps a 36px bottom padding, which leaves no room between the
+     copy and the scroll cue - and on a short landscape screen (a phone on its
+     side, or a desktop window at 150-200% zoom) the cue is decoration there
+     isn't space for. Phones portrait already hide it the same way. */
+  .hero-scroll-cue{display:none}
 }
 
 /* World map labels are dropped on phones. At 390px the map is ~390x195 and the
@@ -581,10 +585,11 @@
   .about-hero-banner img{--hero-focus:72% 50%}
   /* Vertical gradient - a left-weighted one assumes a wide frame, and here the
      words are on top of the picture rather than next to it. */
+  /* Never below .9 behind the copy - see .network-hero:before. */
   .about-hero:before{background:linear-gradient(180deg,
-    color-mix(in srgb,var(--deep) 90%,transparent) 0%,
-    color-mix(in srgb,var(--deep) 74%,transparent) 46%,
-    color-mix(in srgb,var(--deep) 94%,transparent) 100%)}
+    color-mix(in srgb,var(--deep) 94%,transparent) 0%,
+    color-mix(in srgb,var(--deep) 90%,transparent) 46%,
+    color-mix(in srgb,var(--deep) 96%,transparent) 100%)}
 }
 
 @media(max-width:780px){
@@ -624,4 +629,12 @@
    features/pages/HeroPicture.jsx); this is the one case it must yield. */
 @media(max-width:780px){
   picture[data-phone-crop] img{object-position:50% 50%!important}
+}
+
+/* Home hero on a phone: the copy stacks over the full width of the picture, so
+   the diagonal desktop scrim would leave the right-hand words on bare photo.
+   Vertical, and never below .9 behind the copy. Dark mode resolves this token
+   to its own diagonal scrim, so it is unchanged there. */
+@media(max-width:780px){
+  .hero-media:after{background:var(--hero-scrim-phone)}
 }

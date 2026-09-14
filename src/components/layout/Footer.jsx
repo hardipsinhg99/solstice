@@ -1,7 +1,7 @@
 import { Eyebrow } from '../ui/Eyebrow.jsx'
 import { Button } from '../ui/Button.jsx'
 import { navGroup } from '../../data/navigation.js'
-import { usePublishedPages } from '../../features/pages/index.js'
+import { usePublishedPages, usePage } from '../../features/pages/index.js'
 import { useNavigate } from '../../app/navigation.js'
 import { useSiteSettings, telHref, mailtoHref } from '../../features/settings/index.js'
 import { useSocialLinks, SOCIAL_LABELS } from '../../features/social/index.js'
@@ -18,6 +18,15 @@ export function Footer() {
   const mailto = mailtoHref(contactEmail)
   const tel = telHref(contactPhone)
   const social = useSocialLinks()
+
+  // Registration marks under the brand, taken from the Home page's
+  // "Our certifications" section so there is one list to maintain. Names only:
+  // no number is shown unless the admin has written one, and none is invented
+  // here. A hidden section or an unpublished certificate drops its chip too.
+  const home = usePage('home')
+  const badges = (home.section('certifications').items ?? [])
+    .filter((c) => c && c.name && c.published !== false)
+    .map((c) => c.name)
 
   // Enabled is NOT the same question as "is the value usable" - disabled means
   // the operator has a value and is choosing not to publish it. Both have to
@@ -38,6 +47,11 @@ export function Footer() {
             <img src="/solstice-logo.png" alt="Solstice Trading International LLP"/>
           </button>
           <p>Fresh produce, spices &amp; essential foods<br/>from India, for international buyers.</p>
+          {badges.length > 0 && (
+            <ul className="footer-badges" aria-label="Registrations and certifications">
+              {badges.map((name) => <li key={name}>{name}</li>)}
+            </ul>
+          )}
         </div>
         <div className="footer-col">
           <span className="footer-heading">Explore</span>

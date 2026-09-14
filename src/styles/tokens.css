@@ -259,3 +259,171 @@ html[data-theme='dark']{
   --hero-scrim:linear-gradient(100deg,rgba(4,12,8,.98) 0%,rgba(4,12,8,.93) 28%,rgba(4,12,8,.75) 54%,rgba(4,12,8,.36) 78%,rgba(4,12,8,.13) 100%);
   --hero-filter:saturate(1.02) brightness(.9);
 }
+
+/* ============================================================
+   LIGHT GREEN SYSTEM - bands, heroes and the header over a hero
+   ============================================================
+   The site used to paint its large sections (hero, manifesto, enquiry CTA,
+   service callouts, the network bands, the footer) in dark forest green, with
+   text tokens named *-on-dark that were deliberately NOT theme-aware. The
+   brand direction is now White -> very light mint -> soft green -> green
+   accent, with dark green kept to small things: button fills, icons, text
+   accents, indicators.
+
+   This is done at the token layer, not per section, so every consumer - and
+   any section added later - follows it without being touched:
+
+     --band / -2 / -3      the large section surfaces. Light: the mint scale.
+                           Dark theme: the previous dark greens, unchanged.
+     --on-band*            text on those surfaces. Light: the normal ink ramp.
+                           Dark theme: the previous light-on-dark values.
+     --deep*, *-on-dark    the old names, aliased onto the above so nothing
+                           that reads them breaks. New code should use --band.
+     --brand-fill          SOLID green for small controls (primary button, nav
+                           CTA, active filter, chat bubble, icon discs). These
+                           used --deep and must not turn mint with the bands.
+
+   The mint scale is four steps and no more. Measured (WCAG relative luminance)
+   on the lightest surface each is paired with:
+     --mint-50  #F5FBF7  footer, alternate sections
+     --green-050 #EEF6F1 existing tinted section surface (--soft), unchanged
+     --mint-200 #DFF1E6  CTA band, featured container
+     --mint-300 #C4E4D1  hairlines and borders ON mint - decorative only */
+:root{
+  --mint-50:#F5FBF7;
+  --mint-200:#DFF1E6;
+  --mint-300:#C4E4D1;
+
+  --band:var(--green-050);
+  --band-2:var(--mint-200);
+  --band-3:var(--mint-50);
+  --band-line:var(--mint-300);
+  /* The featured container keeps its "green panel" presence as a soft mint
+     gradient rather than a dark slab. */
+  --feature-fill:linear-gradient(135deg,#D9EFE2 0%,#E9F6EE 55%,#F3FAF6 100%);
+
+  /* A card, chip or panel sitting ON a band, and its hover. Light: a white
+     card lifting off the mint. Dark: the translucent white it always was. */
+  --band-card:#FFFFFF;
+  --band-card-hover:#FFFFFF;
+  --band-card-shadow:0 1px 2px rgba(18,45,33,.04),0 8px 22px rgba(18,45,33,.06);
+  /* The secondary "glass" button on a hero: a green outline on light, the
+     frosted white it always was on dark. */
+  --glass-bg:rgba(255,255,255,.72);
+  --glass-bg-hover:#FFFFFF;
+  --glass-border:var(--green-600);
+  --glass-ink:var(--green-700);
+  /* The primary button on the GTN hero was WHITE, to stand out of a dark
+     hero. On a light hero it is the ordinary solid brand button. */
+  --hero-primary-bg:var(--brand-fill);
+  --hero-primary-bg-hover:var(--brand-fill-hover);
+  --hero-primary-ink:var(--on-brand-fill);
+  /* The About hero's eyebrow. Gold on mint cannot reach AA (--gold-text is
+     4.29:1 on --soft), so on the light hero it is the brand green; the gold
+     rule beside it stays as the decorative accent. Dark keeps its gold. */
+  --hero-eyebrow:var(--green-600);
+  /* Footer: a light tint of the LOGO green (#00894D, hue 154), not the neutral
+     mint the page bands use, so the close of every page reads as brand colour.
+     Measured on #D4F0E4: ink 13.98, body 7.69, muted 4.69, green-600 5.48,
+     green-700 7.22 - every footer text colour clears AA. The next step deeper
+     (#CEEEE0) put muted at 4.56, too close to the 4.5 floor.
+     It sits within ~1.03:1 of the CTA band above it, so the two are separated
+     by --footer-accent: the logo's own green-to-gold rule. */
+  --footer-bg:#D4F0E4;
+  --footer-line:color-mix(in srgb,#00894D 24%,#D4F0E4);
+  --footer-accent:linear-gradient(90deg,#00894D 0%,#00894D 68%,#C9A24D 100%);
+  --flow-bg:rgba(245,251,247,.9);
+  --flow-border:var(--band-line);
+  --flow-pad:clamp(16px,2vw,22px) clamp(12px,1.6vw,20px);
+  --flow-blur:blur(8px);
+  /* A card that sits over photography and must hold its text over any pixel:
+     white on light, near-opaque dark band on dark (the translucent .06 it used
+     to be measured ~3:1 over the bright part of the GTN artwork). */
+  --band-card-solid:#FFFFFF;
+  --cue-bg:rgba(245,251,247,.9);
+  --on-band:var(--ink);
+  --on-band-body:var(--body);
+  --on-band-muted:var(--muted);
+  --on-band-accent:var(--green-600);
+
+  /* Founder monogram plate (stands in for a portrait): a mint plate with a
+     dark green monogram - #005731 on #C4E4D1 measures 6.9:1. The original
+     dark plate is kept for dark mode below. */
+  --monogram-plate:linear-gradient(150deg,#DDF1E6,#C4E4D1);
+  --monogram-ink:#005731;
+  --brand-fill:var(--green-600);
+  --brand-fill-hover:var(--green-700);
+  --on-brand-fill:#fff;            /* 6.71:1 on -600, 8.84:1 on -700 */
+  --on-brand-fill-hover:#fff;
+
+  /* Old names, now theme-aware aliases. */
+  --deep:var(--band);
+  --deep-2:var(--band-2);
+  --deep-3:var(--band-3);
+  --ink-on-dark:var(--on-band);
+  --body-on-dark:var(--on-band-body);
+  --muted-on-dark:var(--on-band-muted);
+  --green-on-dark:var(--on-band-accent);
+
+  /* Heroes: a light scrim that fades the photograph into the page on the text
+     side, with dark ink on top. Alpha is highest where the copy sits (left)
+     and the photograph shows through untouched on the right. */
+  --hero-scrim:linear-gradient(100deg,rgba(245,251,247,.97) 0%,rgba(245,251,247,.93) 30%,
+    rgba(245,251,247,.72) 50%,rgba(245,251,247,.22) 74%,rgba(245,251,247,0) 100%);
+  /* Phones stack the copy over the whole picture, so the scrim goes vertical
+     and never drops below .9 behind text. */
+  --hero-scrim-phone:linear-gradient(180deg,rgba(245,251,247,.94) 0%,rgba(245,251,247,.92) 70%,rgba(245,251,247,.97) 100%);
+  --hero-filter:saturate(1.04) brightness(1.02);
+
+  /* The header while it floats over a hero at the top of the page. */
+  --header-hero-bg:linear-gradient(180deg,rgba(245,251,247,.92),rgba(245,251,247,.7) 60%,transparent);
+  --header-hero-ink:var(--ink);
+}
+html[data-theme='dark']{
+  /* Dark mode keeps the design it had: the bands and heroes stay dark, their
+     text stays light. These are the exact values the light-on-dark tokens
+     were measured against before this change. */
+  --band:#143026;
+  --band-2:#10291F;
+  --band-3:#0C2119;
+  --band-line:rgba(255,255,255,.14);
+  --band-card:rgba(255,255,255,.06);
+  --band-card-hover:rgba(255,255,255,.1);
+  --band-card-shadow:none;
+  --glass-bg:rgba(255,255,255,.12);
+  --glass-bg-hover:rgba(255,255,255,.2);
+  --glass-border:rgba(255,255,255,.72);
+  --glass-ink:#fff;
+  --hero-primary-bg:#fff;
+  --hero-primary-bg-hover:var(--green-050);
+  --hero-primary-ink:#005731;
+  --feature-fill:linear-gradient(135deg,#1B3A2C 0%,#143026 100%);
+  --on-band:#F5F7F3;
+  --on-band-body:#C9D5CD;
+  --on-band-muted:#BDCAC2;
+  --on-band-accent:#b7dcb5;
+  --monogram-plate:linear-gradient(150deg,#0B5C36,#00894D);
+  --monogram-ink:#f2f6ec;
+  --hero-eyebrow:var(--gold);
+  --cue-bg:transparent;
+  --footer-bg:var(--band-3);
+  --footer-line:var(--band-line);
+  --footer-accent:transparent;
+  /* The panel behind the GTN process strip exists in dark mode too. Without
+     it the last step sat on the bright part of the artwork at 3.39:1 - a
+     failure that predates the light redesign, measured on production. */
+  --flow-bg:rgba(12,33,25,.72);
+  --flow-border:var(--band-line);
+  --flow-pad:clamp(16px,2vw,22px) clamp(12px,1.6vw,20px);
+  --flow-blur:blur(8px);
+  --band-card-solid:rgba(20,48,38,.9);
+  /* Unchanged dark-mode buttons: the dark fill with a white label, turning
+     mint with a dark label on hover - exactly as before. */
+  --brand-fill:#143026;
+  --brand-fill-hover:var(--green-600);
+  --on-brand-fill:#fff;
+  --on-brand-fill-hover:var(--on-green);
+  --hero-scrim-phone:var(--hero-scrim);   /* dark mode keeps the scrim it had */
+  --header-hero-bg:linear-gradient(180deg,rgba(6,18,12,.66),rgba(6,18,12,.38) 58%,transparent);
+  --header-hero-ink:#fff;
+}
