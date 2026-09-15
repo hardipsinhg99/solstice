@@ -538,10 +538,13 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 .about-globe-stage{width:100%;margin:0}
 .about-presence-list-title{margin:0 0 18px;font:500 10px 'DM Mono';letter-spacing:1.15px;text-transform:uppercase;color:var(--green-600)}
 .about-presence-list ul{list-style:none;margin:0 0 22px;padding:0;display:grid;gap:14px}
-.about-presence-list li{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line)}
+/* Each row's dot + country + labels are centred as one group. flex-wrap
+   drops a label to a second centred line rather than overflowing, and the
+   country itself wraps at word breaks on a very narrow column. */
+.about-presence-list li{display:flex;align-items:baseline;justify-content:center;column-gap:11px;row-gap:4px;flex-wrap:wrap;text-align:center;padding-bottom:14px;border-bottom:1px solid var(--line)}
 .about-presence-list li:last-child{border-bottom:0;padding-bottom:0}
 .about-presence-list li i{width:8px;height:8px;border-radius:50%;background:var(--green-500);flex-shrink:0;align-self:center}
-.about-office-country{font-size:15px;color:var(--ink);font-weight:600}
+.about-office-country{min-width:0;max-width:calc(100% - 19px);font-size:15px;color:var(--ink);font-weight:600}
 .about-office-city,.about-office-note{font:500 10px 'DM Mono';letter-spacing:.9px;text-transform:uppercase;color:var(--muted)}
 .about-office-note{color:var(--green-600)}
 .about-presence-markets{margin:0;font-size:14px;line-height:1.7;color:var(--muted)}
