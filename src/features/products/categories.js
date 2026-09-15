@@ -28,9 +28,15 @@ export function categorySlug(type) {
     .replace(/^-+|-+$/g, '')
 }
 
-/** The route for one category's list: 'products/export/fresh-fruit'. */
+/**
+ * The route for one category's list. With no direction it is the whole
+ * catalogue - both directions, exactly the list the Products page shows when
+ * that category's chip is pressed: 'products/all/fresh-fruit'. A direction
+ * narrows it: 'products/export/fresh-fruit'.
+ */
 export function categoryRoute({ trade, type }) {
-  const direction = trade === 'import' ? 'import' : 'export'
+  const direction = trade === 'import' || trade === 'export' ? trade : 'all'
   const slug = categorySlug(type)
-  return slug ? `products/${direction}/${slug}` : `products/${direction}`
+  if (!slug) return direction === 'all' ? 'products' : `products/${direction}`
+  return `products/${direction}/${slug}`
 }

@@ -80,8 +80,9 @@ export function App() {
         route and bounce the user to the home page. */}
     <button className="skip-link" onClick={() => mainRef.current?.focus()}>Skip to content</button>
     {/* A category list is still its direction's page, so the header's Export or
-        Import item stays highlighted on 'products/export/fresh-fruit'. */}
-    <Header route={onProduct ? 'products' : (onProducts && trade ? `products/${trade}` : route)} theme={theme} setTheme={setTheme}/>
+        Import item stays highlighted on 'products/export/fresh-fruit', and a
+        whole-catalogue one ('products/all/fresh-fruit') reads as Products. */}
+    <Header route={onProduct ? 'products' : (onProducts ? (trade ? `products/${trade}` : 'products') : route)} theme={theme} setTheme={setTheme}/>
     {/* data-hero says whether this route paints a dark hero behind the fixed
         header, deciding both the header's transparency and whether <main>
         offsets the header height.

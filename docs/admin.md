@@ -408,14 +408,18 @@ light-mode map has to be.
 
 `home.productsIntro.cards` is a list of at most three `{ category, image, title,
 description, published }`. There is no category table: a category is the `type` its
-products share, so `category` stores that name and the rest - which products are in it,
-the direction it trades in, the fallback photograph - is resolved from the published
+products share, so `category` stores that name and the rest - which products are in it
+and the fallback photograph - is resolved from the published
 catalogue at render time (`features/products/featuredCards.js`). The editor's dropdown is
 built from the same catalogue (`productCategories`), so a type that gains a published
 product appears there with no admin work.
 
 - `image` is a Home-only upload through the normal media pipeline; it never touches a
   product's images. Empty falls back to a photo from the category.
+- A card links to `products/all/<category-slug>`: the whole catalogue with that category's
+  chip selected, so it lists every product of the type in both directions - the same list
+  as pressing the chip on the Products page. (It once linked to the export list only, and
+  Fresh fruit showed 1 product instead of 12.)
 - A card whose category no published product has any more is dropped from the site, and
   the editor flags it and refuses to save until another is chosen.
 - `cards` absent (every row saved before the feature) renders the legacy positional cards

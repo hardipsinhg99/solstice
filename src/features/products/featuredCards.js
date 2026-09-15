@@ -46,7 +46,7 @@ export function resolveFeaturedCards(cards, products) {
   if (!Array.isArray(cards)) {
     return [list[0], list[3], list[1]].filter(Boolean).map((p) => ({
       category: categoryName(p.type), title: p.name, description: p.description,
-      image: photoOf(p), route: categoryRoute(p)
+      image: photoOf(p), route: categoryRoute({ type: p.type })
     }))
   }
   return cards
@@ -55,16 +55,17 @@ export function resolveFeaturedCards(cards, products) {
       const members = list.filter((p) => !p.placeholder && sameCategory(p.type, c.category))
       if (members.length === 0) return null
       const custom = c.image?.url && c.image.published !== false ? c.image : null
-      // "What we export": the export list when the category has exports, else
-      // the direction it actually trades in.
-      const trade = members.some((p) => p.trade === 'export') ? 'export' : 'import'
       const category = categoryName(c.category)
       return {
         category,
         title: (c.title ?? '').trim() || category,
         description: (c.description ?? '').trim(),
         image: custom ?? photoOf(members.find((p) => p.image)),
-        route: categoryRoute({ trade, type: category })
+        // The card only names the category; the Products page decides what is
+        // in it. No direction, so it is every product of that type - the same
+        // list as Products -> that category's chip (Fresh fruit: 12, not the
+        // 1 export). Narrowing to exports hid the 11 imports.
+        route: categoryRoute({ type: category })
       }
     })
     .filter(Boolean)
