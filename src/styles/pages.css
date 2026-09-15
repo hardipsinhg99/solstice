@@ -141,23 +141,75 @@ html[data-theme=dark] .globe-wrap-static{--globe-hi:#14301f;--globe-lo:#08150f;-
 
 .home-products{background:var(--surface)}
 .section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:39px}
-.product-feature-grid{display:grid;grid-template-columns:1.15fr .92fr .92fr;gap:14px}
-.product-feature{height:385px;position:relative;overflow:hidden;color:#fff;cursor:pointer}
-.product-feature-1{margin-top:53px;height:332px}
-.product-feature-2{margin-top:20px;height:365px}
+/* Home "featured products" - photograph cards with the text over a scrim.
+   All text sits in normal flow in one column (category at the top; name +
+   arrow, then the description, at the foot), so a long name or description
+   pushes its neighbours rather than landing on them, and the card grows
+   (min-height, not height) if the content ever needs more room. Phones: the
+   first card full width, the next two side by side; 3 across from 781px, the
+   staggered editorial row from 1025px. */
+.product-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(max-width:780px){.product-feature-grid>:first-child:nth-last-child(odd){grid-column:1/-1}}
+@media(max-width:299px){.product-feature-grid{grid-template-columns:minmax(0,1fr)}}
+@media(min-width:781px){.product-feature-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}}
+@media(min-width:1025px){.product-feature-grid{grid-template-columns:1.15fr .92fr .92fr}}
+.product-feature{position:relative;isolation:isolate;overflow:hidden;container-type:inline-size;display:flex;min-width:0;min-height:250px;color:#fff;cursor:pointer;border-radius:clamp(12px,1.2vw,16px);background:#0c1e15}
+.product-feature-grid>:first-child:nth-last-child(odd){min-height:220px}
+@media(min-width:781px){.product-feature,.product-feature-grid>:first-child:nth-last-child(odd){min-height:330px}}
+/* The stagger: the grid stretches each card to the row, so the offsets
+   below keep the three different heights (385 / 332 / 365). */
+@media(min-width:1025px){
+  .product-feature{min-height:385px}
+  .product-feature-1{margin-top:53px;min-height:332px}
+  .product-feature-2{margin-top:20px;min-height:365px}
+}
 .product-feature-image,.product-feature-overlay{position:absolute;inset:0}
-.product-feature-image{overflow:hidden;transition:transform .6s var(--ease)}
-.product-feature-image img{display:block;width:100%;height:100%;object-fit:cover}
-.product-feature:hover .product-feature-image{transform:scale(1.08)}
-.product-feature-overlay{background:linear-gradient(0deg,#10231ae6 0%,#10231a55 45%,transparent 70%)}
-.product-feature>span,.product-feature h3,.product-feature .card-cue,.product-feature-desc{position:absolute;z-index:1}
-.product-feature>span{top:19px;left:19px;font:9px 'DM Mono';letter-spacing:.9px}
-.product-feature h3{bottom:15px;left:20px;margin:0;font-size:25px;letter-spacing:-.04em;transition:transform .35s var(--ease)}
-.product-feature-desc{left:20px;right:65px;bottom:15px;margin:0;font-size:12px;line-height:1.5;color:#e3e8dc;opacity:0;transform:translateY(10px);transition:opacity .3s,transform .3s}
-.product-feature:hover h3{transform:translateY(-30px)}
-.product-feature:hover .product-feature-desc{opacity:1;transform:translateY(-14px)}
-.product-feature .card-cue{right:17px;bottom:17px;width:34px;height:34px;border:0;border-radius:50%;background:var(--green-600);display:grid;place-items:center;color:var(--on-green);transition:transform .3s var(--ease)}
-.product-feature:hover .card-cue{transform:rotate(45deg)}
+.product-feature-image{z-index:-2;overflow:hidden}
+.product-feature-image img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .7s var(--ease)}
+/* Scrim deep enough under the text block for white type on any photograph;
+   the hover tint is a second layer that only fades. */
+.product-feature-overlay{z-index:-1;background:linear-gradient(0deg,rgba(12,30,21,.92) 0%,rgba(12,30,21,.66) 36%,rgba(12,30,21,.14) 66%,rgba(12,30,21,0) 100%)}
+.product-feature-overlay:after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(6,40,25,.5),rgba(6,40,25,.18));opacity:0;transition:opacity .45s var(--ease)}
+.product-feature-body{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:clamp(14px,6cqi,22px)}
+/* A pill with its own backing, so the category reads on a white photograph. */
+.product-feature-tag{max-width:100%;font:500 10px/1.3 'DM Mono',ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#F2F6EC;background:rgba(10,31,22,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-radius:20px;padding:5px 10px;overflow-wrap:anywhere}
+.product-feature-foot{margin-top:auto;width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"name cue" "desc desc";align-items:end;column-gap:12px}
+.product-feature-foot h3{grid-area:name}
+.product-feature-foot .card-cue{grid-area:cue}
+.product-feature-reveal{grid-area:desc}
+/* Narrow cards (two-up phones): the name keeps the full width - beside a
+   34px arrow it would have ~64px and break mid-word - and the arrow takes
+   the bottom-right corner under the description. */
+@container(max-width:220px){
+  .product-feature-foot{grid-template-areas:"name name" "desc desc" ". cue"}
+  .product-feature-foot .card-cue{width:30px;height:30px;margin-top:10px}
+}
+.product-feature h3{margin:0;color:#fff;font-size:clamp(16px,10cqi,26px);line-height:1.15;letter-spacing:-.03em;overflow-wrap:break-word;text-wrap:balance}
+.product-feature .card-cue{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--green-600);color:var(--on-green);transition:transform .3s var(--ease)}
+/* Description row. Open by default - touch screens have no hover, so the
+   text is simply there. Clamped to 3 lines (2 on narrow cards); the whole
+   card opens the full specification. */
+.product-feature-reveal{display:grid;grid-template-rows:1fr}
+.product-feature-reveal>div{min-height:0;overflow:hidden}
+.product-feature-desc{margin:12px 0 0;padding-top:11px;border-top:1px solid rgba(255,255,255,.24);font-size:12.5px;line-height:1.55;color:#E3E8DC;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;overflow:hidden}
+@container(max-width:260px){.product-feature-desc{-webkit-line-clamp:2;line-clamp:2;font-size:12px}}
+@container(max-width:170px){.product-feature-tag{letter-spacing:.03em;padding:4px 8px;border-radius:8px}}
+/* Mouse and trackpad: the description row opens from zero height on hover or
+   keyboard focus, lifting the name by exactly the row's height - the card
+   itself never changes size, and the two are never in the same place. */
+@media(hover:hover) and (pointer:fine){
+  .product-feature-reveal{grid-template-rows:0fr;transition:grid-template-rows .45s var(--ease)}
+  .product-feature-desc{opacity:0;transform:translateY(6px);transition:opacity .3s var(--ease),transform .45s var(--ease)}
+  .product-feature:is(:hover,:focus-visible) .product-feature-reveal{grid-template-rows:1fr}
+  .product-feature:is(:hover,:focus-visible) .product-feature-desc{opacity:1;transform:none;transition-delay:.08s}
+  .product-feature:is(:hover,:focus-visible) .product-feature-image img{transform:scale(1.05)}
+  .product-feature:is(:hover,:focus-visible) .product-feature-overlay:after{opacity:1}
+  .product-feature:is(:hover,:focus-visible) .card-cue{transform:translateX(3px)}
+}
+@media(prefers-reduced-motion:reduce){
+  .product-feature-reveal,.product-feature-desc,.product-feature-image img,.product-feature-overlay:after,.product-feature .card-cue{transition:none}
+  .product-feature:is(:hover,:focus-visible) .product-feature-image img,.product-feature:is(:hover,:focus-visible) .card-cue{transform:none}
+}
 
 /* ============================================================
    Journey - scroll-scrubbed logistics sequence

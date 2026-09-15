@@ -31,10 +31,6 @@
   .differentiator-grid,.trust-grid,.team-grid{grid-template-columns:1fr 1fr}
   .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
 
-  /* The staggered feature row needs the full 1180px to read as deliberate
-     rather than as a broken baseline; at this width it flattens to one row. */
-  .product-feature-grid{grid-template-columns:repeat(3,1fr)}
-  .product-feature,.product-feature-1,.product-feature-2{height:330px;margin-top:0}
 
   /* Escaped the container and pushed a horizontal scrollbar at this width. */
   .manifesto-stats{left:0}
@@ -209,9 +205,8 @@
   .section-head{display:block;margin-bottom:29px}
   .section-head .quiet-link{margin-top:19px}
 
-  .product-feature-grid,.team-grid,.related-grid{grid-template-columns:1fr;gap:13px}
+  .team-grid,.related-grid{grid-template-columns:1fr;gap:13px}
   .detail-top{margin-bottom:32px}
-  .product-feature,.product-feature-1,.product-feature-2{height:307px;margin:0;width:100%;min-width:0}
 
   .buyer-path{padding:72px 0}
   .buyer-path-head{display:block;margin-bottom:28px}
@@ -306,8 +301,6 @@
   .page-title h1{font-size:41px;line-height:1}
   .section{padding:60px 0}
   .intro-block-grid,.buyer-path-head{gap:20px}
-  .product-feature,.product-feature-1,.product-feature-2{height:275px}
-  .product-feature h3{font-size:22px}
   .buyer-path-grid article{padding:17px 0}
   .home-manifesto{padding:60px 0}
   .manifesto-image,.manifesto-photo{height:255px}

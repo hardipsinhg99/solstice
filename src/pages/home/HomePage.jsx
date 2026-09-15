@@ -172,20 +172,39 @@ export default function HomePage({ selectProduct, theme }) {
             {homeProducts.map((product, index) => (
               <Reveal as="article" key={product.slug} delay={index * 90} className={`product-feature product-feature-${index}`} {...cardProps(() => selectProduct(product.slug), `View ${product.name}`)}>
                 <div className="product-feature-image">
-                  <img
-                    src={unsplashAt(product.image, 800)}
-                    srcSet={unsplashSrcSet(product.image)}
-                    sizes="(max-width: 780px) 100vw, 33vw"
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  {product.image && (
+                    <img
+                      src={unsplashAt(product.image, 800)}
+                      srcSet={unsplashSrcSet(product.image)}
+                      // Phones: the first card is full width, the other two share a row.
+                      sizes={index === 0 ? '(max-width: 780px) 100vw, 40vw' : '(max-width: 780px) 50vw, 33vw'}
+                      {...(product.imageWidth ? { width: product.imageWidth, height: product.imageHeight } : {})}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )}
                 </div>
                 <div className="product-feature-overlay"/>
-                <span>{product.type.toUpperCase()}</span>
-                <h3>{product.name}</h3>
-                <p className="product-feature-desc">{product.description}</p>
-                <span className="card-cue" aria-hidden="true"><Icon name="arrow"/></span>
+                {/* All text is in normal flow inside one column: category at the
+                    top, the name/arrow row and the description stacked at the
+                    foot. Nothing is absolutely positioned, so a long name or a
+                    long description pushes its neighbours instead of landing
+                    on them. On hover-capable pointers the description row
+                    opens from zero height (grid 0fr -> 1fr), lifting the name
+                    by exactly its own height; touch screens show it always. */}
+                <div className="product-feature-body">
+                  {product.type && <span className="product-feature-tag">{product.type}</span>}
+                  <div className="product-feature-foot">
+                    <h3>{product.name}</h3>
+                    <span className="card-cue" aria-hidden="true"><Icon name="arrow" size={16}/></span>
+                    {product.description && (
+                      <div className="product-feature-reveal">
+                        <div><p className="product-feature-desc">{product.description}</p></div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </Reveal>
             ))}
           </div>
