@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { PAGE_CONFIG, useAdminPage, saveSection, publishPage, unpublishPage, discardDraft, validateSection } from '../../features/pages/index.js'
-import { Field } from '../../components/admin/SectionFields.jsx'
+import { Field, FieldOptionsProvider } from '../../components/admin/SectionFields.jsx'
+import { useProductCatalogue, productCategories, seedFeaturedCards, categoryName } from '../../features/products/index.js'
 import { DangerConfirm } from '../../components/admin/DangerConfirm.jsx'
 import { TeamMembersManager } from './sections/TeamMembersManager.jsx'
 import { goTo } from '../../app/router.js'
@@ -19,6 +20,14 @@ import { goTo } from '../../app/router.js'
  * publishedData; Publish copies one onto the other. An unpublished edit is not
  * hidden by the UI - it is not in the public response at all.
  */
+// Stored category names come back HTML-escaped by the server's plain-text
+// cleaner ("&" -> "&amp;"). Decoded for editing so a select shows the name it
+// matches; the server escapes it again on save, consistently.
+function normaliseDraft(data) {
+  if (!Array.isArray(data?.cards)) return data
+  return { ...data, cards: data.cards.map((c) => (c && typeof c.category === 'string' ? { ...c, category: categoryName(c.category) } : c)) }
+}
+
 export default function AdminPageEditor({ slug }) {
   const config = PAGE_CONFIG[slug]
   const { page, status, error, reload } = useAdminPage(slug)
@@ -32,14 +41,42 @@ export default function AdminPageEditor({ slug }) {
   // button. Kept out of `drafts` because it is not a field - it never appears
   // in the section's data payload and must not be sanitized as content.
   const [visible, setVisible] = useState({})
+  const [seeded, setSeeded] = useState([])
+
+  // The published catalogue: the source of every category a select may offer.
+  // Categories are not a table - a category is the type its products share -
+  // so this is the one list, the same one the Products page filters by.
+  const [products, catalogueStatus] = useProductCatalogue()
+  const optionSets = useMemo(() => ({
+    productCategories: catalogueStatus === 'ready' ? productCategories(products) : undefined
+  }), [products, catalogueStatus])
 
   // Seed the local editing copy from the server's draft. Keyed by section, so
   // saving one section never discards unsaved work in another.
   useEffect(() => {
     if (!page) return
-    setDrafts(Object.fromEntries(page.sections.map((s) => [s.key, s.draftData ?? {}])))
+    setDrafts(Object.fromEntries(page.sections.map((s) => [s.key, normaliseDraft(s.draftData ?? {})])))
     setVisible(Object.fromEntries(page.sections.map((s) => [s.key, s.draftVisible !== false])))
   }, [page])
+
+  // A section declaring `seed` that has never saved the seeded field gets it
+  // pre-filled from live data once, in the editing copy only - it shows as
+  // Unsaved and nothing is written until the editor presses Save. Today only
+  // Home's "What we export" cards: the three the page shows now.
+  const seededOnce = useRef(new Set())
+  useEffect(() => {
+    if (!page || !config || catalogueStatus !== 'ready') return
+    for (const section of config.sections) {
+      if (section.seed !== 'featuredCards' || seededOnce.current.has(section.key)) continue
+      const row = page.sections.find((r) => r.key === section.key)
+      if (!row || Array.isArray(row.draftData?.cards)) continue
+      seededOnce.current.add(section.key)
+      const cards = seedFeaturedCards(products)
+      if (cards.length === 0) continue
+      setDrafts((d) => ({ ...d, [section.key]: { ...d[section.key], cards } }))
+      setSeeded((k) => [...k, section.key])
+    }
+  }, [page, config, products, catalogueStatus])
 
   if (!config) return <p className="admin-error" role="alert">No editor is configured for “{slug}”.</p>
   if (status === 'loading') return <p className="admin-skeleton" role="status">Loading {config.title}…</p>
@@ -55,7 +92,7 @@ export default function AdminPageEditor({ slug }) {
 
   const sectionRow = (key) => page.sections.find((s) => s.key === key)
   const isDirty = (key) =>
-    JSON.stringify(drafts[key]) !== JSON.stringify(sectionRow(key)?.draftData ?? {}) ||
+    JSON.stringify(drafts[key]) !== JSON.stringify(normaliseDraft(sectionRow(key)?.draftData ?? {})) ||
     // Without this the Save button stays disabled after toggling visibility and
     // nothing the editor did could be persisted.
     (visible[key] ?? true) !== (sectionRow(key)?.draftVisible !== false)
@@ -70,7 +107,7 @@ export default function AdminPageEditor({ slug }) {
     // "Add founder" makes a card - and a nameless card renders as an empty box
     // the public component then filters away. Refusing the save and naming the
     // row is far kinder than accepting it and showing nothing.
-    const problems = validateSection(config.sections.find((s) => s.key === key), drafts[key])
+    const problems = validateSection(config.sections.find((s) => s.key === key), drafts[key], optionSets)
     if (problems.length) {
       setActionError(problems.join(' '))
       setSavingKey('')
@@ -81,6 +118,7 @@ export default function AdminPageEditor({ slug }) {
       await saveSection(slug, key, drafts[key], visible[key] ?? true)
       await reload()
       setSavedKey(key)
+      setSeeded((k) => k.filter((x) => x !== key))
     } catch (err) {
       setActionError(err.message)
     } finally {
@@ -96,6 +134,7 @@ export default function AdminPageEditor({ slug }) {
   const published = page.status === 'PUBLISHED'
 
   return (
+    <FieldOptionsProvider value={optionSets}>
     <section className="admin-page">
       <header className="admin-page-head">
         <div>
@@ -180,6 +219,12 @@ export default function AdminPageEditor({ slug }) {
                 <span>Show on the site</span>
               </label>
               {section.help && <p className="admin-hint">{section.help}</p>}
+              {seeded.includes(section.key) && (
+                <p className="admin-hint admin-ok" role="status">
+                  Pre-filled with the cards the Home page shows today, taken from the catalogue.
+                  Nothing has changed yet - Save this section, then Publish page, to manage them here from now on.
+                </p>
+              )}
             </div>
 
             {section.fields.map((field) => (
@@ -231,5 +276,6 @@ export default function AdminPageEditor({ slug }) {
         />
       )}
     </section>
+    </FieldOptionsProvider>
   )
 }

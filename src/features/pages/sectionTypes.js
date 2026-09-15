@@ -117,13 +117,33 @@ const HOME = [
     ]
   },
   {
-    key: 'productsIntro', type: 'home.productsIntro', label: 'Featured products heading',
-    help: 'The three products themselves come from the catalogue, not from here.',
+    key: 'productsIntro', type: 'home.productsIntro', label: 'What we export',
+    help: 'The heading and the three featured cards. Each card points at a product category and opens that category\'s product list. Its picture here is used only on the Home page - product images are never changed. Up to 3 cards; use the arrows to set their order.',
+    // First visit after this section gained its cards: pre-fill the three the
+    // Home page shows today, so saving keeps the page exactly as it is.
+    seed: 'featuredCards',
     fields: [
       f('eyebrow', 'Eyebrow'),
       f('headingLine1', 'Heading, first line'),
       f('headingAccent', 'Heading, italic accent'),
-      f('linkLabel', 'Link text')
+      f('linkLabel', 'Link text'),
+      f('cards', 'Featured cards', 'list', {
+        itemLabel: 'Card',
+        max: 3,
+        fields: [
+          f('category', 'Product category', 'select', {
+            required: true, options: 'productCategories',
+            placeholder: 'Select a product category',
+            help: 'Lists the categories of your published products (the Type field in Admin → Products). A new category appears here as soon as a product with it is published.'
+          }),
+          f('image', 'Home page image', 'image', {
+            help: 'Used only on this card. Landscape, at least 1200 × 900 px (4:3) looks best; JPG, PNG or WebP up to 8 MB - it is converted and resized on upload. Leave empty to use a product photo from this category.'
+          }),
+          f('title', 'Card title', 'text', { help: 'Optional, e.g. Cavendish Bananas. Leave empty to show the category name.' }),
+          f('description', 'Short description', 'textarea', { help: 'Optional. Appears on hover on desktop and under the title on phones.' }),
+          f('published', 'Show on the site', 'toggle', { default: true, help: 'Off hides this card without deleting it.' })
+        ]
+      })
     ]
   },
   {
@@ -585,7 +605,7 @@ export const PAGE_TITLES = Object.fromEntries(
  *
  * Returns an array of human-readable messages; empty means valid.
  */
-export function validateSection(section, data) {
+export function validateSection(section, data, optionSets = {}) {
   const errors = []
 
   const walk = (fields, value, path) => {
@@ -593,13 +613,24 @@ export function validateSection(section, data) {
       if (field.kind === 'list') {
         const items = Array.isArray(value?.[field.name]) ? value[field.name] : []
         const label = field.itemLabel ?? 'Item'
+        if (field.max && items.length > field.max) errors.push(`${field.label}: at most ${field.max}.`)
         items.forEach((item, i) => walk(field.fields, item, `${label} ${i + 1}`))
         continue
       }
-      if (!field.required) continue
       const v = value?.[field.name]
       const blank = v == null || (typeof v === 'string' && v.trim() === '')
-      if (blank) errors.push(`${path ? `${path}: ` : ''}${field.label} is required.`)
+      if (field.required && blank) {
+        errors.push(`${path ? `${path}: ` : ''}${field.label} is required.`)
+        continue
+      }
+      // A choice must still be one of the live options - a category renamed
+      // or emptied since it was picked is refused, not saved as a dead link.
+      // (Only when the options have loaded: an empty set is "unknown", not
+      // "nothing is valid".)
+      const options = field.kind === 'select' ? optionSets[field.options] : null
+      if (!blank && options?.length && !options.includes(String(v).trim())) {
+        errors.push(`${path ? `${path}: ` : ''}“${v}” is no longer a product category - choose another.`)
+      }
     }
   }
 

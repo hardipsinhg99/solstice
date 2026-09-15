@@ -404,6 +404,26 @@ page meant both the globe body and its dot map were invisible. The base now sits
 the page background and the dots are darker than the base, which is the way round a
 light-mode map has to be.
 
+### Home "What we export" cards reference a category, they do not copy one
+
+`home.productsIntro.cards` is a list of at most three `{ category, image, title,
+description, published }`. There is no category table: a category is the `type` its
+products share, so `category` stores that name and the rest - which products are in it,
+the direction it trades in, the fallback photograph - is resolved from the published
+catalogue at render time (`features/products/featuredCards.js`). The editor's dropdown is
+built from the same catalogue (`productCategories`), so a type that gains a published
+product appears there with no admin work.
+
+- `image` is a Home-only upload through the normal media pipeline; it never touches a
+  product's images. Empty falls back to a photo from the category.
+- A card whose category no published product has any more is dropped from the site, and
+  the editor flags it and refuses to save until another is chosen.
+- `cards` absent (every row saved before the feature) renders the legacy positional cards
+  (catalogue items 1, 4, 2), so shipping it changed nothing. The editor pre-fills those
+  three as unsaved config on first open.
+- Names are compared decoded: the plain-text cleaner escapes `&` on both the product type
+  and the saved copy, possibly a different number of times.
+
 ### Rich text is targeted by section type and path
 
 `RICH_PATHS` in `PagesService` names the exact `type` + dotted path of every rich-text

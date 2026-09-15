@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { createContext, useContext, useRef, useState } from 'react'
 import { Icon } from '../ui/Icon.jsx'
 import { RichTextEditor } from './RichTextEditor.jsx'
 import { uploadAsset } from '../../features/admin/useMediaAssets.js'
@@ -11,6 +11,37 @@ import { uploadAsset } from '../../features/admin/useMediaAssets.js'
  */
 
 const setIn = (obj, name, value) => ({ ...obj, [name]: value })
+
+/* Option lists for `select` fields, keyed by the name a field declares in
+   `options` (e.g. 'productCategories'). Supplied by the page editor, which can
+   read domain data; this file stays free of it. A missing set renders the
+   select disabled with a "loading" note rather than an empty, pickable list. */
+const FieldOptionsContext = createContext({})
+export const FieldOptionsProvider = FieldOptionsContext.Provider
+
+function SelectField({ field, value, onChange, id, helpId }) {
+  const sets = useContext(FieldOptionsContext)
+  const options = sets[field.options]
+  const current = typeof value === 'string' ? value : ''
+  const stale = current !== '' && Array.isArray(options) && options.length > 0 && !options.includes(current)
+  return (
+    <div className="admin-field">
+      <label htmlFor={id}>{field.label}{field.required && <span aria-hidden="true"> *</span>}</label>
+      <select id={id} value={current} disabled={!options} required={field.required}
+              aria-invalid={stale || undefined} aria-describedby={helpId}
+              onChange={(e) => onChange(e.target.value)}>
+        <option value="">{options ? (field.placeholder ?? 'Select…') : 'Loading…'}</option>
+        {/* A saved choice that is no longer offered stays visible, flagged,
+            so the editor sees what is wrong instead of a silently blank box. */}
+        {stale && <option value={current}>{current} - no longer in the catalogue</option>}
+        {(options ?? []).map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+      {stale && <p className="admin-error" role="alert">“{current}” no longer matches any published product. Choose another category - until then this card is hidden on the site.</p>}
+      {options && options.length === 0 && <p className="admin-hint">No categories yet - publish a product in Admin → Products first.</p>}
+      {field.help && <small id={helpId} className="admin-hint">{field.help}</small>}
+    </div>
+  )
+}
 
 /* Mirrors server/src/media/media.constants.ts. Duplicated deliberately: the
    server still validates by CONTENT, which is the check that matters and the
@@ -188,9 +219,16 @@ function ListField({ field, value, onChange, idBase }) {
           </div>
         ))}
       </div>
-      <button type="button" className="admin-btn" onClick={() => onChange([...items, blank])}>
-        Add {label.toLowerCase()}
-      </button>
+      {/* A fixed-size slot set (e.g. the three Home cards) stops offering Add
+          when full, and says why, rather than accepting a row that would
+          never be shown. */}
+      {field.max && items.length >= field.max
+        ? <p className="admin-hint">{field.max} of {field.max} - remove one to add another.</p>
+        : (
+          <button type="button" className="admin-btn" onClick={() => onChange([...items, blank])}>
+            Add {label.toLowerCase()}
+          </button>
+        )}
     </fieldset>
   )
 }
@@ -201,6 +239,7 @@ export function Field({ field, value, onChange, idBase }) {
 
   if (field.kind === 'list') return <ListField field={field} value={value} onChange={onChange} idBase={id}/>
   if (field.kind === 'image') return <ImageField field={field} value={value} onChange={onChange} id={id}/>
+  if (field.kind === 'select') return <SelectField field={field} value={value} onChange={onChange} id={id} helpId={helpId}/>
 
   if (field.kind === 'rich') {
     return (

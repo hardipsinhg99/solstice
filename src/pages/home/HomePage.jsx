@@ -10,7 +10,7 @@ import { Reveal } from '../../components/motion/Reveal.jsx'
 // entry chunk for every page - including the ones with no map and no animation.
 // The transform is tiny and eager; the component is lazy, below.
 import { mapFromLocations } from '../../features/worldmap/fromLocations.js'
-import { useProductCatalogue, categoryRoute } from '../../features/products/index.js'
+import { useProductCatalogue, resolveFeaturedCards } from '../../features/products/index.js'
 import { HOME_MAP_FALLBACK } from '../../data/globe.js'
 import { useNavigate } from '../../app/navigation.js'
 import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
@@ -47,11 +47,12 @@ export default function HomePage({ theme }) {
   const buyerPath = section('buyerPath')
   const manifesto = section('manifesto')
   const cta = section('cta')
-  // The three featured slots are positional. While the catalogue is still in
-  // flight the array is empty, so filter the holes out rather than render
-  // undefined into ProductCard - the section simply has nothing in it for a
-  // moment, which is the honest state.
-  const homeProducts = [products[0], products[3], products[1]].filter(Boolean)
+  // "What we export" cards, as configured in Admin -> Pages -> Home, resolved
+  // against the live catalogue (category members, fallback photo, link
+  // direction). A page that has never saved the cards shows the three it always
+  // did. While the catalogue is in flight the list is empty - the section
+  // simply has nothing in it for a moment, which is the honest state.
+  const featured = useMemo(() => resolveFeaturedCards(productsIntro.cards, products), [productsIntro.cards, products])
   // Same rule as About: the legend beside the globe is what plots it.
   const legend = footprint.legend
   const plot = useMemo(
@@ -169,20 +170,18 @@ export default function HomePage({ theme }) {
             <button className="quiet-link" onClick={() => navigate('products')}>{productsIntro.linkLabel} <Icon name="arrow" size={16}/></button>
           </Reveal>
           <div className="product-feature-grid">
-            {homeProducts.map((product, index) => (
-              // A card opens its product's CATEGORY list in its direction, e.g.
-              // Fresh fruit (export), not the single product. The destination is
-              // built from the product's own type and trade, both set in the
-              // admin, so a re-categorised product links to its new list.
-              <Reveal as="article" key={product.slug} delay={index * 90} className={`product-feature product-feature-${index}`} {...cardProps(() => navigate(categoryRoute(product)), `${product.name}: view all ${product.type || 'products'}`)}>
+            {featured.map((card, index) => (
+              // A card opens its CATEGORY's product list, e.g. Fresh fruit
+              // (export) - never a single product.
+              <Reveal as="article" key={`${card.category}-${index}`} delay={index * 90} className={`product-feature product-feature-${index}`} {...cardProps(() => navigate(card.route), `${card.title}: view all ${card.category}`)}>
                 <div className="product-feature-image">
-                  {product.image && (
+                  {card.image && (
                     <img
-                      src={unsplashAt(product.image, 800)}
-                      srcSet={unsplashSrcSet(product.image)}
+                      src={unsplashAt(card.image.url, 800)}
+                      srcSet={unsplashSrcSet(card.image.url)}
                       // Phones: the first card is full width, the other two share a row.
                       sizes={index === 0 ? '(max-width: 780px) 100vw, 40vw' : '(max-width: 780px) 50vw, 33vw'}
-                      {...(product.imageWidth ? { width: product.imageWidth, height: product.imageHeight } : {})}
+                      {...(card.image.width ? { width: card.image.width, height: card.image.height } : {})}
                       alt=""
                       loading="lazy"
                       decoding="async"
@@ -198,13 +197,14 @@ export default function HomePage({ theme }) {
                     opens from zero height (grid 0fr -> 1fr), lifting the name
                     by exactly its own height; touch screens show it always. */}
                 <div className="product-feature-body">
-                  {product.type && <span className="product-feature-tag">{product.type}</span>}
+                  {/* The category badge, unless the title already is the category. */}
+                  {card.title !== card.category && <span className="product-feature-tag">{card.category}</span>}
                   <div className="product-feature-foot">
-                    <h3>{product.name}</h3>
+                    <h3>{card.title}</h3>
                     <span className="card-cue" aria-hidden="true"><Icon name="arrow" size={16}/></span>
-                    {product.description && (
+                    {card.description && (
                       <div className="product-feature-reveal">
-                        <div><p className="product-feature-desc">{product.description}</p></div>
+                        <div><p className="product-feature-desc">{card.description}</p></div>
                       </div>
                     )}
                   </div>
