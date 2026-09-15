@@ -17,7 +17,7 @@ import GalleryPage from '../pages/gallery/GalleryPage.jsx'
 import ContactPage from '../pages/contact/ContactPage.jsx'
 import { NavigationProvider } from './navigation.js'
 import { useTheme } from './ThemeProvider.jsx'
-import { goTo, useHashRoute, isProductRoute, productSlug, isProductsRoute, productsTrade, isAdminRoute } from './router.js'
+import { goTo, useHashRoute, isProductRoute, productSlug, isProductsRoute, productsTrade, productsCategory, isAdminRoute } from './router.js'
 import AdminApp from '../pages/admin/AdminApp.jsx'
 
 // Routes whose first section is a dark full-bleed hero.
@@ -57,8 +57,10 @@ export function App() {
   // is a shareable URL.
   const onProducts = isProductsRoute(route)
   const trade = productsTrade(route)
+  // Optional category pre-selection, e.g. from a Home feature card.
+  const category = productsCategory(route)
   const pages = {
-    home: <HomePage selectProduct={selectProduct} theme={theme}/>,
+    home: <HomePage theme={theme}/>,
     about: <AboutPage/>,
     services: <ServicesPage/>,
     team: <TeamPage/>,
@@ -77,7 +79,9 @@ export function App() {
         so an in-page anchor would be read as a navigation to a "main-content"
         route and bounce the user to the home page. */}
     <button className="skip-link" onClick={() => mainRef.current?.focus()}>Skip to content</button>
-    <Header route={onProduct ? 'products' : route} theme={theme} setTheme={setTheme}/>
+    {/* A category list is still its direction's page, so the header's Export or
+        Import item stays highlighted on 'products/export/fresh-fruit'. */}
+    <Header route={onProduct ? 'products' : (onProducts && trade ? `products/${trade}` : route)} theme={theme} setTheme={setTheme}/>
     {/* data-hero says whether this route paints a dark hero behind the fixed
         header, deciding both the header's transparency and whether <main>
         offsets the header height.
@@ -94,8 +98,10 @@ export function App() {
         : onProducts
           // key remounts on a direction change, which resets the category chips.
           // Carrying "Fresh fruit" from one direction into another that has no
-          // fruit would strand the grid empty for a reason nobody chose.
-          ? <ProductsPage key={trade ?? 'all'} trade={trade} selectProduct={selectProduct}/>
+          // fruit would strand the grid empty for a reason nobody chose. The
+          // category is in the key too, so arriving from a Home card at a
+          // different category applies it rather than keeping the old chip.
+          ? <ProductsPage key={`${trade ?? 'all'}/${category ?? ''}`} trade={trade} category={category} selectProduct={selectProduct}/>
           : (pages[route] || pages.home)}
     </main>
     <Footer/>

@@ -10,7 +10,7 @@ import { Reveal } from '../../components/motion/Reveal.jsx'
 // entry chunk for every page - including the ones with no map and no animation.
 // The transform is tiny and eager; the component is lazy, below.
 import { mapFromLocations } from '../../features/worldmap/fromLocations.js'
-import { useProductCatalogue } from '../../features/products/index.js'
+import { useProductCatalogue, categoryRoute } from '../../features/products/index.js'
 import { HOME_MAP_FALLBACK } from '../../data/globe.js'
 import { useNavigate } from '../../app/navigation.js'
 import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
@@ -31,7 +31,7 @@ const WorldMap = lazy(() =>
 import { Certifications } from './sections/Certifications.jsx'
 import { HOME_FALLBACK } from './homeFallback.js'
 
-export default function HomePage({ selectProduct, theme }) {
+export default function HomePage({ theme }) {
   const [products] = useProductCatalogue()
   const navigate = useNavigate()
   // Published section data, edited at #admin/page-home. HOME_FALLBACK is the
@@ -170,7 +170,11 @@ export default function HomePage({ selectProduct, theme }) {
           </Reveal>
           <div className="product-feature-grid">
             {homeProducts.map((product, index) => (
-              <Reveal as="article" key={product.slug} delay={index * 90} className={`product-feature product-feature-${index}`} {...cardProps(() => selectProduct(product.slug), `View ${product.name}`)}>
+              // A card opens its product's CATEGORY list in its direction, e.g.
+              // Fresh fruit (export), not the single product. The destination is
+              // built from the product's own type and trade, both set in the
+              // admin, so a re-categorised product links to its new list.
+              <Reveal as="article" key={product.slug} delay={index * 90} className={`product-feature product-feature-${index}`} {...cardProps(() => navigate(categoryRoute(product)), `${product.name}: view all ${product.type || 'products'}`)}>
                 <div className="product-feature-image">
                   {product.image && (
                     <img

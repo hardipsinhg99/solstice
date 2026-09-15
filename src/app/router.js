@@ -27,6 +27,10 @@ export const productsTrade = (route) => {
   return segment === 'import' || segment === 'export' ? segment : null
 }
 export const productSlug = (route) => route.split('/')[1]
+// Optional third segment: a category slug, 'products/export/fresh-fruit'. It
+// only pre-selects a category chip; the route is still a products route with
+// the same direction, so every existing URL keeps meaning what it meant.
+export const productsCategory = (route) => (isProductsRoute(route) && route.split('/')[2]) || null
 
 // Admin lives under the same hash router rather than a second deployable, which
 // is how the PRIM AI panel is actually built. 'admin' and 'admin/...' cannot

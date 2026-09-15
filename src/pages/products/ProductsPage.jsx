@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { PageTitle } from '../../components/layout/PageTitle.jsx'
-import { ProductFilter, ProductGrid, useProductCatalogue } from '../../features/products/index.js'
+import { ProductFilter, ProductGrid, useProductCatalogue, categorySlug } from '../../features/products/index.js'
 import { ExplodeSequence } from './sections/ExplodeSequence.jsx'
 import { CatalogueEmpty } from './sections/CatalogueEmpty.jsx'
 
@@ -30,8 +30,9 @@ const HEADINGS = {
   }
 }
 
-export default function ProductsPage({ trade, selectProduct }) {
-  const [category, setCategory] = useState('All')
+export default function ProductsPage({ trade, category: categoryParam, selectProduct }) {
+  // null until a chip is pressed: until then the route's category applies.
+  const [picked, setCategory] = useState(null)
   const [products, status, retry] = useProductCatalogue()
 
   // No direction in the route means the whole catalogue.
@@ -41,6 +42,12 @@ export default function ProductsPage({ trade, selectProduct }) {
   // hardcoded - an empty direction offers no chips, and an import catalogue with
   // different categories gets correct ones for free.
   const categories = ['All', ...new Set(inTrade.map(product => product.type))]
+  // A category named by the route ('products/export/fresh-fruit', e.g. from a
+  // Home feature card) is matched against the live category names, so it follows
+  // an admin rename. One that matches nothing - renamed since the link was
+  // shared, or mistyped - shows the whole direction rather than an empty grid.
+  const fromRoute = categoryParam ? categories.find(c => c !== 'All' && categorySlug(c) === categoryParam) : null
+  const category = picked ?? fromRoute ?? 'All'
   const filtered = category === 'All' ? inTrade : inTrade.filter(product => product.type === category)
 
   const noun = filtered.length === 1 ? 'product' : 'products'
