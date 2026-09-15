@@ -1,13 +1,13 @@
 import { Reveal } from '../../../components/motion/Reveal.jsx'
+import { useAutoScroller } from '../../../components/motion/useAutoScroller.js'
 
 /**
- * The certification marquee.
+ * The certification strip: an auto-advancing row that can also be swiped.
  *
- * No carousel library. The reference implementation reaches for embla plus an
- * auto-scroll plugin, a slot primitive and a variance helper - four packages to
- * translate a row of images at a constant rate, which two CSS rules already do.
- * The same seamless-loop technique is already in use by the Trade Network
- * quotes, so this is one pattern in the codebase rather than two.
+ * No carousel library - useAutoScroller drives a plain scrollable row, the
+ * same hook as the Trade Network quotes, so the codebase has one pattern for
+ * both. It drifts continuously, or steps one logo every few seconds under
+ * Reduce Motion, and pauses while the visitor touches or scrolls it.
  *
  * Renders nothing at all when there are no published certificates. That is not
  * a placeholder state - a certification is a legal claim in the destination
@@ -15,6 +15,8 @@ import { Reveal } from '../../../components/motion/Reveal.jsx'
  */
 export function Certifications({ data }) {
   const certs = data ?? {}
+  // Hooks run before the early return below - their order must not change.
+  const [rowRef, copies] = useAutoScroller({ speed: 34 })
 
   // `published` is per-certificate, so a lapsed one can be taken down without
   // losing its record. Undefined counts as published: rows added before the
@@ -23,20 +25,6 @@ export function Certifications({ data }) {
     (c) => c && c.name && c.published !== false
   )
   if (items.length === 0) return null
-
-  // A short list would leave a visible gap before the loop restarts, because
-  // the track must be at least twice the viewport for -50% to land seamlessly.
-  // Repeating the set until it is long enough fixes that without asking the
-  // editor to paste duplicates in the admin.
-  const MIN_PER_RUN = 8
-  const run = []
-  while (run.length < MIN_PER_RUN) run.push(...items)
-
-  // A fixed duration would make the strip appear to speed up as certificates
-  // are added, because the same time is spent covering a longer track. Tying
-  // the duration to the number of tiles keeps the pixels-per-second constant,
-  // so three logos and thirty drift at the same rate.
-  const seconds = Math.max(24, run.length * 5)
 
   return (
     <section className="section certifications">
@@ -47,22 +35,20 @@ export function Certifications({ data }) {
         </Reveal>
       </div>
 
-      {/* Two identical runs inside one track, translated by exactly -50%: at
-          the end of the cycle the second run sits precisely where the first
-          began, so the restart is invisible. A percentage rather than a pixel
-          value, so it cannot drift as logos are added or removed.
-          The second run is aria-hidden - it is a visual duplicate, and the list
-          should be announced once. */}
-      <div className="certifications-marquee">
-        <div className="certifications-track" style={{ '--marquee-duration': `${seconds}s` }}>
-          {[0, 1].map((copy) => (
+      {/* Identical runs of the list side by side; the hook keeps the scroll
+          position inside the second run and moves it by exactly one run's
+          width to loop, which is invisible. How many runs is measured, so a
+          short list never shows a gap. Only the first run is announced. */}
+      <div className="certifications-marquee" ref={rowRef} tabIndex={0} role="region" aria-label={certs.heading || 'Certifications'}>
+        <div className="certifications-track">
+          {Array.from({ length: copies }, (_, copy) => (
             <ul className="certifications-run" key={copy}
-                aria-hidden={copy === 1 || undefined}>
-              {run.map((c, i) => (
-                <li className="certification" key={`${copy}-${i}`}>
+                aria-hidden={copy > 0 || undefined}>
+              {items.map((c, i) => (
+                <li className="certification" data-marquee-item key={`${copy}-${i}`}>
                   {c.logo?.url
-                    ? <img src={c.logo.url} alt={c.logo.alt || c.name}
-                           loading="lazy" decoding="async"/>
+                    ? <img src={c.logo.url} alt={copy > 0 ? '' : (c.logo.alt || c.name)}
+                           loading="lazy" decoding="async" draggable="false"/>
                     /* No logo yet: the name carries the row rather than a
                        broken-image icon or a stock badge standing in for a
                        credential. */

@@ -10,6 +10,7 @@ import { useNavigate } from '../../app/navigation.js'
 import { usePage, HeroPicture } from '../../features/pages/index.js'
 import { useProductCatalogue } from '../../features/products/index.js'
 import { NETWORK_FALLBACK } from './networkFallback.js'
+import { useAutoScroller } from '../../components/motion/useAutoScroller.js'
 import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
 
 /* Category tile columns from the number of tiles, so the last row is as full
@@ -38,6 +39,8 @@ export default function NetworkPage() {
   const navigate = useNavigate()
   const { section, shows, missing } = usePage('network', NETWORK_FALLBACK)
   const [products] = useProductCatalogue()
+  // Buyer quotes row. Called up here with the other hooks, before any early return.
+  const [voicesRef, voiceCopies] = useAutoScroller({ speed: 30 })
 
   const hero = section('hero')
   const stats = section('stats')
@@ -263,9 +266,9 @@ export default function NetworkPage() {
       </section>
     )}
 
-    {/* Marquee. Duplicated track, translated by exactly -50% so the second
-        copy lands where the first began and the loop has no seam. The copy is
-        aria-hidden so a screen reader hears each quote once, not twice. */}
+    {/* Buyer quotes: an auto-advancing row that can also be swiped - see
+        useAutoScroller. Identical runs side by side for a seamless loop; only
+        the first is announced, so a screen reader hears each quote once. */}
     {shows('voices') && (voices.items ?? []).length > 0 && (
       <section className="section network-voices">
         <div className="container">
@@ -274,15 +277,15 @@ export default function NetworkPage() {
             <h2>{voices.heading}</h2>
           </Reveal>
         </div>
-        <div className="network-marquee" data-count={voices.items.length}>
+        <div className="network-marquee" data-count={voices.items.length} ref={voicesRef} tabIndex={0} role="region" aria-label={voices.heading || 'Buyer quotes'}>
           <div className="network-marquee-track">
-            {[0, 1].map((copy) => (
-              <div className="network-marquee-run" key={copy} aria-hidden={copy === 1 || undefined}>
+            {Array.from({ length: voiceCopies }, (_, copy) => (
+              <div className="network-marquee-run" key={copy} aria-hidden={copy > 0 || undefined}>
                 {voices.items.map((v, i) => (
-                  <figure className="network-voice" key={`${copy}-${i}`}>
+                  <figure className="network-voice" data-marquee-item key={`${copy}-${i}`}>
                     <blockquote>{v.quote}</blockquote>
                     <figcaption>
-                      {v.photo?.url && <img src={v.photo.url} alt="" loading="lazy" decoding="async"/>}
+                      {v.photo?.url && <img src={v.photo.url} alt="" loading="lazy" decoding="async" draggable="false"/>}
                       <span><strong>{v.name}</strong>{v.role && <em>{v.role}</em>}</span>
                     </figcaption>
                   </figure>
