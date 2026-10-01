@@ -51,13 +51,19 @@
 
     <title>Solstice Trading International LLP | Fresh Produce Exporter from India</title>
     <meta name="description" content="Indian exporter of fresh fruit, vegetables, spices and food staples - mangoes, pomegranates, grapes, onions and okra. Export cartons, phytosanitary certification and enquiries welcome from international buyers." />
-    <link rel="canonical" href="https://solsticellp.com/" />
+    <!-- No canonical or og:url here on purpose. Every path is served this one
+         file, so a hard-coded value would tell a crawler that /about, /contact
+         and all 30 product pages ARE the homepage - the whole index collapsed
+         into one URL, which is the failure the solsticetrading.com canonical
+         nearly caused. app/App.jsx writes a self-referential canonical and
+         og:url per route instead, which a rendering crawler reads; Part 2's
+         prerenderer emits them into the static HTML, which every crawler
+         reads, and this comment goes with it. -->
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Solstice Trading International LLP" />
     <meta property="og:title" content="Solstice Trading International LLP | Fresh Produce Exporter from India" />
     <meta property="og:description" content="Fresh fruit, vegetables, spices and essential foods sourced across India for international buyers. Send a product enquiry with your destination and pack requirement." />
-    <meta property="og:url" content="https://solsticellp.com/" />
     <meta property="og:image" content="https://solsticellp.com/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />

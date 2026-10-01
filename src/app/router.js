@@ -68,7 +68,20 @@ export function migrateLegacyHash () {
     ['about', 'services', 'team', 'network', 'gallery', 'contact', 'products'].includes(route) ||
     route.startsWith('products/') || route.startsWith('product/') ||
     route === 'admin' || route.startsWith('admin/')
-  if (!known) return
+  if (!known) {
+    // Something linked a hash this map does not know - an old route, a typo in
+    // a directory listing, a URL from before a rename. It is left alone (the
+    // app will answer Not Found) and recorded, because the alternative is
+    // guessing at what is still out there. The request 404s; its value is the
+    // line it writes in the nginx access log, which is greppable server-side
+    // without an endpoint, a dependency or a cookie. An <img> rather than
+    // fetch(): no CORS preflight, no promise to handle, fails silently.
+    try {
+      new Image().src = `/__legacy-hash?h=${encodeURIComponent(raw.slice(0, 120))}`
+      console.warn(`[router] unmapped legacy hash: #${raw}`)
+    } catch { /* logging must never break a page load */ }
+    return
+  }
   // replaceState, not pushState: the hash URL should not become a back-button
   // stop the user can return to.
   window.history.replaceState(null, '', toPath(route) + window.location.search)

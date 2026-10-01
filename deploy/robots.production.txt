@@ -8,6 +8,10 @@
 User-agent: *
 Allow: /
 
-# The admin is a client-rendered hash route, so a crawler cannot reach it
-# anyway - this is belt and braces, not the control.
-Disallow: /#admin
+# /admin, not /#admin: "#" opens a comment in robots.txt, so the old line read
+# as a bare "Disallow: /" - the whole site. It survived only because an equally
+# specific "Allow: /" outranks it in Google's least-restrictive tie-break.
+# The admin is a real path now. This is belt and braces either way: it is also
+# served with X-Robots-Tag: noindex and sits behind a JWT, because robots.txt
+# is a request, not a lock.
+Disallow: /admin

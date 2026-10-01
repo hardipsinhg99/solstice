@@ -20,6 +20,7 @@ import { useTheme } from './ThemeProvider.jsx'
 import { goTo, usePathRoute, isKnownRoute, isProductRoute, productSlug, isProductsRoute, productsTrade, productsCategory, isAdminRoute } from './router.js'
 import AdminApp from '../pages/admin/AdminApp.jsx'
 import { NotFound } from '../components/layout/NotFound.jsx'
+import { setCanonical } from '../lib/head.js'
 
 // Routes whose first section is a dark full-bleed hero.
 const HERO_ROUTES = new Set(['home', 'about', 'network'])
@@ -31,7 +32,7 @@ export function App() {
 
   const { theme, setTheme } = useTheme()
   const route = usePathRoute()
-  const [products] = useProductCatalogue()
+  const [products, catalogueStatus] = useProductCatalogue()
   const mainRef = useRef(null)
   const firstRender = useRef(true)
 
@@ -50,9 +51,27 @@ export function App() {
     mainRef.current?.focus()
   }, [route])
 
+
   const selectProduct = (slug) => goTo(`product/${slug}`)
   const onProduct = isProductRoute(route)
   const product = onProduct ? products.find(p => p.slug === productSlug(route)) : null
+  // A slug no published product has is a 404, not a page. Only once the
+  // catalogue has actually loaded: while it is in flight every slug looks
+  // unknown, and flashing Not Found at a buyer following a real link - then
+  // replacing it with the product - is worse than a moment of nothing.
+  // Unresolved it is a soft 404: /products/anything-at-all answered 200 with
+  // the full export listing, which is an unbounded supply of indexable URLs
+  // all carrying the same content.
+  const unknownProduct = onProduct && catalogueStatus === 'ready' && !product
+
+  // The canonical follows the URL, not the render: it must be right on the
+  // first paint of a deep link and after every in-app navigation. Declared
+  // after the product lookup it reads - a hook may sit anywhere, the value it
+  // closes over may not. Admin pages and unknown products get none: the first
+  // are noindex at the server, the second do not exist.
+  useEffect(() => {
+    setCanonical(isAdminRoute(route) || unknownProduct ? null : window.location.pathname)
+  }, [route, unknownProduct])
   // The catalogue's direction lives in the route, so the header dropdown and the
   // on-page switch read from one source and cannot disagree, and a filtered view
   // is a shareable URL.
@@ -95,7 +114,9 @@ export function App() {
         0.05 before. Layout must never depend on content still in flight. */}
     <main id="main-content" ref={mainRef} tabIndex={-1}
           data-hero={HERO_ROUTES.has(route) ? '' : undefined}>
-      {onProduct
+      {unknownProduct
+        ? <NotFound/>
+        : onProduct
         ? <ProductDetailPage product={product} selectProduct={selectProduct}/>
         : onProducts
           // key remounts on a direction change, which resets the category chips.
