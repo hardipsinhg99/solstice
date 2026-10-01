@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { PAGE_CONFIG, useAdminPage, saveSection, publishPage, unpublishPage, discardDraft, validateSection } from '../../features/pages/index.js'
+import { PAGE_CONFIG, useAdminPage, saveSection, savePageMeta, publishPage, unpublishPage, discardDraft, validateSection } from '../../features/pages/index.js'
+import { PageSeoFields } from './sections/PageSeoFields.jsx'
+import { PrerenderStatus } from './sections/PrerenderStatus.jsx'
 import { Field, FieldOptionsProvider } from '../../components/admin/SectionFields.jsx'
 import { useProductCatalogue, productCategories, seedFeaturedCards, categoryName } from '../../features/products/index.js'
 import { DangerConfirm } from '../../components/admin/DangerConfirm.jsx'
@@ -172,6 +174,19 @@ export default function AdminPageEditor({ slug }) {
       )}
 
       {actionError && <p className="admin-error" role="alert">{actionError}</p>}
+
+      {/* Re-polls as soon as the page reloads after a publish, rather than
+          waiting out the interval with a stale "up to date" on screen. */}
+      <PrerenderStatus refreshKey={page.updatedAt}/>
+
+      <PageSeoFields
+        slug={slug}
+        pageTitle={config.title}
+        seoTitle={page.seoTitle ?? ''}
+        seoDescription={page.seoDescription ?? ''}
+        onSave={savePageMeta}
+        onSaved={reload}
+      />
 
       {config.sections.map((section) => {
         const row = sectionRow(section.key)

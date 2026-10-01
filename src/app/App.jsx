@@ -1,10 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { lazy, Suspense, useEffect, useRef } from 'react'
 import { Header } from '../components/layout/Header.jsx'
 import { Footer } from '../components/layout/Footer.jsx'
 import { WhatsAppFab } from '../components/layout/WhatsAppFab.jsx'
 import { BackToTop } from '../components/layout/BackToTop.jsx'
 import { useScrollAway } from '../components/motion/useScrollAway.js'
-import { ChatWidget } from '../features/chat/index.js'
 import { useProductCatalogue } from '../features/products/index.js'
 import HomePage from '../pages/home/HomePage.jsx'
 import AboutPage from '../pages/about/AboutPage.jsx'
@@ -18,9 +17,28 @@ import ContactPage from '../pages/contact/ContactPage.jsx'
 import { NavigationProvider } from './navigation.js'
 import { useTheme } from './ThemeProvider.jsx'
 import { goTo, usePathRoute, isKnownRoute, isProductRoute, productSlug, isProductsRoute, productsTrade, productsCategory, isAdminRoute } from './router.js'
-import AdminApp from '../pages/admin/AdminApp.jsx'
 import { NotFound } from '../components/layout/NotFound.jsx'
 import { setCanonical } from '../lib/head.js'
+
+/* Split out of the main bundle, not out of the app.
+ *
+ * The admin is ~3,500 lines a buyer never runs, and it was being downloaded on
+ * every visit - on the Indian mobile connections this site is read on, that is
+ * real money and real seconds. It is safe to defer because no admin route is
+ * prerendered: there is no static content for a Suspense fallback to replace,
+ * so nothing can flash.
+ *
+ * The public pages stay eager for exactly that reason. They DO arrive as
+ * prerendered HTML, and React replaces that DOM on boot: a lazy page would
+ * blank the finished content a visitor is already reading while its chunk
+ * downloads. Code splitting is worth seconds; that would cost the first
+ * impression.
+ *
+ * The chat widget is deferred as a floating control that is not part of the
+ * page's content and appears a beat later than the page.
+ */
+const AdminApp = lazy(() => import('../pages/admin/AdminApp.jsx'))
+const ChatWidget = lazy(() => import('../features/chat/index.js').then((m) => ({ default: m.ChatWidget })))
 
 // Routes whose first section is a dark full-bleed hero.
 const HERO_ROUTES = new Set(['home', 'about', 'network'])
@@ -92,7 +110,13 @@ export function App() {
   // The admin renders instead of the marketing shell, not inside it: it has its
   // own chrome and must not inherit the site header, footer, chat widget or the
   // floating corner column.
-  if (isAdminRoute(route)) return <AdminApp route={route}/>
+  if (isAdminRoute(route)) {
+    return (
+      <Suspense fallback={<p className="admin-skeleton" role="status">Loading the admin…</p>}>
+        <AdminApp route={route}/>
+      </Suspense>
+    )
+  }
 
   return <NavigationProvider value={goTo}>
     {/* A <button>, not an <a href="#main-content">: the router owns location.hash,
@@ -128,7 +152,7 @@ export function App() {
           : (pages[route] ?? <NotFound/>)}
     </main>
     <Footer/>
-    <ChatWidget/>
+    <Suspense fallback={null}><ChatWidget/></Suspense>
     <WhatsAppFab/>
     {/* Shares the skip link's target so 'top of the page' means one place. */}
     <BackToTop targetRef={mainRef}/>

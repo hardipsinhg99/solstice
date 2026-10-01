@@ -117,7 +117,11 @@ ENV UPLOAD_DIR=/app/uploads
 # on the first real deploy as a restart loop:
 #   Error: Can't write to /app/node_modules/@prisma/engines
 # chowning only uploads left the entrypoint unable to run its first command.
-RUN mkdir -p /app/uploads && chown -R node:node /app
+# prerender-state is where this API asks for a static-HTML rebuild. It must
+# exist, owned by node, in the image: a named volume takes its ownership from
+# the mount point of whichever container mounts it first, and a root-owned one
+# silently turns every publish's rebuild request into EACCES.
+RUN mkdir -p /app/uploads /app/prerender-state && chown -R node:node /app
 
 USER node
 EXPOSE 3001

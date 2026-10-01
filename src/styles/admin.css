@@ -387,6 +387,16 @@ td.admin-row-actions>*+*{margin-left:8px}
 .admin-image-preview[data-hidden] img{filter:grayscale(1);opacity:.55}
 .admin-image-preview[data-hidden]{outline:1px dashed var(--line-strong);outline-offset:3px}
 .admin-ok{color:var(--green-600)}
+
+/* Character counters on the search-result fields. Sits in the same slice as the
+   other admin field affordances so the cascade order is unchanged.
+
+   Over the guideline is amber-free on purpose: --danger is reserved for things
+   that failed, and a 62-character title has not failed. It is stated in words
+   as well as colour, so the warning survives a reader who cannot see it. */
+.admin-count{display:block;margin-top:6px;font-variant-numeric:tabular-nums}
+.admin-count.is-over{color:var(--ink);font-weight:600}
+.admin-section-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
 .admin-image-preview figcaption{display:grid;gap:8px;justify-items:start}
 .admin-image-preview input{background:var(--bg);border:1px solid var(--line-strong);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:12.5px;width:100%}
 .admin-optional{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)}

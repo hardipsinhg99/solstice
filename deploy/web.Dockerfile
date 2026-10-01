@@ -24,6 +24,19 @@ FROM nginx:1.27-alpine AS runtime
 COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /build/dist /usr/share/nginx/html
 
+# Bind this image to the prerendered HTML that matches it. The prerender job
+# hashes the index.html it is served (the same bytes as this file) and files
+# its output under that hash; nginx looks only under this image's own hash.
+# A deploy with a new bundle therefore never serves HTML that points at
+# /assets/ files the new image no longer has. See deploy/nginx.conf.
+# The prerender volume's mount point, owned by uid 1000 (the prerender job's
+# user). web starts first and mounts the volume first, so this directory is
+# what decides the fresh volume's ownership. nginx only reads it.
+RUN mkdir -p /usr/share/nginx/html/prerender && chown 1000:1000 /usr/share/nginx/html/prerender
+RUN id=$(sha256sum /usr/share/nginx/html/index.html | cut -c1-16) \
+ && sed -i "s/__SHELL_ID__/$id/g" /etc/nginx/conf.d/default.conf \
+ && grep -q "shell-$id" /etc/nginx/conf.d/default.conf
+
 # WHICH robots.txt this image gets is a build argument, defaulting to the
 # staging one. That default is deliberate: a stack that forgets to set it gets
 # Disallow, which is the safe direction to fail. Production passes

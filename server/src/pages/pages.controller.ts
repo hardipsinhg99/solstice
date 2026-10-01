@@ -2,6 +2,7 @@ import { Body, Controller, Get, Header, Param, Patch, Post, UseGuards } from '@n
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentAdmin } from '../auth/current-admin.decorator';
 import { PagesService } from './pages.service';
+import { UpdatePageMetaDto } from './dto';
 
 @Controller('pages')
 export class PagesController {
@@ -61,6 +62,19 @@ export class PagesController {
       slug, key, data, admin.id,
       visible === undefined ? undefined : Boolean(visible),
     );
+  }
+
+  /** Per-page search metadata. Separate from section saves: it belongs to the
+      page, not to any one section, and it is not part of the draft/publish
+      round trip - meta is live the moment it is saved. */
+  @Patch('admin/:slug/meta')
+  @UseGuards(JwtAuthGuard)
+  updateMeta(
+    @Param('slug') slug: string,
+    @Body() dto: UpdatePageMetaDto,
+    @CurrentAdmin() admin: { id: string },
+  ) {
+    return this.pages.updateMeta(slug, dto, admin.id);
   }
 
   @UseGuards(JwtAuthGuard)

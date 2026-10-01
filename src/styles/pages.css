@@ -74,6 +74,12 @@
 .hero-meta{animation:heroUp .9s var(--ease) .32s both}
 .hero-scroll-cue{animation:heroUp .9s var(--ease) .48s both}
 @media(prefers-reduced-motion:reduce){.hero-copy .eyebrow,.hero-copy h1,.hero-copy>p,.hero-buttons,.hero-meta,.hero-scroll-cue{animation:none}}
+/* A prerendered load already played this intro on the static HTML. React then
+   renders fresh nodes over it, which would restart every one of these
+   animations and run the headline in a second time. The attribute is set only
+   for that first page and cleared on the first navigation - see
+   lib/prerender.js - so a client-side visit to Home still gets the intro. */
+html[data-prerendered] :is(.hero-copy .eyebrow,.hero-copy h1,.hero-copy>p,.hero-buttons,.hero-meta,.hero-scroll-cue){animation:none}
 
 .hero-scroll-cue{position:absolute;left:50%;bottom:96px;transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:9px;color:var(--on-band-muted)}
 .hero-scroll-cue span{font:9px 'DM Mono';letter-spacing:2px}

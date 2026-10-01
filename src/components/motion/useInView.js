@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { isPrerenderBoot } from '../../lib/prerender.js'
 
 // Scroll-reveal: fades sections in as they enter the viewport, skipped entirely for reduced-motion users.
 //
@@ -15,6 +16,24 @@ import { useEffect, useRef, useState } from 'react'
 export function useInView() {
   const ref = useRef(null)
   const [inView, setInView] = useState(false)
+
+  // On a prerendered load this content is ALREADY on screen - the static HTML
+  // painted it before React arrived. Starting it at opacity 0 and fading it in
+  // would make the page visibly blink. So anything inside the viewport at mount
+  // is revealed before the first paint, with its transition switched off for
+  // that one change. A layout effect because a plain effect runs after paint,
+  // which is the blink. Below the fold nothing changes: it was never seen, so
+  // it still fades in on scroll exactly as designed.
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el || !isPrerenderBoot()) return
+    const r = el.getBoundingClientRect()
+    if (r.bottom <= 0 || r.top >= window.innerHeight) return
+    el.style.transition = 'none'
+    setInView(true)
+    requestAnimationFrame(() => requestAnimationFrame(() => { el.style.transition = '' }))
+  }, [])
+
   useEffect(() => {
     const el = ref.current
     if (!el) return

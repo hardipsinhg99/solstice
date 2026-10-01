@@ -75,6 +75,7 @@ services:
       SMTP_FROM: ${SMTP_FROM:-}
       NOTIFY_EMAIL: ${NOTIFY_EMAIL:-}
     volumes:
+      - prerender-state:/app/prerender-state
       # NAMED volume, not a bind mount. This is the durability gap the storage
       # layer's own comment flags: a bind mount to a host path, or no volume at
       # all, loses every uploaded product image on the next rebuild.
@@ -141,6 +142,13 @@ services:
     restart: unless-stopped
     networks:
       - coolify
+      # The prerender job reaches the site through this network to render it.
+      - internal
+    volumes:
+      # Read-only: nginx serves this, the prerender job writes it. Mounting it
+      # writable here would let a compromised web container rewrite the HTML
+      # every crawler sees.
+      - prerender:/usr/share/nginx/html/prerender:ro
     labels:
       - traefik.enable=true
       - traefik.docker.network=coolify
@@ -199,9 +207,80 @@ services:
       - internal
     restart: "no"
 
+  # -------------------------------------------------------- prerender ------
+  # Static HTML for crawlers, in two services built from one image.
+  #
+  # prerender-watch runs with the stack. It idles as a bare Node process and
+  # renders only when (a) the API has recorded a rebuild request - every page,
+  # product and settings publish does - or (b) the web image's shell has
+  # changed, i.e. after a deploy. Publishing therefore reaches the static HTML
+  # with no command run by anyone, within about a minute.
+  #
+  # prerender is the same job, one-shot, behind a profile like `seed`. For an
+  # immediate render by hand:
+  #     docker compose --profile prerender run --rm prerender
+  # The two share a lock, so running it while the watcher renders is refused
+  # rather than racing.
+  #
+  # Both render into a fresh build directory and swap it in atomically only if
+  # every route succeeded. A failure at any point leaves the previous build
+  # serving - see prerender/prerender.mjs.
+  prerender-watch:
+    build:
+      context: .
+      dockerfile: deploy/prerender.Dockerfile
+    command: ["node", "prerender.mjs", "--watch"]
+    restart: unless-stopped
+    depends_on:
+      - api
+      - web
+    environment: &prerender-env
+      # Rendered against the containers, not the public hostname: this must work
+      # before DNS or a certificate does, and must not depend on the edge.
+      PRERENDER_BASE: http://web:8080
+      PRERENDER_API: http://api:3001
+      # But every canonical, og:url and JSON-LD URL it EMITS is public. Getting
+      # this wrong publishes http://web:8080 links to a crawler.
+      PRERENDER_PUBLIC_ORIGIN: ${PRERENDER_PUBLIC_ORIGIN:-https://solsticellp.com}
+      PRERENDER_OUT: /out
+      PRERENDER_STATE_DIR: /state
+    volumes: &prerender-volumes
+      - prerender:/out
+      - prerender-state:/state
+    networks:
+      - internal
+    # Chromium needs far more than the 128m the web container runs in. Idle,
+    # this service uses a small fraction of it.
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  prerender:
+    profiles: ["prerender"]
+    build:
+      context: .
+      dockerfile: deploy/prerender.Dockerfile
+    depends_on:
+      - api
+      - web
+    environment: *prerender-env
+    volumes: *prerender-volumes
+    networks:
+      - internal
+    restart: "no"
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
 volumes:
   pgdata:
   uploads:
+  prerender:
+  # Shared with the API so the admin can report when the static HTML last ran
+  # and whether a publish since then has left it stale.
+  prerender-state:
 
 networks:
   internal:

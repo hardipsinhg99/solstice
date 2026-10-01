@@ -279,6 +279,18 @@ model Page {
   id     String        @id @default(cuid())
   slug   String        @unique
   title  String
+
+  /// Per-page search metadata. Named to mirror Product.seoTitle/seoDescription
+  /// exactly, so the two content types read the same way in the admin and in the
+  /// prerenderer rather than each inventing a shape.
+  ///
+  /// Nullable with no backfill. A guessed description is worse than none: it
+  /// ships to search results as if someone had written it, and nobody ever
+  /// reviews a field that already looks filled. Empty falls back to the page
+  /// title plus a site suffix at render time, which is honest and obviously
+  /// provisional.
+  seoTitle       String?
+  seoDescription String?
   status ProductStatus @default(DRAFT)
 
   /// Reusing ProductStatus rather than declaring an identical second enum. The

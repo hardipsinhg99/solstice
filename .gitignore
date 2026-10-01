@@ -13,3 +13,6 @@ media-source/
 # Python bytecode from skill scripts
 __pycache__/
 *.pyc
+
+# Owner-maintained source data, not part of the build.
+solstice-product-spec-sheet.xlsx

@@ -2,6 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, ProductStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { sanitizePlainText, sanitizeRichOptional } from '../common/sanitize';
+import { UpdatePageMetaDto } from './dto';
+import { PrerenderService } from '../prerender/prerender.service';
+
+const SITE_NAME = 'Solstice Trading International LLP';
 
 /**
  * Section data is Json, so it is sanitized by walking it rather than field by
@@ -48,7 +52,7 @@ function clean(value: unknown, rich: Set<string>, path = ''): unknown {
 
 @Injectable()
 export class PagesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private prerender: PrerenderService) {}
 
   /**
    * Which pages are live. Drives the public navigation, so that unpublishing a
@@ -83,6 +87,17 @@ export class PagesService {
     return {
       slug: page.slug,
       title: page.title,
+      // Resolved here, not in the renderer. "Empty means title plus suffix" is a
+      // content decision, and one answer on the server stops the prerenderer,
+      // the SPA and anything added later each inventing their own.
+      seoTitle: page.seoTitle?.trim() || `${page.title} | ${SITE_NAME}`,
+      seoDescription: page.seoDescription?.trim() || null,
+      // Whether the client actually wrote them, so the admin and the prerender
+      // report can tell "authored" from "fell back".
+      seoAuthored: {
+        title: Boolean(page.seoTitle?.trim()),
+        description: Boolean(page.seoDescription?.trim()),
+      },
       sections: page.sections
         // A section that has never been published has nothing to show. It is
         // omitted rather than rendered empty.
@@ -150,6 +165,26 @@ export class PagesService {
    * page itself goes PUBLISHED. All-or-nothing per page, in a transaction -
    * publishing half a page is not a state anybody asked for.
    */
+  /** Meta is not draft/publish - it is live on save. It affects only the
+      document head, never the visible copy, so there is nothing for a reader to
+      see half-changed and no reason to make the client publish twice. */
+  async updateMeta(slug: string, dto: UpdatePageMetaDto, adminId: string) {
+    const page = await this.prisma.page.update({
+      where: { slug },
+      data: {
+        ...(dto.seoTitle !== undefined ? { seoTitle: sanitizePlainText(dto.seoTitle) || null } : {}),
+        ...(dto.seoDescription !== undefined
+          ? { seoDescription: sanitizePlainText(dto.seoDescription) || null }
+          : {}),
+        updatedById: adminId,
+      },
+      select: { slug: true, seoTitle: true, seoDescription: true, status: true },
+    });
+    // A published page's head just changed, so the static copy is stale.
+    this.prerender.requestRebuild(`page-meta:${slug}`);
+    return page;
+  }
+
   async publish(slug: string, adminId: string) {
     const page = await this.requirePage(slug);
     const sections = await this.prisma.pageSection.findMany({ where: { pageId: page.id } });
@@ -170,6 +205,8 @@ export class PagesService {
       }),
     ]);
     await this.audit(page.id, 'published', adminId, page.title);
+    // The published set just changed, so the static HTML is stale.
+    this.prerender.requestRebuild(`page-publish:${slug}`);
     return this.findAdmin(slug);
   }
 
@@ -181,6 +218,8 @@ export class PagesService {
       data: { status: ProductStatus.DRAFT, updatedById: adminId },
     });
     await this.audit(page.id, 'unpublished', adminId, page.title);
+    // The published set just changed, so the static HTML is stale.
+    this.prerender.requestRebuild(`page-unpublish:${slug}`);
     return this.findAdmin(slug);
   }
 

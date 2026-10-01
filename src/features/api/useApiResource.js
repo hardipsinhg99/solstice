@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { SNAPSHOT_ID } from '../../lib/prerender.js'
 
 /**
  * One cached public GET, shared by every consumer that asks for the same key.
@@ -12,7 +13,30 @@ import { useEffect, useRef, useState } from 'react'
  * Native fetch and useState only. No data-fetching library, per the standing
  * no-new-frontend-dependency rule.
  */
-const store = new Map() // key -> { data, inflight }
+const store = new Map() // key -> { data, inflight, seeded?, revalidating? }
+
+/* A prerendered page carries the responses it was rendered from. Seeding the
+   store from them BEFORE the first render is what makes React's first frame
+   'ready' rather than 'loading' - without it, every prerendered page would show
+   its full content, blink to the fallback copy while the API answered, then
+   show the content again. Read at module evaluation, which runs before
+   main.jsx calls createRoot.
+
+   Seeded entries are marked, because a snapshot is only as fresh as the last
+   prerender run. The first consumer to mount revalidates it once; see below. */
+try {
+  const tag = typeof document !== 'undefined' && document.getElementById(SNAPSHOT_ID)
+  if (tag) {
+    for (const [key, data] of Object.entries(JSON.parse(tag.textContent))) {
+      store.set(key, { data, inflight: null, seeded: true })
+    }
+    tag.remove()
+  }
+} catch { /* a malformed snapshot just means an ordinary client-side fetch */ }
+
+/* The prerenderer reads the store back out to build that snapshot. Exposed only
+   when it has set the flag, so a normal visit publishes nothing on window. */
+if (typeof window !== 'undefined' && window.__SOLSTICE_PRERENDER__) window.__SOLSTICE_STORE__ = store
 
 const entry = (key) => {
   if (!store.has(key)) store.set(key, { data: undefined, inflight: null })
@@ -62,7 +86,26 @@ export function useApiResource(key, fetcher, initial = null) {
   const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
-    const hit = store.get(key)?.data
+    const slot = store.get(key)
+    const hit = slot?.data
+
+    // Seeded from the prerendered page: already rendered, but possibly stale.
+    // Refetch once - shared by every consumer of the key - and swap only if the
+    // answer changed. On failure the snapshot stays, which is exactly what a
+    // visitor was already looking at.
+    if (slot?.seeded) {
+      let cancelled = false
+      slot.revalidating ??= Promise.resolve()
+        .then(() => fetcherRef.current())
+        .then((fresh) => { slot.data = fresh; slot.seeded = false; return fresh })
+      slot.revalidating
+        .then((fresh) => {
+          if (!cancelled && JSON.stringify(fresh) !== JSON.stringify(hit)) setData(fresh)
+        })
+        .catch(() => { slot.seeded = false })
+      return () => { cancelled = true }
+    }
+
     if (hit !== undefined) { setData(hit); setStatus('ready'); return }
 
     let cancelled = false

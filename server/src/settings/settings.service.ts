@@ -3,13 +3,14 @@ import { SiteSettings } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { sanitizePlainText } from '../common/sanitize';
 import { UpdateSettingsDto } from './dto';
+import { PrerenderService } from '../prerender/prerender.service';
 
 /** Fixed id, so the singleton is addressed rather than discovered. */
 const SINGLETON = 'singleton';
 
 @Injectable()
 export class SettingsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private prerender: PrerenderService) {}
 
   /**
    * Upsert rather than findUnique: a fresh database that has run migrations but
@@ -76,6 +77,10 @@ export class SettingsService {
         actorId: adminId, summary: Object.keys(data).join(', ') || 'no change',
       },
     });
+    // Settings reach every prerendered page: the contact details and social
+    // links are in the footer of all of them, and the enquiry email appears in
+    // Organization JSON-LD. A settings change makes the whole set stale.
+    this.prerender.requestRebuild('settings');
     return updated;
   }
 }

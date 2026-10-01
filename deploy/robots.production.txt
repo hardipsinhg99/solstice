@@ -8,10 +8,14 @@
 User-agent: *
 Allow: /
 
-# /admin, not /#admin: "#" opens a comment in robots.txt, so the old line read
-# as a bare "Disallow: /" - the whole site. It survived only because an equally
-# specific "Allow: /" outranks it in Google's least-restrictive tie-break.
-# The admin is a real path now. This is belt and braces either way: it is also
-# served with X-Robots-Tag: noindex and sits behind a JWT, because robots.txt
-# is a request, not a lock.
+# The admin has been a real path since the hash router went. The control is
+# the X-Robots-Tag nginx sends on /admin (deploy/nginx.conf); this line only
+# saves crawlers the fetch. It used to read /#admin, which matched nothing -
+# a fragment is never part of the path robots.txt rules are compared against.
 Disallow: /admin
+
+# Written by the prerender job from the exact set of pages it rendered, so it
+# lists only published pages and real products. Absent until the job has run
+# once, in which case this line points at a 404 - harmless, and fixed by the
+# first run.
+Sitemap: https://solsticellp.com/sitemap.xml

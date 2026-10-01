@@ -3,6 +3,7 @@ import { Prisma, ProductStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { sanitizeOptional, sanitizePlainText } from '../common/sanitize';
 import { UpsertProductDto } from './dto';
+import { PrerenderService } from '../prerender/prerender.service';
 
 const INCLUDE = {
   primaryImage: true,
@@ -14,7 +15,7 @@ const INCLUDE = {
 
 @Injectable()
 export class ProductsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private prerender: PrerenderService) {}
 
   /** Public read: published only, and the filter lives here rather than in a
    *  query param the client controls. */
@@ -117,6 +118,8 @@ export class ProductsService {
       include: INCLUDE,
     });
     await this.audit('Product', product.id, 'created', adminId, product.name);
+    // A product page's content or published state changed.
+    this.prerender.requestRebuild('product-create');
     return product;
   }
 
@@ -148,6 +151,8 @@ export class ProductsService {
       });
     });
     await this.audit('Product', id, 'updated', adminId, product.name);
+    // A product page's content or published state changed.
+    this.prerender.requestRebuild('product-update');
     return product;
   }
 
@@ -155,12 +160,16 @@ export class ProductsService {
     const product = await this.findOneAdmin(id);
     await this.prisma.product.delete({ where: { id } });
     await this.audit('Product', id, 'deleted', adminId, product.name);
+    // A product page's content or published state changed.
+    this.prerender.requestRebuild('product-remove');
     return { id, deleted: true };
   }
 
   async setStatus(id: string, status: ProductStatus, adminId: string) {
     const product = await this.prisma.product.update({ where: { id }, data: { status, updatedById: adminId }, include: INCLUDE });
     await this.audit('Product', id, status === ProductStatus.PUBLISHED ? 'published' : 'unpublished', adminId, product.name);
+    // A product page's content or published state changed.
+    this.prerender.requestRebuild('product-status');
     return product;
   }
 

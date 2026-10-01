@@ -38,6 +38,17 @@ export const saveSection = async (slug, key, data, visible) => {
   return row
 }
 
+/**
+ * Search-result title and description for a page.
+ *
+ * Its own endpoint rather than another section, because it is not content on
+ * the page - it never renders to a visitor. Folding it into a section would
+ * put it behind the draft/publish cycle too, and there is no such thing as an
+ * unpublished page title: the prerenderer reads whatever the row says.
+ */
+export const savePageMeta = async (slug, meta) =>
+  apiFetch(`/pages/admin/${slug}/meta`, { method: 'PATCH', body: JSON.stringify(meta) })
+
 export const publishPage = async (slug) => {
   const page = await apiFetch(`/pages/admin/${slug}/publish`, { method: 'POST' })
   invalidate(slug)
