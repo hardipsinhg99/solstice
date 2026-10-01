@@ -31,6 +31,10 @@ const OUT       = process.env.PRERENDER_OUT ?? '/out'
 const STATE     = process.env.PRERENDER_STATE_DIR ?? '/state'
 const CHROME    = process.env.CHROME_PATH ?? '/usr/bin/chromium'
 const SITE_NAME = 'Solstice Trading International LLP'
+// The limits search results actually render before truncating. Asserted by
+// scripts/acceptance-prerender.mjs, which fails the deploy if either is passed.
+const TITLE_MAX = 60
+const DESC_MAX = 155
 
 /* Media URLs arrive either absolute (the Unsplash seed imagery) or
    site-relative (/api/uploads/...). Only the relative ones get the public origin. */
@@ -136,9 +140,43 @@ const productLd = (p) => ({
      not made. */
 })
 
-function buildHead ({ title, description, path, ld, image = `${PUBLIC}/og-image.png` }) {
+/* Search results truncate a title past ~60 characters and a description past
+   ~155, mid-word, and the cut usually lands in the one part that identifies
+   the page. The suffix is what gives, never the product's own name: a buyer
+   scanning results needs "Premium Arabica Coffee Beans" in full far more than
+   the legal form of the company, which the result's own domain line already
+   shows. Measured against real catalogue names, which is where this first
+   failed - "Premium Arabica Coffee Beans | Solstice Trading International LLP"
+   is 65 characters. */
+const SUFFIXES = [` | ${SITE_NAME}`, ' | Solstice Trading', ' | Solstice']
+
+function fitTitle (name) {
+  const clean = String(name ?? '').trim()
+  for (const suffix of SUFFIXES) {
+    if (clean.length + suffix.length <= TITLE_MAX) return clean + suffix
+  }
+  // A name that long on its own is already the whole title; it is never cut,
+  // because a half-written product name is worse than a long one.
+  return clean
+}
+
+/* Trimmed at a sentence end when there is one inside the budget, else at a
+   word boundary. Never mid-word, and never with text added: the description
+   is the owner's copy, shortened, not rewritten. */
+function fitDescription (text) {
+  const clean = String(text ?? '').replace(/\s+/g, ' ').trim()
+  if (clean.length <= DESC_MAX) return clean
+  const budget = clean.slice(0, DESC_MAX + 1)
+  const sentence = Math.max(budget.lastIndexOf('. '), budget.lastIndexOf('! '), budget.lastIndexOf('? '))
+  if (sentence >= DESC_MAX * 0.6) return clean.slice(0, sentence + 1)
+  const word = budget.lastIndexOf(' ')
+  return clean.slice(0, word > 0 ? word : DESC_MAX).replace(/[,;:.\s]+$/, '') + '…'
+}
+
+function buildHead ({ title: rawTitle, description, path, ld, image = `${PUBLIC}/og-image.png` }) {
   const canonical = PUBLIC + (path === '/' ? '/' : path)
-  const desc = description || `${SITE_NAME} — fresh produce, spices and staples from India for international buyers.`
+  const title = rawTitle.length <= TITLE_MAX ? rawTitle : fitTitle(rawTitle.split(' | ')[0])
+  const desc = fitDescription(description || `${SITE_NAME} — fresh produce, spices and staples from India for international buyers.`)
   return [
     `<title>${esc(title)}</title>`,
     `<meta name="description" content="${esc(desc)}"/>`,
