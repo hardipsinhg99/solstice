@@ -298,6 +298,14 @@ async function renderRouteInner (page, route, settings, pageMeta, url) {
     // The CONFIRM-BEFORE-DEPLOY comment in the shell is about the tags just
     // removed; shipping it into rendered pages would be noise at best.
     .replace(/<!--\s*=+\s*CONFIRM BEFORE DEPLOY[\s\S]*?-->/, '')
+    // The page is rendered at http://web:8080 - a hostname that exists only
+    // between containers. Vite's runtime adds <link rel="modulepreload"> for
+    // dynamically imported chunks using the CURRENT origin, so that internal
+    // name was being serialised into the HTML every visitor and crawler gets:
+    // two requests per page that cannot resolve, and a preload hint pointing
+    // off-site. Rewritten to root-relative, which is correct on any host.
+    .replaceAll(`${BASE}/`, '/')
+    .replaceAll(BASE, '')
     .replace('</head>', `  ${head}\n  </head>`)
   return { html, title, description, authored: Boolean(description) }
 }

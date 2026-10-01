@@ -103,7 +103,19 @@ async function main () {
       if (og['og:url'] && og['og:url'].replace(/\/$/, '') !== canonical.replace(/\/$/, '')) fail(path, 'og:url and canonical disagree')
     }
 
-    // 5. structured data, if emitted, must parse - an AI crawler reading
+    // 5. no internal hostnames. The job renders at http://web:8080, a name that
+    //    resolves only between containers, and Vite's modulepreload hints are
+    //    written with the current origin - so an unrewritten build ships two
+    //    dead requests per page to every visitor and crawler. A host with no
+    //    dot in it is a container name; plain http:// on a tls site is mixed
+    //    content. Either is a bug in the output, not in the content.
+    for (const [, url] of html.matchAll(/(?:href|src)="(https?:\/\/[^"]+)"/gi)) {
+      const host = new URL(url).hostname
+      if (!host.includes('.')) fail(path, `links to the internal host "${host}": ${url}`)
+      else if (url.startsWith('http://') && !url.startsWith('http://localhost')) fail(path, `insecure http:// reference: ${url}`)
+    }
+
+    // 6. structured data, if emitted, must parse - an AI crawler reading
     //    broken JSON-LD learns nothing and may distrust the rest.
     for (const [, raw] of html.matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) {
       try { JSON.parse(raw) } catch (e) { fail(path, `JSON-LD does not parse: ${e.message}`) }
