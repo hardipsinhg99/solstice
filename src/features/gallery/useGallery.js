@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { readToken, apiFetch } from '../admin/useAdminAuth.js'
+import { apiFetch } from '../admin/useAdminAuth.js'
+import { xhrUpload } from '../admin/useMediaAssets.js'
 import { useApiResource, clearResource } from '../api/useApiResource.js'
 
 // The gallery holds more images than a product does - it is the one place a
@@ -9,35 +10,14 @@ export const MAX_GALLERY_IMAGES = 24
 
 /**
  * Upload goes through the SAME multipart shape the product media manager uses,
- * against /api/gallery. XMLHttpRequest rather than fetch for one reason: fetch
- * cannot report upload progress, and a bar that jumps 0 🠖 100 is worse than none
- * on a slow connection. Lifted from useProductMedia, not reinvented.
+ * against /api/gallery, with progress - see xhrUpload.
  */
 function upload(file, { caption, altText }, onProgress) {
-  return new Promise((resolve, reject) => {
-    const body = new FormData()
-    body.append('file', file)
-    if (caption) body.append('caption', caption)
-    if (altText) body.append('altText', altText)
-
-    const xhr = new XMLHttpRequest()
-    xhr.open('POST', '/api/gallery')
-    const token = readToken()
-    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`)
-
-    xhr.upload.addEventListener('progress', (event) => {
-      if (event.lengthComputable) onProgress?.(Math.round((event.loaded / event.total) * 100))
-    })
-    xhr.addEventListener('load', () => {
-      let payload = null
-      try { payload = JSON.parse(xhr.responseText) } catch { /* non-JSON error body */ }
-      if (xhr.status >= 200 && xhr.status < 300) return resolve(payload)
-      const message = Array.isArray(payload?.message) ? payload.message.join(', ') : payload?.message
-      reject(new Error(message || `Upload failed (${xhr.status})`))
-    })
-    xhr.addEventListener('error', () => reject(new Error('Upload failed - could not reach the server.')))
-    xhr.send(body)
-  })
+  const body = new FormData()
+  body.append('file', file)
+  if (caption) body.append('caption', caption)
+  if (altText) body.append('altText', altText)
+  return xhrUpload('/api/gallery', body, onProgress)
 }
 
 const PUBLIC_KEY = 'gallery'

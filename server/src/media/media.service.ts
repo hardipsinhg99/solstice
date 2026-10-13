@@ -1,12 +1,32 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { createHash } from 'crypto';
 import { MediaAsset, StorageDriver, MediaKind, MediaStatus } from '@prisma/client';
 import sharp from 'sharp';
 import type { OutputInfo } from 'sharp';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
 import { sanitizeOptional } from '../common/sanitize';
-import { MEDIA, VIDEO, detectImageType, detectVideoContainer } from './media.constants';
+import { HERO_VIDEO, MEDIA, VIDEO, detectImageType, detectVideoContainer } from './media.constants';
 import { VideoService } from './video.service';
+
+/** What the hero video field polls, and what it stores once READY. */
+export interface HeroVideoState {
+  status: MediaStatus;
+  failureReason: string | null;
+  video: null | {
+    desktop: { id: string; url: string; width: number; height: number; sizeBytes: number };
+    mobile: { id: string; url: string; width: number; height: number; sizeBytes: number };
+    poster: { url: string; width: number; height: number } | null;
+    durationSeconds: number;
+  };
+}
+
+/* The two renditions of one hero upload are tied by a SHA-256 of the source
+   file and the encoding profile, carried in their `filename`. That is the whole link - no schema change - and
+   it is also the de-duplication key: the same file uploaded twice is found by
+   its hash and never encoded twice. */
+const HERO_DESKTOP = 'hero-desktop:'
+const HERO_MOBILE = 'hero-mobile:'
 
 export interface ProcessedImage {
   buffer: Buffer;
@@ -284,5 +304,188 @@ export class MediaService {
     const asset = await this.prisma.mediaAsset.findUnique({ where: { id } });
     if (!asset) throw new NotFoundException('Media asset not found');
     return asset;
+  }
+
+  /**
+   * A Home hero background video: validated exactly like a gallery video, then
+   * encoded by VideoService.transcodeHero into a desktop and a mobile rendition
+   * plus a poster - in the background, because two `medium` encodes take
+   * minutes, not a request's worth of time. The caller polls heroVideoState.
+   *
+   * Never processes the same file twice. A re-upload of identical bytes - the
+   * same clip picked again after a discard, or a second tab - returns the
+   * existing pair, ready or still in flight, instead of queueing another encode.
+   * Only a FAILED pair is retried.
+   */
+  async createHeroVideo(
+    file: { buffer: Buffer; originalname: string; size: number },
+    adminId: string,
+  ): Promise<HeroVideoState & { desktopId: string }> {
+    if (file.size > VIDEO.MAX_UPLOAD_BYTES) {
+      throw new BadRequestException(
+        `That video is ${(file.size / 1024 / 1024).toFixed(0)} MB. The limit is ${VIDEO.MAX_UPLOAD_BYTES / 1024 / 1024} MB.`,
+      );
+    }
+
+    // The profile is part of the key: change an encoder setting and the same
+    // source file is a new encode, not a stale one served from the old key.
+    const sha = createHash('sha256').update(file.buffer).update(JSON.stringify(HERO_VIDEO)).digest('hex');
+    const existing = await this.prisma.mediaAsset.findFirst({
+      where: { filename: HERO_DESKTOP + sha, kind: MediaKind.VIDEO, status: { not: MediaStatus.FAILED } },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (existing) {
+      this.logger.log(`Hero video ${sha.slice(0, 12)} already ${existing.status} - not encoding it again`);
+      return { desktopId: existing.id, ...(await this.heroVideoState(existing.id)) };
+    }
+
+    // ffprobe before anything is stored: the same gate as the gallery, so a
+    // non-video, a file with no video track, or an unreadable one is refused
+    // synchronously, with a message, before any job exists.
+    const probe = await this.video.probe(file.buffer);
+    if (probe.durationSeconds > HERO_VIDEO.MAX_DURATION_SECONDS) {
+      throw new BadRequestException(
+        `That video is ${probe.durationSeconds}s. A hero background loops, so 8-15 seconds works best; ` +
+        `the limit is ${HERO_VIDEO.MAX_DURATION_SECONDS}s. Please trim it and upload again.`,
+      );
+    }
+
+    const placeholder = (rendition: string) => ({
+      filename: rendition + sha,
+      storagePath: '',
+      driver: StorageDriver.LOCAL,
+      url: '',
+      mimeType: VIDEO.OUTPUT_MIME,
+      width: probe.width,
+      height: probe.height,
+      sizeBytes: file.size,
+      durationSeconds: probe.durationSeconds,
+      kind: MediaKind.VIDEO,
+      status: MediaStatus.QUEUED,
+      uploadedById: adminId,
+    });
+    const [desktop, mobile] = await this.prisma.$transaction([
+      this.prisma.mediaAsset.create({ data: placeholder(HERO_DESKTOP) }),
+      this.prisma.mediaAsset.create({ data: placeholder(HERO_MOBILE) }),
+    ]);
+
+    setImmediate(() => {
+      void this.runHeroTranscode(desktop.id, mobile.id, file.buffer, probe, adminId);
+    });
+
+    return { desktopId: desktop.id, ...(await this.heroVideoState(desktop.id)) };
+  }
+
+  /** The pair's combined state, as the admin field polls it. */
+  async heroVideoState(desktopId: string): Promise<HeroVideoState> {
+    const desktop = await this.prisma.mediaAsset.findUnique({
+      where: { id: desktopId },
+      include: { posterAsset: true },
+    });
+    if (!desktop || !desktop.filename.startsWith(HERO_DESKTOP)) {
+      throw new NotFoundException('Hero video not found');
+    }
+    const mobile = await this.prisma.mediaAsset.findFirst({
+      where: { filename: HERO_MOBILE + desktop.filename.slice(HERO_DESKTOP.length) },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    // The pair is only as far along as its slower half.
+    const failed = desktop.status === MediaStatus.FAILED || mobile?.status === MediaStatus.FAILED;
+    const ready = desktop.status === MediaStatus.READY && mobile?.status === MediaStatus.READY;
+    const status = failed ? MediaStatus.FAILED
+      : ready ? MediaStatus.READY
+      : desktop.status === MediaStatus.QUEUED ? MediaStatus.QUEUED
+      : MediaStatus.PROCESSING;
+
+    const rendition = (a: MediaAsset) => ({ id: a.id, url: a.url, width: a.width, height: a.height, sizeBytes: a.sizeBytes });
+    return {
+      status,
+      failureReason: failed ? (desktop.failureReason ?? mobile?.failureReason ?? 'The video could not be processed.') : null,
+      video: ready && mobile ? {
+        desktop: rendition(desktop),
+        mobile: rendition(mobile),
+        poster: desktop.posterAsset
+          ? { url: desktop.posterAsset.url, width: desktop.posterAsset.width, height: desktop.posterAsset.height }
+          : null,
+        durationSeconds: desktop.durationSeconds ?? 0,
+      } : null,
+    };
+  }
+
+  /** The background half. Owns all of its errors - nothing awaits it. */
+  private async runHeroTranscode(
+    desktopId: string,
+    mobileId: string,
+    buffer: Buffer,
+    probe: Awaited<ReturnType<VideoService['probe']>>,
+    adminId: string,
+  ): Promise<void> {
+    const ids = { id: { in: [desktopId, mobileId] } };
+    try {
+      await this.prisma.mediaAsset.updateMany({ where: ids, data: { status: MediaStatus.PROCESSING } });
+
+      const result = await this.video.transcodeHero(buffer, probe);
+
+      // The poster goes through the site's one image pipeline - WebP, resize
+      // ladder, EXIF stripped - exactly as gallery posters do.
+      const processedPoster = await this.process(result.posterFrame);
+      const storedPoster = await this.storage.save(processedPoster.buffer, {
+        extension: MEDIA.OUTPUT_FORMAT,
+        contentType: MEDIA.OUTPUT_MIME,
+      });
+      const posterAsset = await this.prisma.mediaAsset.create({
+        data: {
+          filename: 'hero-poster',
+          storagePath: storedPoster.storagePath,
+          driver: StorageDriver.LOCAL,
+          url: storedPoster.url,
+          mimeType: MEDIA.OUTPUT_MIME,
+          width: processedPoster.width,
+          height: processedPoster.height,
+          sizeBytes: processedPoster.sizeBytes,
+          kind: MediaKind.IMAGE,
+          status: MediaStatus.READY,
+          uploadedById: adminId,
+        },
+      });
+
+      for (const [id, rendition] of [[desktopId, result.desktop], [mobileId, result.mobile]] as const) {
+        const stored = await this.storage.save(rendition.buffer, {
+          extension: VIDEO.OUTPUT_EXT,
+          contentType: VIDEO.OUTPUT_MIME,
+        });
+        await this.prisma.mediaAsset.update({
+          where: { id },
+          data: {
+            storagePath: stored.storagePath,
+            url: stored.url,
+            sizeBytes: rendition.buffer.length,
+            width: rendition.width,
+            height: rendition.height,
+            durationSeconds: result.durationSeconds,
+            posterAssetId: posterAsset.id,
+            status: MediaStatus.READY,
+            failureReason: null,
+          },
+        });
+      }
+      this.logger.log(
+        `Hero video ${desktopId}: desktop ${(result.desktop.buffer.length / 1048576).toFixed(1)}MB, ` +
+        `mobile ${(result.mobile.buffer.length / 1048576).toFixed(1)}MB, ${result.durationSeconds}s` +
+        (result.looped ? ', crossfaded loop' : ''),
+      );
+    } catch (err) {
+      const reason = (err as Error)?.message?.slice(0, 300) ?? 'Transcode failed';
+      this.logger.error(`Hero transcode failed for ${desktopId}: ${reason}`);
+      // FAILED, not deleted: the field polls these rows for the reason. Nothing
+      // reached storage before this point, so there are no files to clean up.
+      await this.prisma.mediaAsset
+        .updateMany({
+          where: ids,
+          data: { status: MediaStatus.FAILED, failureReason: 'The video could not be processed. Try exporting it again as MP4 (H.264) and re-uploading.' },
+        })
+        .catch(() => undefined);
+    }
   }
 }

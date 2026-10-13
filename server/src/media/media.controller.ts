@@ -1,5 +1,5 @@
 import {
-  BadRequestException, Body, Controller, Delete, Param, Patch, Post,
+  BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post,
   UploadedFile, UseGuards, UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -7,7 +7,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentAdmin } from '../auth/current-admin.decorator';
 import { MediaService } from './media.service';
 import { ProductMediaService } from './product-media.service';
-import { MEDIA } from './media.constants';
+import { MEDIA, VIDEO } from './media.constants';
 
 type Admin = { id: string; email: string; name: string };
 type Upload = { buffer: Buffer; originalname: string; size: number; mimetype: string };
@@ -88,6 +88,23 @@ export class MediaController {
     @CurrentAdmin() admin: Admin,
   ) {
     return this.media.createAsset(this.require(file), altText ?? null, admin.id);
+  }
+
+  /**
+   * The Home hero background video. Its own multer limit (video-sized), the
+   * class-level JWT guard like every route here, and the same MediaService
+   * validation as the gallery. Returns immediately with the pair's state; the
+   * encode runs in the background and the field polls the route below.
+   */
+  @Post('hero-video')
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: VIDEO.MAX_UPLOAD_BYTES, files: 1 } }))
+  createHeroVideo(@UploadedFile() file: Upload, @CurrentAdmin() admin: Admin) {
+    return this.media.createHeroVideo(this.require(file), admin.id);
+  }
+
+  @Get('hero-video/:id')
+  heroVideoState(@Param('id') id: string) {
+    return this.media.heroVideoState(id);
   }
 
   /** Alt text is editable without re-uploading; it is content, not a file property. */

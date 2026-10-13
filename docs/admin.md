@@ -428,6 +428,28 @@ product appears there with no admin work.
 - Names are compared decoded: the plain-text cleaner escapes `&` on both the product type
   and the saved copy, possibly a different number of times.
 
+### The Home hero video is encoded for the network, and never costs LCP
+
+`home.hero.video` holds a reference to two encodes made at upload - not the upload. The
+field posts to `POST /api/media/hero-video` (JWT); `MediaService.createHeroVideo` runs the
+gallery's validation (size, container sniff, ffprobe) plus a 20s cap, and
+`VideoService.transcodeHero` produces a desktop (<=1600w, 2.5 Mbps cap) and a phone
+(<=960w, 1 Mbps cap) H.264 rendition and a poster, in the background. The field polls
+`GET /api/media/hero-video/:id` and writes the value only when both are READY.
+
+- **No schema change.** The pair is linked by `filename` = `hero-desktop:` / `hero-mobile:` +
+  a SHA-256 of the source AND the profile constants. The same file is never encoded twice;
+  changing an encoder setting makes it a new key rather than serving a stale encode.
+- **The loop seam is fixed at encode time**: the last second crossfades into the opening
+  and the native `loop` attribute does the rest. No script restarts the video.
+- **LCP.** Chrome counts a video's first frame and moves LCP to anything strictly larger
+  that paints later. Over the live 1600x588 hero image the video became LCP seconds late,
+  so with a video on, the still is the video's own poster (same size, same first frame).
+  The hero image is used whenever there is no video or it is switched off.
+- **Loads last.** HeroVideo requests nothing until `load` + idle, never under reduced
+  motion, Data Saver or 2G, never in the prerender job (`__SOLSTICE_PRERENDER__`), and
+  removes itself on a load error or a refused autoplay.
+
 ### Rich text is targeted by section type and path
 
 `RICH_PATHS` in `PagesService` names the exact `type` + dotted path of every rich-text

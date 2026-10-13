@@ -65,7 +65,17 @@ const HOME = [
       f('secondaryCtaLabel', 'Secondary link'),
       f('secondaryCtaRoute', 'Secondary link goes to'),
       f('metaItems', 'Meta strip', 'list', { itemLabel: 'Item', fields: [f('text', 'Text')] }),
-      ...heroImageFields('the branded logistics composite')
+      ...heroImageFields('the branded logistics composite'),
+      // Home only. The image above stays the fallback in every case where the
+      // video does not play: reduced-motion, data-saver and slow connections,
+      // a phone that refuses autoplay (iOS Low Power Mode), a load error, and
+      // the moment before the video arrives. Never instead of the image.
+      f('video', 'Background video (optional)', 'video', {
+        help: 'Plays silently on a loop behind the heading. MP4, MOV, WebM or AVI, up to 200 MB and 20 seconds - ' +
+              '8 to 15 seconds of slow, steady footage looks best. It is optimised on upload into a desktop and a phone ' +
+              'version, and the end blends into the start so the loop never jumps. "Keep this part in frame" above ' +
+              'applies to the video too. The hero image stays as the fallback for anyone the video does not play for.'
+      })
     ]
   },
   {

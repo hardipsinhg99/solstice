@@ -1,7 +1,7 @@
-import { createContext, useContext, useRef, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { Icon } from '../ui/Icon.jsx'
 import { RichTextEditor } from './RichTextEditor.jsx'
-import { uploadAsset } from '../../features/admin/useMediaAssets.js'
+import { uploadAsset, uploadHeroVideo, fetchHeroVideoState } from '../../features/admin/useMediaAssets.js'
 
 /**
  * The field renderers the section config drives. One switch, six kinds - not a
@@ -162,6 +162,166 @@ function ImageField({ field, value, onChange, id }) {
   )
 }
 
+/* Mirrors VIDEO.MAX_UPLOAD_BYTES and the accepted containers on the server,
+   which re-checks everything by content. This copy only spares an editor a
+   200 MB upload that was always going to be refused. */
+const VIDEO_MAX_BYTES = 200 * 1024 * 1024
+const VIDEO_ACCEPT = 'video/mp4,video/quicktime,video/webm,video/x-msvideo,.mp4,.mov,.webm,.avi,.m4v'
+const VIDEO_EXT = /\.(mp4|m4v|mov|webm|avi)$/i
+const mb = (bytes) => `${(bytes / 1048576).toFixed(1)} MB`
+
+/**
+ * An optimised background video. Upload is only the first half: the server
+ * encodes a desktop and a phone rendition plus a poster in the background, so
+ * the field polls until they are ready and writes the value ONLY then - a
+ * half-processed video can never be saved into the page, or published.
+ *
+ * Leaving the page mid-encode loses nothing: the encode carries on, and picking
+ * the same file again finds it by its hash instead of starting over.
+ */
+function VideoField({ field, value, onChange, id }) {
+  const inputRef = useRef(null)
+  const [progress, setProgress] = useState(0)
+  const [pendingId, setPendingId] = useState(null)
+  const [phase, setPhase] = useState('idle')            // idle | uploading | processing
+  const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
+  const [confirming, setConfirming] = useState(false)
+  const published = value?.published !== false
+
+  const accept = (state) => {
+    const v = state.video
+    onChange({
+      id: v.desktop.id,
+      desktop: { url: v.desktop.url, width: v.desktop.width, height: v.desktop.height, sizeBytes: v.desktop.sizeBytes },
+      mobile: { url: v.mobile.url, width: v.mobile.width, height: v.mobile.height, sizeBytes: v.mobile.sizeBytes },
+      poster: v.poster,
+      durationSeconds: v.durationSeconds,
+      // A replacement keeps the visibility of what it replaced; a first video
+      // is shown - uploading one and seeing nothing would read as broken.
+      published: value ? published : true
+    })
+    setPhase('idle'); setPendingId(null)
+    setNotice(`Video ready. Now Save this section, then press Publish page to put it on the site.`)
+  }
+
+  // Poll while the server encodes. setTimeout, not setInterval, so a slow
+  // response can never stack requests; cleared on unmount and on completion.
+  useEffect(() => {
+    if (!pendingId) return undefined
+    let stopped = false
+    let timer
+    const tick = async () => {
+      try {
+        const state = await fetchHeroVideoState(pendingId)
+        if (stopped) return
+        if (state.status === 'READY' && state.video) return accept(state)
+        if (state.status === 'FAILED') {
+          setPhase('idle'); setPendingId(null)
+          setError(state.failureReason || 'The video could not be processed.')
+          return
+        }
+      } catch (err) {
+        if (stopped) return
+        // A dropped poll is not a failed encode - keep asking.
+        console.warn('[hero video] status check failed, retrying:', err.message)
+      }
+      timer = setTimeout(tick, 3000)
+    }
+    timer = setTimeout(tick, 1500)
+    return () => { stopped = true; clearTimeout(timer) }
+    // accept closes over value/published; re-subscribing on each edit would
+    // restart the timer, which is harmless but pointless.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingId])
+
+  const pick = async (file) => {
+    if (inputRef.current) inputRef.current.value = ''
+    if (!file) return
+    setError(''); setNotice('')
+    // Some systems report an empty type for .mov - the extension is the
+    // fallback here, and the server's content check is the real gate.
+    if (!(file.type.startsWith('video/') || VIDEO_EXT.test(file.name))) {
+      setError('That file is not a video. Upload an MP4, MOV, WebM or AVI.')
+      return
+    }
+    if (file.size > VIDEO_MAX_BYTES) {
+      setError(`That video is ${mb(file.size)}. The limit is 200 MB - export it smaller and try again.`)
+      return
+    }
+    setPhase('uploading'); setProgress(0)
+    try {
+      const state = await uploadHeroVideo(file, setProgress)
+      if (state.status === 'READY' && state.video) return accept(state)
+      if (state.status === 'FAILED') throw new Error(state.failureReason || 'The video could not be processed.')
+      setPhase('processing'); setPendingId(state.desktopId)
+    } catch (err) {
+      setPhase('idle')
+      setError(err.message)
+    }
+  }
+
+  const busy = phase !== 'idle'
+  return (
+    <div className="admin-field admin-image-field admin-video-field">
+      <span id={`${id}-label`}>{field.label}</span>
+
+      {value?.desktop?.url && (
+        <figure className="admin-image-preview admin-video-preview" data-hidden={!published || undefined}>
+          {/* The preview is the real desktop rendition, looping as the hero
+              will - what you see here is what buyers get. */}
+          <video src={value.desktop.url} poster={value.poster?.url} controls muted loop playsInline preload="metadata"/>
+          <figcaption>
+            <span className="admin-meta">
+              {value.durationSeconds ? `${value.durationSeconds}s loop · ` : ''}
+              desktop {mb(value.desktop.sizeBytes)} · phones {mb(value.mobile?.sizeBytes ?? 0)}
+            </span>
+            <label className="admin-toggle-row">
+              <input type="checkbox" checked={published}
+                     onChange={(e) => onChange({ ...value, published: e.target.checked })}/>
+              <span>{published ? 'Video on - plays behind the hero' : 'Video off - the hero image is shown instead'}</span>
+            </label>
+            {confirming ? (
+              <span className="admin-verify-cell">
+                <span className="admin-hint">Remove the video? The hero image stays.</span>
+                <button type="button" className="admin-btn admin-btn-danger-quiet"
+                        onClick={() => { setConfirming(false); setNotice(''); onChange(null) }}>Yes, remove</button>
+                <button type="button" className="admin-btn" onClick={() => setConfirming(false)}>Cancel</button>
+              </span>
+            ) : (
+              <button type="button" className="admin-btn admin-btn-danger-quiet" disabled={busy}
+                      onClick={() => setConfirming(true)}>Remove</button>
+            )}
+          </figcaption>
+        </figure>
+      )}
+
+      <input ref={inputRef} id={id} type="file" accept={VIDEO_ACCEPT}
+             disabled={busy} aria-labelledby={`${id}-label`}
+             onChange={(e) => pick(e.target.files?.[0])}/>
+
+      {phase === 'uploading' && (
+        <div className="admin-progress" role="status" aria-live="polite">
+          <div className="admin-progress-track" role="progressbar" aria-valuemin={0} aria-valuemax={100}
+               aria-valuenow={progress} aria-label="Upload progress">
+            <div className="admin-progress-bar" style={{ width: `${progress}%` }}/>
+          </div>
+          <span className="admin-meta">{progress}% uploaded{progress === 100 ? ' - checking the file…' : ''}</span>
+        </div>
+      )}
+      {phase === 'processing' && (
+        <span className="admin-hint" role="status">
+          Optimising for the web - a desktop and a phone version with a seamless loop. This usually takes
+          one to three minutes; you can keep editing other sections meanwhile.
+        </span>
+      )}
+      {notice && !busy && <span className="admin-hint admin-ok" role="status">{notice}</span>}
+      {error && <p className="admin-error" role="alert">{error}</p>}
+      {field.help && <small className="admin-hint">{field.help}</small>}
+    </div>
+  )
+}
+
 function ListField({ field, value, onChange, idBase }) {
   const items = Array.isArray(value) ? value : []
   const label = field.itemLabel ?? 'Item'
@@ -239,6 +399,7 @@ export function Field({ field, value, onChange, idBase }) {
 
   if (field.kind === 'list') return <ListField field={field} value={value} onChange={onChange} idBase={id}/>
   if (field.kind === 'image') return <ImageField field={field} value={value} onChange={onChange} id={id}/>
+  if (field.kind === 'video') return <VideoField field={field} value={value} onChange={onChange} id={id}/>
   if (field.kind === 'select') return <SelectField field={field} value={value} onChange={onChange} id={id} helpId={helpId}/>
 
   if (field.kind === 'rich') {

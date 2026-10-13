@@ -31,6 +31,12 @@
    which is what leaves the left clear for the copy. */
 .hero-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 32%;filter:var(--hero-filter)}
 .hero-media:after{content:'';position:absolute;inset:0;background:var(--hero-scrim)}
+/* The optional background video: same box, crop and grade as the image under
+   it, transparent until it plays and then faded in, so the hand-over from image
+   to video reads as a dissolve rather than a swap. pointer-events:none - it is
+   a background and must never take a click or a tap from the buttons above. */
+.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 32%;filter:var(--hero-filter);opacity:0;transition:opacity .9s ease;pointer-events:none}
+.hero-video.is-playing{opacity:1}
 /* Follows the hero instead of a second fixed number. The padding is the fixed
    header's clearance - without it the eyebrow slides under the nav as the hero
    shortens. */

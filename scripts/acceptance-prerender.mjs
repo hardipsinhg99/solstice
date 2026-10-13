@@ -110,7 +110,11 @@ async function main () {
     //    dot in it is a container name; plain http:// on a tls site is mixed
     //    content. Either is a bug in the output, not in the content.
     for (const [, url] of html.matchAll(/(?:href|src)="(https?:\/\/[^"]+)"/gi)) {
-      const host = new URL(url).hostname
+      const u = new URL(url)
+      // The origin under test is never "internal": run against a local stack,
+      // its canonicals are http://localhost:NNNN by design.
+      if (u.origin === new URL(BASE).origin) continue
+      const host = u.hostname
       if (!host.includes('.')) fail(path, `links to the internal host "${host}": ${url}`)
       else if (url.startsWith('http://') && !url.startsWith('http://localhost')) fail(path, `insecure http:// reference: ${url}`)
     }
