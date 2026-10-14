@@ -1,8 +1,8 @@
 import { Eyebrow } from '../ui/Eyebrow.jsx'
+import { Link } from '../ui/Link.jsx'
 import { Button } from '../ui/Button.jsx'
 import { navGroup } from '../../data/navigation.js'
 import { usePublishedPages, usePage } from '../../features/pages/index.js'
-import { useNavigate } from '../../app/navigation.js'
 import { useSiteSettings, telHref, mailtoHref } from '../../features/settings/index.js'
 import { useSocialLinks, SOCIAL_LABELS } from '../../features/social/index.js'
 import { Icon } from '../ui/Icon.jsx'
@@ -10,7 +10,6 @@ import { Icon } from '../ui/Icon.jsx'
 export function Footer() {
   const { isPublished } = usePublishedPages()
 
-  const navigate = useNavigate()
   const {
     contactEmail, contactPhone, contactEmailEnabled, contactPhoneEnabled,
     contactEmailLabel, contactPhoneLabel
@@ -38,14 +37,14 @@ export function Footer() {
       <div className="footer-cta">
         <div className="container footer-cta-inner">
           <div><Eyebrow>NEW ENQUIRY</Eyebrow><h3>Looking to source <em>fresh produce, spices or staples</em> from India?</h3></div>
-          <Button onClick={() => navigate('contact')} variant="lime">Start an enquiry</Button>
+          <Button to="contact" variant="lime">Start an enquiry</Button>
         </div>
       </div>
       <div className="container footer-grid">
         <div className="footer-brand">
-          <button className="brand brand-logo footer-logo notranslate" translate="no" onClick={() => navigate('home')} aria-label="Solstice home">
+          <Link to="home" className="brand brand-logo footer-logo notranslate" translate="no" aria-label="Solstice home">
             <img src="/solstice-logo.png" alt="Solstice Trading International LLP"/>
-          </button>
+          </Link>
           <p>Fresh produce, spices &amp; essential foods<br/>from India, for international buyers.</p>
           {badges.length > 0 && (
             <ul className="footer-badges" aria-label="Registrations and certifications">
@@ -55,11 +54,11 @@ export function Footer() {
         </div>
         <div className="footer-col">
           <span className="footer-heading">Explore</span>
-          {navGroup('explore', isPublished).map(item => <button key={item.route} onClick={() => navigate(item.route)}>{item.label}</button>)}
+          {navGroup('explore', isPublished).map(item => <Link key={item.route} to={item.route} className="footer-nav-link">{item.label}</Link>)}
         </div>
         <div className="footer-col">
           <span className="footer-heading">Company</span>
-          {navGroup('company', isPublished).map(item => <button key={item.route} onClick={() => navigate(item.route)}>{item.label}</button>)}
+          {navGroup('company', isPublished).map(item => <Link key={item.route} to={item.route} className="footer-nav-link">{item.label}</Link>)}
         </div>
         <div className="footer-col">
           <span className="footer-heading">Get in touch</span>

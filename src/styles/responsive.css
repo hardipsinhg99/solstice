@@ -94,9 +94,9 @@
      inside itself instead of running off the bottom. */
   .nav-links{position:fixed;top:var(--header-h);max-height:calc(100dvh - var(--header-h));overflow-y:auto;overscroll-behavior:contain;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--line);padding:19px 20px;box-shadow:var(--shadow);flex-direction:column;align-items:stretch;gap:6px;opacity:0;visibility:hidden;transform:translateY(-10px);pointer-events:none;transition:opacity .25s var(--ease),transform .25s var(--ease),visibility 0s linear .25s}
   .nav-links.open{opacity:1;visibility:visible;transform:none;pointer-events:auto;transition:opacity .25s var(--ease),transform .25s var(--ease),visibility 0s linear 0s}
-  .nav-links>button{text-align:left;margin:0;padding:12px 4px;border-radius:0;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
-  .nav-links>button:hover{background:none;color:var(--green-600)}
-  .nav-links>button:after{display:none}
+  .nav-links>:is(button,a){text-align:left;margin:0;padding:12px 4px;border-radius:0;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+  .nav-links>:is(button,a):hover{background:none;color:var(--green-600)}
+  .nav-links>:is(button,a):after{display:none}
   /* In the drawer the panel expands inline instead of floating - a positioned
      overlay inside a vertical menu would cover the items beneath it. */
   /* The row is a FLEX row, and the caret is its second child. It used to be
@@ -112,7 +112,7 @@
     position:static;flex-wrap:nowrap;
     border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
   /* The label takes the row so the caret is pushed to the right edge and the two
-     share one baseline. Padding matches .nav-links>button exactly, so this row
+     share one baseline. Padding matches .nav-links>:is(button,a) exactly, so this row
      sits on the same rhythm as Home, About us and the rest. */
   .nav-dropdown-label{flex:1 1 auto;min-width:0;text-align:left;margin:0;padding:12px 4px;
     border-radius:0;border-bottom:0}
@@ -230,7 +230,7 @@
 
 
   .service-list article{grid-template-columns:42px 35px 1fr;gap:8px;padding:21px 0}
-  .service-list article>button{display:none}
+  .service-list article>:is(button,a){display:none}
   .service-list h3{font-size:18px}
   .service-list p{font-size:11px}
   .service-callout{padding:71px 0}

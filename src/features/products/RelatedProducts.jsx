@@ -1,7 +1,7 @@
 import { Icon } from '../../components/ui/Icon.jsx'
 import { Eyebrow } from '../../components/ui/Eyebrow.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
-import { cardProps } from '../../components/ui/Card.jsx'
+import { Link } from '../../components/ui/Link.jsx'
 import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
 
 export function RelatedProducts({ products, onSelect }) {
@@ -14,7 +14,7 @@ export function RelatedProducts({ products, onSelect }) {
         </Reveal>
         <div className="related-grid">
           {products.map((p, i) => (
-            <Reveal as="article" key={p.slug} delay={i * 90} className="related-card" {...cardProps(() => onSelect(p.slug), `View ${p.name}`)}>
+            <Reveal as={Link} to={`product/${p.slug}`} key={p.slug} delay={i * 90} className="related-card" aria-label={`View ${p.name}`}>
               <div className="related-image">
                 <img
                   src={unsplashAt(p.image, 480)}

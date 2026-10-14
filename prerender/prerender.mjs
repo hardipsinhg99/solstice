@@ -45,11 +45,20 @@ const absolute = (u) => (!u ? undefined : /^https?:\/\//.test(u) ? u : PUBLIC + 
    which is why a short list here is acceptable where a list of pages to
    INCLUDE would not be.
 
-   network: excluded on the brief's instruction because it holds [CONFIRM]
-   copy. That copy lives in a section whose publishedVisible is false, so the
-   public API already withholds it and a render would not contain it; the
-   exclusion is kept until the client confirms the copy. */
-const EXCLUDED_PAGES = new Set(['network'])
+   network (Trade Network, /trade-network) WAS excluded, because it holds
+   [CONFIRM] copy. That copy lives in a section whose publishedVisible is false,
+   so the public API withholds it - verified: the public payload carries no
+   [CONFIRM] text - and a render contains only what visitors already see.
+   Excluded, a published page linked from every page's navigation was an empty
+   shell to every crawler and absent from the sitemap. */
+const EXCLUDED_PAGES = new Set(['team'])
+/* team: removed from discovery on purpose - it is in neither the header nor the
+   footer (src/data/navigation.js says why) - but it is still published, so it
+   was rendered and listed in the sitemap: an orphan page announced to Google
+   with nothing linking to it, the classic "crawled - currently not indexed".
+   Excluding it here makes the sitemap agree with the navigation. The page still
+   works for anyone with the link. Restoring Team is the navigation line, a
+   publish, and removing it from this set. */
 
 const log = (...a) => console.log('[prerender]', ...a)
 const fail = (...a) => console.error('[prerender] ERROR', ...a)
@@ -197,6 +206,26 @@ function buildHead ({ title: rawTitle, description, path, ld, image = `${PUBLIC}
 }
 
 /* ─── render ─────────────────────────────────────────────────────────────── */
+
+/* <lastmod> as a real date per URL, or absent. The render date on every URL -
+   what this wrote before - changes on each deploy for pages nobody edited, and
+   Google learns to ignore a field that always says "today". Pages use their
+   publish date, products their own updatedAt, a listing the newest product in
+   it. Gallery and Contact have no single honest date, so they carry none,
+   which the sitemap protocol allows. */
+function lastModified (route, pageMeta, routes) {
+  const day = (iso) => (iso ? String(iso).slice(0, 10) : null)
+  if (route.kind === 'page') return day(pageMeta.get(route.slug)?.publishedAt)
+  if (route.kind === 'product') return day(route.product?.updatedAt)
+  if (route.kind === 'listing') {
+    const trade = route.path.split('/')[2]
+    const pool = (routes ?? []).filter((r) => r.kind === 'product').map((r) => r.product)
+      .filter((p) => p && (!trade || String(p.trade).toLowerCase() === trade))
+    const newest = pool.map((p) => p.updatedAt).filter(Boolean).sort().pop()
+    return day(newest)
+  }
+  return null
+}
 
 async function renderRoute (page, route, settings, pageMeta) {
   const url = BASE + route.path
@@ -464,7 +493,7 @@ async function runOnce () {
       const dir = join(staging, route.path === '/' ? '' : route.path)
       await mkdir(dir, { recursive: true })
       await writeFile(join(dir, 'index.html'), html)
-      results.push({ path: route.path, bytes: html.length, title, hasDescription: Boolean(description) })
+      results.push({ path: route.path, bytes: html.length, title, hasDescription: Boolean(description), lastmod: lastModified(route, pageMeta, routes) })
       log(`ok ${route.path} (${Math.round(html.length / 1024)}KB)`)
     }
   } catch (err) {
@@ -478,11 +507,10 @@ async function runOnce () {
   /* The sitemap docs/website-strategy.md asks for, built from exactly the set
      rendered above - so it can never list an unpublished page or a
      placeholder product, and never omits a route that was rendered. */
-  const today = started.toISOString().slice(0, 10)
   await writeFile(join(staging, 'sitemap.xml'),
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
-    results.map((r) => `  <url><loc>${esc(PUBLIC + r.path)}</loc><lastmod>${today}</lastmod></url>`).join('\n') +
+    results.map((r) => `  <url><loc>${esc(PUBLIC + r.path)}</loc>${r.lastmod ? `<lastmod>${r.lastmod}</lastmod>` : ''}</url>`).join('\n') +
     '\n</urlset>\n')
 
   /* The swap. Only reached if EVERY route rendered - any throw above skips it

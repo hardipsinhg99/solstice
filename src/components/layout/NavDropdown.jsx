@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../ui/Icon.jsx'
+import { Link } from '../ui/Link.jsx'
 
 // A click-triggered disclosure for a nav item that has children.
 //
@@ -23,7 +24,7 @@ import { Icon } from '../ui/Icon.jsx'
 // The panel is conditionally rendered rather than hidden with CSS, so a closed
 // menu cannot leave seven invisible items in the tab order - the failure the
 // mobile drawer had to be fixed for.
-export function NavDropdown({ item, route, onNavigate }) {
+export function NavDropdown({ item, route, onClose }) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef(null)
   const triggerRef = useRef(null)
@@ -73,21 +74,21 @@ export function NavDropdown({ item, route, onNavigate }) {
     }
   }, [open])
 
-  const go = (target) => { onNavigate(target); setOpen(false) }
+  const went = () => { setOpen(false); onClose?.() }
   // startsWith, not equality: the parent is active on '#products' and on both
   // '#products/export' and '#products/import'.
   const parentActive = route === item.route || route.startsWith(`${item.route}/`)
 
   return (
     <div className="nav-dropdown" ref={rootRef}>
-      <button
-        type="button"
+      <Link
+        to={item.route}
         className={parentActive ? 'nav-dropdown-label active' : 'nav-dropdown-label'}
         aria-current={parentActive ? 'page' : undefined}
-        onClick={() => go(item.route)}
+        onClick={went}
       >
         {item.label}
-      </button>
+      </Link>
       <button
         ref={triggerRef}
         type="button"
@@ -102,20 +103,25 @@ export function NavDropdown({ item, route, onNavigate }) {
         <Icon name="chevron" size={13}/>
       </button>
 
-      {open && (
-        <div className="nav-dropdown-panel" id={panelId} ref={panelRef}>
+      {/* Always in the page, hidden when closed: rendering it only while open
+          kept /products/export and /products/import out of the HTML crawlers
+          read, so no link anywhere on the site pointed at them. `hidden`
+          removes the closed panel from view, the tab order and the
+          accessibility tree, exactly as unmounting it did. */}
+      {(
+        <div className="nav-dropdown-panel" id={panelId} ref={panelRef} hidden={!open}>
           <ul>
             {item.children.map(child => (
               <li key={child.route}>
-                <button
-                  type="button"
+                <Link
+                  to={child.route}
                   className={route === child.route ? 'nav-dropdown-item active' : 'nav-dropdown-item'}
-                  onClick={() => go(child.route)}
+                  onClick={went}
                 >
                   <span className="nav-dropdown-item-label">{child.label}</span>
                   {child.meta && <span className="nav-dropdown-item-meta">{child.meta}</span>}
                   <Icon name="arrow" size={14}/>
-                </button>
+                </Link>
               </li>
             ))}
           </ul>

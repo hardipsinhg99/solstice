@@ -14,9 +14,9 @@ import TeamPage from '../pages/team/TeamPage.jsx'
 import NetworkPage from '../pages/network/NetworkPage.jsx'
 import GalleryPage from '../pages/gallery/GalleryPage.jsx'
 import ContactPage from '../pages/contact/ContactPage.jsx'
-import { NavigationProvider } from './navigation.js'
+import { NavigationProvider, HrefProvider } from './navigation.js'
 import { useTheme } from './ThemeProvider.jsx'
-import { goTo, usePathRoute, isKnownRoute, isProductRoute, productSlug, isProductsRoute, productsTrade, productsCategory, isAdminRoute } from './router.js'
+import { goTo, toPath, usePathRoute, isKnownRoute, isProductRoute, productSlug, isProductsRoute, productsTrade, productsCategory, isAdminRoute } from './router.js'
 import { NotFound } from '../components/layout/NotFound.jsx'
 import { setCanonical } from '../lib/head.js'
 
@@ -82,14 +82,6 @@ export function App() {
   // all carrying the same content.
   const unknownProduct = onProduct && catalogueStatus === 'ready' && !product
 
-  // The canonical follows the URL, not the render: it must be right on the
-  // first paint of a deep link and after every in-app navigation. Declared
-  // after the product lookup it reads - a hook may sit anywhere, the value it
-  // closes over may not. Admin pages and unknown products get none: the first
-  // are noindex at the server, the second do not exist.
-  useEffect(() => {
-    setCanonical(isAdminRoute(route) || unknownProduct ? null : window.location.pathname)
-  }, [route, unknownProduct])
   // The catalogue's direction lives in the route, so the header dropdown and the
   // on-page switch read from one source and cannot disagree, and a filtered view
   // is a shareable URL.
@@ -97,6 +89,20 @@ export function App() {
   const trade = productsTrade(route)
   // Optional category pre-selection, e.g. from a Home feature card.
   const category = productsCategory(route)
+
+  // The canonical follows the URL, not the render: it must be right on the
+  // first paint of a deep link and after every in-app navigation. Declared
+  // after everything it reads - a hook may sit anywhere, the value it
+  // closes over may not. Admin pages and unknown products get none: the first
+  // are noindex at the server, the second do not exist.
+  useEffect(() => {
+    // A category view (/products/all/fresh-fruit) is its listing with one chip
+    // pre-selected - a filter, not a page of its own - so it names the listing
+    // as canonical. Now that cards link to these views, crawlers will find them,
+    // and as near-duplicates of the listing they would otherwise compete with it.
+    const path = category ? toPath(trade ? `products/${trade}` : 'products') : window.location.pathname
+    setCanonical(isAdminRoute(route) || unknownProduct ? null : path)
+  }, [route, unknownProduct, category, trade])
   const pages = {
     home: <HomePage theme={theme}/>,
     about: <AboutPage/>,
@@ -118,7 +124,7 @@ export function App() {
     )
   }
 
-  return <NavigationProvider value={goTo}>
+  return <NavigationProvider value={goTo}><HrefProvider value={toPath}>
     {/* A <button>, not an <a href="#main-content">: the router owns location.hash,
         so an in-page anchor would be read as a navigation to a "main-content"
         route and bounce the user to the home page. */}
@@ -156,5 +162,5 @@ export function App() {
     <WhatsAppFab/>
     {/* Shares the skip link's target so 'top of the page' means one place. */}
     <BackToTop targetRef={mainRef}/>
-  </NavigationProvider>
+  </HrefProvider></NavigationProvider>
 }

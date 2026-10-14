@@ -1,5 +1,5 @@
 import { Icon } from '../../components/ui/Icon.jsx'
-import { cardProps } from '../../components/ui/Card.jsx'
+import { Link } from '../../components/ui/Link.jsx'
 import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
 
 // The catalogue card carries specification, not just a name and a photograph.
@@ -94,7 +94,8 @@ export function ProductCard({ product, onSelect, showTrade = false }) {
   if (product.placeholder) return <PlaceholderCard product={product} showTrade={showTrade}/>
 
   return (
-    <article className="product-list-card" {...cardProps(() => onSelect(product.slug), `View ${product.name} specification`)}>
+    // A real link to the spec sheet, so crawlers can follow listing -> product.
+    <Link to={`product/${product.slug}`} className="product-list-card" aria-label={`View ${product.name} specification`}>
       <div className="product-list-image">
         {/* No image is a real state now that imagery is admin-managed: an editor
             can delete the only photograph. Rendering <img src={null}> would give
@@ -135,6 +136,6 @@ export function ProductCard({ product, onSelect, showTrade = false }) {
           <Icon name="arrow" size={15}/>
         </span>
       </div>
-    </article>
+    </Link>
   )
 }

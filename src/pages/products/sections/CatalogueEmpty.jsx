@@ -1,7 +1,6 @@
 import { Button } from '../../../components/ui/Button.jsx'
 import { Icon } from '../../../components/ui/Icon.jsx'
 import { Reveal } from '../../../components/motion/Reveal.jsx'
-import { useNavigate } from '../../../app/navigation.js'
 
 // Shown when a trade direction has no published products.
 //
@@ -14,7 +13,6 @@ import { useNavigate } from '../../../app/navigation.js'
 //
 // It is not import-specific: any direction that runs out of products gets it.
 export function CatalogueEmpty({ direction }) {
-  const navigate = useNavigate()
   return (
     <Reveal as="div" className="catalogue-empty">
       <span className="catalogue-empty-mark" aria-hidden="true"><Icon name="box" size={24}/></span>
@@ -24,7 +22,7 @@ export function CatalogueEmpty({ direction }) {
         Tell us what you are looking to {direction} and we will come back with availability,
         pack options and an indicative timeline.
       </p>
-      <Button onClick={() => navigate('contact')}>Send a sourcing enquiry</Button>
+      <Button to={'contact'}>Send a sourcing enquiry</Button>
     </Reveal>
   )
 }

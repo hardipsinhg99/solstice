@@ -1,9 +1,10 @@
 import { Icon } from '../ui/Icon.jsx'
+import { Link } from '../ui/Link.jsx'
 import { navItems, visibleNav } from '../../data/navigation.js'
 import { usePublishedPages } from '../../features/pages/index.js'
 import { NavDropdown } from './NavDropdown.jsx'
 
-export function Nav({ route, open, onNavigate }) {
+export function Nav({ route, open, onClose }) {
   // Nav follows publish state, so unpublishing a page in the admin removes its
   // link automatically. Fails open - see usePublishedPages.
   const { isPublished } = usePublishedPages()
@@ -20,17 +21,18 @@ export function Nav({ route, open, onNavigate }) {
     <nav id="primary-navigation" aria-label="Primary" className={open ? 'nav-links open' : 'nav-links'}>
       {items.map(item => (
         item.children
-          ? <NavDropdown key={item.route} item={item} route={route} onNavigate={onNavigate}/>
+          ? <NavDropdown key={item.route} item={item} route={route} onClose={onClose}/>
           : (
-            <button
+            <Link
+              to={item.route}
               className={route === item.route ? 'active' : ''}
               aria-current={route === item.route ? 'page' : undefined}
               key={item.route}
-              onClick={() => onNavigate(item.route)}
-            >{item.label}</button>
+              onClick={onClose}
+            >{item.label}</Link>
           )
       ))}
-      <button className="nav-cta" onClick={() => onNavigate('contact')}>Send enquiry <Icon name="arrow" size={14}/></button>
+      <Link to="contact" className="nav-cta" onClick={onClose}>Send enquiry <Icon name="arrow" size={14}/></Link>
     </nav>
   )
 }

@@ -98,6 +98,11 @@ export class PagesService {
         title: Boolean(page.seoTitle?.trim()),
         description: Boolean(page.seoDescription?.trim()),
       },
+      // When the live content last changed - a publish copies draft onto
+      // published and stamps this. The sitemap's <lastmod> reads it: a real
+      // per-page date, where the render date stamped on every URL taught
+      // search engines to ignore the field.
+      publishedAt: page.publishedAt?.toISOString() ?? null,
       sections: page.sections
         // A section that has never been published has nothing to show. It is
         // omitted rather than rendered empty.

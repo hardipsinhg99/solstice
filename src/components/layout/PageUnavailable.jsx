@@ -1,6 +1,5 @@
 import { Button } from '../ui/Button.jsx'
 import { Eyebrow } from '../ui/Eyebrow.jsx'
-import { useNavigate } from '../../app/navigation.js'
 
 /**
  * What a CMS page renders when it has been unpublished.
@@ -22,7 +21,6 @@ import { useNavigate } from '../../app/navigation.js'
  * screen-reader user is told the page changed rather than landing in silence.
  */
 export function PageUnavailable() {
-  const navigate = useNavigate()
   return (
     <section className="section page-unavailable">
       <div className="container">
@@ -33,8 +31,8 @@ export function PageUnavailable() {
           back. Nothing else on the site is affected.
         </p>
         <div className="page-unavailable-actions">
-          <Button onClick={() => navigate('home')}>Back to home</Button>
-          <Button onClick={() => navigate('contact')} variant="outline">Send an enquiry</Button>
+          <Button to={'home'}>Back to home</Button>
+          <Button to={'contact'} variant="outline">Send an enquiry</Button>
         </div>
       </div>
     </section>

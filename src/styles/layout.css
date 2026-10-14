@@ -61,7 +61,7 @@ body[data-scroll='top']:has(main[data-hero]) .site-header{
   backdrop-filter:none;border-color:transparent;box-shadow:none}
 /* Nav ink while it sits on the hero: dark on the light hero scrim, white on
    the dark-theme one. Tokenised in tokens.css with the scrim it is measured on. */
-body[data-scroll='top']:has(main[data-hero]) .site-header .nav-links>button,
+body[data-scroll='top']:has(main[data-hero]) .site-header .nav-links>:is(button,a),
 body[data-scroll='top']:has(main[data-hero]) .site-header .nav-dropdown-label,
 body[data-scroll='top']:has(main[data-hero]) .site-header .nav-dropdown-caret{color:var(--header-hero-ink)}
 
@@ -87,11 +87,11 @@ body[data-scroll='up'] .site-header .brand-logo img,body[data-scroll='down'] .si
    The lower bound is also the 14px-ish floor website-strategy.md 2.6 asks for on
    body-adjacent text - 12px was under it.
    .nav-cta is a direct child of .nav-links, so it scales with the rest. */
-.nav-links>button,.nav-dropdown-label{border:0;background:transparent;font-size:clamp(13px,1.15vw,15px);color:var(--muted);padding:8px 12px;margin:0 -12px;border-radius:20px;position:relative;transition:color .2s,background .25s}
-.nav-links>button:hover,.nav-dropdown-label:hover{background:color-mix(in srgb,var(--green-500) 10%,transparent);color:var(--ink)}
-.nav-links>button.active,.nav-dropdown-label.active{color:var(--ink);font-weight:600}
-.nav-links>button:after,.nav-dropdown-label:after{content:'';position:absolute;bottom:1px;left:12px;right:12px;height:1px;background:var(--green-500);transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
-.nav-links>button.active:after,.nav-links>button:hover:after,.nav-dropdown-label.active:after,.nav-dropdown-label:hover:after{transform:scaleX(1)}
+.nav-links>:is(button,a),.nav-dropdown-label{border:0;background:transparent;font-size:clamp(13px,1.15vw,15px);color:var(--muted);padding:8px 12px;margin:0 -12px;border-radius:20px;position:relative;transition:color .2s,background .25s}
+.nav-links>:is(button,a):hover,.nav-dropdown-label:hover{background:color-mix(in srgb,var(--green-500) 10%,transparent);color:var(--ink)}
+.nav-links>:is(button,a).active,.nav-dropdown-label.active{color:var(--ink);font-weight:600}
+.nav-links>:is(button,a):after,.nav-dropdown-label:after{content:'';position:absolute;bottom:1px;left:12px;right:12px;height:1px;background:var(--green-500);transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
+.nav-links>:is(button,a).active:after,.nav-links>:is(button,a):hover:after,.nav-dropdown-label.active:after,.nav-dropdown-label:hover:after{transform:scaleX(1)}
 /* The caret is a second control beside the label, not part of it: the label
    navigates to the whole catalogue, the caret opens the two directions. It sits
    tight against the label so the pair still reads as one nav item, and it keeps
@@ -117,7 +117,7 @@ body[data-scroll='up'] .site-header .brand-logo img,body[data-scroll='down'] .si
   .nav-dropdown-panel{animation:none}
 }
 .nav-cta{background:var(--brand-fill)!important;color:var(--on-brand-fill)!important;padding:11px 14px!important;display:flex;align-items:center;gap:7px;margin-left:19px;position:relative;transition:background .25s}
-/* The CTA is itself a .nav-links>button, so it inherited margin:0 -12px - and
+/* The CTA is itself a .nav-links>:is(button,a), so it inherited margin:0 -12px - and
    that selector (0,1,1) outranked .nav-cta{margin-left:19px} (0,1,0). The
    intended 19px became -12px and this separator line landed on the last letter
    of "Contact us" at every width. The margin is now stated at matching weight,

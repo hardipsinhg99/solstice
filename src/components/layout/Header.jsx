@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../ui/Icon.jsx'
 import { Nav } from './Nav.jsx'
-import { useNavigate } from '../../app/navigation.js'
+import { Link } from '../ui/Link.jsx'
 import { useTranslateSlot } from './useTranslateSlot.js'
 import { useSiteSettings } from '../../features/settings/index.js'
 
 export function Header({ route, theme, setTheme }) {
-  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const toggleRef = useRef(null)
   const settings = useSiteSettings()
@@ -73,7 +72,6 @@ export function Header({ route, theme, setTheme }) {
     }
   }, [menuOpen])
 
-  const onNavigate = (target) => { navigate(target); setMenuOpen(false) }
 
   return (
     // Fragment, not a lone <header>, so the backdrop can be a SIBLING of the
@@ -86,13 +84,13 @@ export function Header({ route, theme, setTheme }) {
     <>
     <header className="site-header">
       <div className="container nav">
-        <button className="brand brand-logo notranslate" translate="no" onClick={() => onNavigate('home')} aria-label="Solstice home">
+        <Link to="home" className="brand brand-logo notranslate" translate="no" onClick={() => setMenuOpen(false)} aria-label="Solstice home">
           {/* Intrinsic dimensions, not the rendered 145px: they give the browser
               the aspect ratio it needs to reserve the box before the PNG lands,
               which is what stops the header from reflowing on first paint. */}
           <img src="/solstice-logo.png" alt="Solstice Trading International LLP" width="1299" height="468"/>
-        </button>
-        <Nav route={route} open={menuOpen} onNavigate={onNavigate}/>
+        </Link>
+        <Nav route={route} open={menuOpen} onClose={() => setMenuOpen(false)}/>
         <div className="nav-tools">
           {/* Empty on purpose. Google's <select> is parked over this box with
               position:fixed from outside #root; nothing is rendered into it here,

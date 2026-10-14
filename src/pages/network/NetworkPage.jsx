@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { Link } from '../../components/ui/Link.jsx'
 import { Icon } from '../../components/ui/Icon.jsx'
 import { Button } from '../../components/ui/Button.jsx'
 import { Eyebrow } from '../../components/ui/Eyebrow.jsx'
@@ -6,7 +7,6 @@ import { visibleImage } from '../../features/pages/index.js'
 import { EnquiryForm } from '../../features/enquiry/index.js'
 import { Reveal } from '../../components/motion/Reveal.jsx'
 import { PageUnavailable } from '../../components/layout/PageUnavailable.jsx'
-import { useNavigate } from '../../app/navigation.js'
 import { usePage, HeroPicture } from '../../features/pages/index.js'
 import { useProductCatalogue } from '../../features/products/index.js'
 import { NETWORK_FALLBACK } from './networkFallback.js'
@@ -36,7 +36,6 @@ const TILE_SIZES = '(max-width: 699px) 50vw, (max-width: 1199px) 33vw, 260px'
  * without a deploy.
  */
 export default function NetworkPage() {
-  const navigate = useNavigate()
   const { section, shows, missing } = usePage('network', NETWORK_FALLBACK)
   const [products] = useProductCatalogue()
   // Buyer quotes row. Called up here with the other hooks, before any early return.
@@ -114,9 +113,9 @@ export default function NetworkPage() {
             <p className="network-lede">{hero.lede}</p>
             <div className="network-hero-actions">
               {hero.primaryCtaLabel &&
-                <Button onClick={() => navigate(hero.primaryCtaRoute)}>{hero.primaryCtaLabel}</Button>}
+                <Button to={hero.primaryCtaRoute}>{hero.primaryCtaLabel}</Button>}
               {hero.secondaryCtaLabel &&
-                <Button variant="glass" onClick={() => navigate(hero.secondaryCtaRoute)}>
+                <Button variant="glass" to={hero.secondaryCtaRoute}>
                   {hero.secondaryCtaLabel}
                 </Button>}
             </div>
@@ -240,7 +239,7 @@ export default function NetworkPage() {
           }}>
             {tiles.map((tile, i) => (
               <Reveal as="li" key={tile.type} delay={Math.min(i % 5, 4) * 60} className="network-category-item">
-                <button type="button" className="network-category" onClick={() => navigate('products')}>
+                <Link to="products" className="network-category">
                   <span className="network-category-media">
                     {tile.image
                       ? <img
@@ -258,7 +257,7 @@ export default function NetworkPage() {
                     </span>
                     <span className="network-category-go" aria-hidden="true"><Icon name="arrow" size={14}/></span>
                   </span>
-                </button>
+                </Link>
               </Reveal>
             ))}
           </ul>

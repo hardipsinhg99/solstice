@@ -1,10 +1,10 @@
 import { Button } from '../../components/ui/Button.jsx'
+import { Link } from '../../components/ui/Link.jsx'
 import { PageUnavailable } from '../../components/layout/PageUnavailable.jsx'
 import { Eyebrow } from '../../components/ui/Eyebrow.jsx'
 import { Icon } from '../../components/ui/Icon.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
 import { PageTitle } from '../../components/layout/PageTitle.jsx'
-import { useNavigate } from '../../app/navigation.js'
 import { usePage } from '../../features/pages/index.js'
 import { SERVICES_FALLBACK } from './servicesFallback.js'
 
@@ -12,7 +12,6 @@ import { SERVICES_FALLBACK } from './servicesFallback.js'
 // that used to be declared inside this component are now repeaters in the page
 // editor; nothing else about the page changed.
 export default function ServicesPage() {
-  const navigate = useNavigate()
   const { section, shows, missing } = usePage('services', SERVICES_FALLBACK)
   const intro = section('intro')
   const services = section('services')
@@ -37,7 +36,7 @@ export default function ServicesPage() {
               <span>0{index + 1}</span>
               <Icon name={item.icon} size={29}/>
               <div><h3>{item.title}</h3><p>{item.body}</p></div>
-              <button onClick={() => navigate(services.ctaRoute)} aria-label={`Enquire about ${item.title}`}><Icon name="arrow"/></button>
+              <Link to={services.ctaRoute} aria-label={`Enquire about ${item.title}`}><Icon name="arrow"/></Link>
             </Reveal>
           ))}
         </div>
@@ -51,7 +50,7 @@ export default function ServicesPage() {
             <Eyebrow>{supply.eyebrow}</Eyebrow>
             <h2>{supply.headingLine1}<br/><em>{supply.headingAccent}</em></h2>
             <p>{supply.body}</p>
-            <Button onClick={() => navigate(supply.ctaRoute)} variant="lime">{supply.ctaLabel}</Button>
+            <Button to={supply.ctaRoute} variant="lime">{supply.ctaLabel}</Button>
           </div>
           <ul className="supply-cta-list">
             {(supply.points ?? []).map((point) => (
@@ -113,7 +112,7 @@ export default function ServicesPage() {
         <Reveal as="div" className="container">
           <Eyebrow>{callout.eyebrow}</Eyebrow>
           <h2>{callout.headingLine1}<br/>{callout.headingLine2} <em>{callout.headingAccent}</em></h2>
-          <Button onClick={() => navigate(callout.ctaRoute)} variant="lime">{callout.ctaLabel}</Button>
+          <Button to={callout.ctaRoute} variant="lime">{callout.ctaLabel}</Button>
         </Reveal>
       </section>
     )}

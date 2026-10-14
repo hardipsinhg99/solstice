@@ -1,14 +1,13 @@
 import { Button } from '../../components/ui/Button.jsx'
+import { Link } from '../../components/ui/Link.jsx'
 import { Eyebrow } from '../../components/ui/Eyebrow.jsx'
 import { Icon } from '../../components/ui/Icon.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
 import { RelatedProducts, useProductCatalogue } from '../../features/products/index.js'
-import { useNavigate } from '../../app/navigation.js'
 import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
 import ProductsPage from './ProductsPage.jsx'
 
 export default function ProductDetailPage({ product, selectProduct }) {
-  const navigate = useNavigate()
   const [products, catalogueStatus] = useProductCatalogue()
 
   // A deep link straight to #product/<slug> arrives before the catalogue does,
@@ -39,7 +38,7 @@ export default function ProductDetailPage({ product, selectProduct }) {
       <div className="container detail-grid">
         <div className="detail-copy">
           <div className="detail-top">
-            <button className="back-link" onClick={() => navigate('products')}>🠔 All products</button>
+            <Link to={'products'} className="back-link">🠔 All products</Link>
             <span className="detail-index notranslate" translate="no">0{index + 1} / 0{products.length}</span>
           </div>
           <span className="detail-type notranslate" translate="no">{product.type.toUpperCase()}</span>
@@ -47,7 +46,7 @@ export default function ProductDetailPage({ product, selectProduct }) {
           <p>{product.description}</p>
           {/* Cultivar names are proper nouns - "Alphonso" must not become a literal. */}
           <div className="variety-pills notranslate" translate="no">{product.varieties.map(v => <span key={v}>{v}</span>)}</div>
-          <Button onClick={() => navigate('contact')}>Enquire about {product.name}</Button>
+          <Button to={'contact'}>Enquire about {product.name}</Button>
         </div>
         {/* The one image on the site that must NOT be lazy: it is the largest
             element in this page's first viewport, so it is the LCP candidate.

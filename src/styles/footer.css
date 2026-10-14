@@ -64,6 +64,11 @@ footer{background:var(--footer-bg);color:var(--body-on-dark)}
    grey was a colour-only distinction. */
 .footer-grid a{color:var(--green-on-dark);transition:opacity .2s;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
 .footer-grid a:hover{opacity:.8}
+/* The footer's page links and logo were <button>s; as real links (so crawlers
+   can follow them) they must not inherit the underlined green treatment above,
+   which is for the contact details. Same look and hover as before. */
+.footer-grid .footer-nav-link,.footer-grid .footer-logo{color:var(--on-band-body);text-decoration:none}
+.footer-grid .footer-nav-link:hover,.footer-grid .footer-logo:hover{opacity:1;color:var(--green-on-dark)}
 
 /* --- Footer contact rows + social marks ------------------------------------
    Both are inside .footer-grid, which force-underlines every <a>. An underline

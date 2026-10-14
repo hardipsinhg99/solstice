@@ -1,6 +1,5 @@
 import { Button } from '../ui/Button.jsx'
 import { Eyebrow } from '../ui/Eyebrow.jsx'
-import { useNavigate } from '../../app/navigation.js'
 
 /**
  * A real 404.
@@ -19,7 +18,6 @@ import { useNavigate } from '../../app/navigation.js'
  * typo'd and every retired URL is a valid page serving home-page content.
  */
 export function NotFound() {
-  const navigate = useNavigate()
   return (
     <section className="section page-unavailable">
       <div className="container">
@@ -30,8 +28,8 @@ export function NotFound() {
           else on the site is where it was.
         </p>
         <div className="page-unavailable-actions">
-          <Button onClick={() => navigate('home')}>Back to home</Button>
-          <Button onClick={() => navigate('products')} variant="outline">Browse products</Button>
+          <Button to={'home'}>Back to home</Button>
+          <Button to={'products'} variant="outline">Browse products</Button>
         </div>
       </div>
     </section>

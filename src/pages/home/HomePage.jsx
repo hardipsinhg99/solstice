@@ -1,9 +1,9 @@
 import { Fragment, lazy, Suspense, useMemo } from 'react'
+import { Link } from '../../components/ui/Link.jsx'
 import { PageUnavailable } from '../../components/layout/PageUnavailable.jsx'
 import { Button } from '../../components/ui/Button.jsx'
 import { Eyebrow } from '../../components/ui/Eyebrow.jsx'
 import { Icon } from '../../components/ui/Icon.jsx'
-import { cardProps } from '../../components/ui/Card.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
 // NOT the barrel. The barrel re-exports WorldMap.jsx, which imports gsap, so
 // importing mapFromLocations through it drags a 6.4MB animation library into the
@@ -12,7 +12,6 @@ import { Reveal } from '../../components/motion/Reveal.jsx'
 import { mapFromLocations } from '../../features/worldmap/fromLocations.js'
 import { useProductCatalogue, resolveFeaturedCards } from '../../features/products/index.js'
 import { HOME_MAP_FALLBACK } from '../../data/globe.js'
-import { useNavigate } from '../../app/navigation.js'
 import { unsplashAt, unsplashSrcSet } from '../../lib/images.js'
 import { usePage } from '../../features/pages/index.js'
 import { HeroMedia } from './sections/HeroMedia.jsx'
@@ -33,7 +32,6 @@ import { HOME_FALLBACK } from './homeFallback.js'
 
 export default function HomePage({ theme }) {
   const [products] = useProductCatalogue()
-  const navigate = useNavigate()
   // Published section data, edited at #admin/page-home. HOME_FALLBACK is the
   // wording that was hardcoded here before, kept as the pre-fetch and
   // API-unreachable render so the page is never a blank frame.
@@ -74,8 +72,8 @@ export default function HomePage({ theme }) {
             <h1>{hero.headingLine1}<br/>{hero.headingLine2} <em>{hero.headingAccent}</em></h1>
             <p>{hero.lede}</p>
             <div className="hero-buttons">
-              <Button onClick={() => navigate(hero.primaryCtaRoute)}>{hero.primaryCtaLabel}</Button>
-              <button className="quiet-link" onClick={() => navigate(hero.secondaryCtaRoute)}>{hero.secondaryCtaLabel} <Icon name="arrow" size={16}/></button>
+              <Button to={hero.primaryCtaRoute}>{hero.primaryCtaLabel}</Button>
+              <Link to={hero.secondaryCtaRoute} className="quiet-link">{hero.secondaryCtaLabel} <Icon name="arrow" size={16}/></Link>
             </div>
             <div className="hero-meta notranslate" translate="no">
               {(hero.metaItems ?? []).map((item, i) => (
@@ -97,7 +95,7 @@ export default function HomePage({ theme }) {
           </Reveal>
           <Reveal as="div" delay={90}>
             <p>{intro.body}</p>
-            <Button variant="outline" onClick={() => navigate(intro.ctaRoute)}>{intro.ctaLabel}</Button>
+            <Button variant="outline" to={intro.ctaRoute}>{intro.ctaLabel}</Button>
           </Reveal>
         </div>
       </section>
@@ -167,13 +165,13 @@ export default function HomePage({ theme }) {
         <div className="container">
           <Reveal as="div" className="section-head">
             <div><Eyebrow>{productsIntro.eyebrow}</Eyebrow><h2>{productsIntro.headingLine1}<br/><em>{productsIntro.headingAccent}</em></h2></div>
-            <button className="quiet-link" onClick={() => navigate('products')}>{productsIntro.linkLabel} <Icon name="arrow" size={16}/></button>
+            <Link to={'products'} className="quiet-link">{productsIntro.linkLabel} <Icon name="arrow" size={16}/></Link>
           </Reveal>
           <div className="product-feature-grid">
             {featured.map((card, index) => (
               // A card opens its CATEGORY's product list, e.g. Fresh fruit
               // (export) - never a single product.
-              <Reveal as="article" key={`${card.category}-${index}`} delay={index * 90} className={`product-feature product-feature-${index}`} {...cardProps(() => navigate(card.route), `${card.title}: view all ${card.category}`)}>
+              <Reveal as={Link} to={card.route} key={`${card.category}-${index}`} delay={index * 90} className={`product-feature product-feature-${index}`} aria-label={`${card.title}: view all ${card.category}`}>
                 <div className="product-feature-image">
                   {card.image && (
                     <img
@@ -264,7 +262,7 @@ export default function HomePage({ theme }) {
             <Eyebrow>{manifesto.eyebrow}</Eyebrow>
             <h2>{manifesto.headingLine1}<br/>{manifesto.headingLine2} <em>{manifesto.headingAccent}</em></h2>
             <p>{manifesto.body}</p>
-            <button className="quiet-link" onClick={() => navigate(manifesto.linkRoute)}>{manifesto.linkLabel} <Icon name="arrow" size={16}/></button>
+            <Link to={manifesto.linkRoute} className="quiet-link">{manifesto.linkLabel} <Icon name="arrow" size={16}/></Link>
           </Reveal>
         </div>
       </section>
@@ -275,7 +273,7 @@ export default function HomePage({ theme }) {
         <Reveal as="div" className="container">
           <Eyebrow>{cta.eyebrow}</Eyebrow>
           <h2>{cta.headingLine1}<br/><em>{cta.headingAccent}</em></h2>
-          <Button onClick={() => navigate(cta.ctaRoute)} variant="lime">{cta.ctaLabel}</Button>
+          <Button to={cta.ctaRoute} variant="lime">{cta.ctaLabel}</Button>
         </Reveal>
       </section>
     )}

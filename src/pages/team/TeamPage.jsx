@@ -1,7 +1,6 @@
 import { Button } from '../../components/ui/Button.jsx'
 import { Reveal } from '../../components/motion/Reveal.jsx'
 import { PageTitle } from '../../components/layout/PageTitle.jsx'
-import { useNavigate } from '../../app/navigation.js'
 import { usePage, usePublicTeam } from '../../features/pages/index.js'
 import { PageUnavailable } from '../../components/layout/PageUnavailable.jsx'
 import { TEAM_FALLBACK } from './teamFallback.js'
@@ -22,7 +21,6 @@ const initials = (name) =>
   (name || '?').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('')
 
 export default function TeamPage() {
-  const navigate = useNavigate()
   const { section, shows, missing } = usePage('team', TEAM_FALLBACK)
   const [members] = usePublicTeam()
 
@@ -75,7 +73,7 @@ export default function TeamPage() {
         <Reveal as="div" className="container">
           <h2>{cta.headingLine1}<br/><em>{cta.headingAccent}</em></h2>
           <p>{cta.body}</p>
-          <Button onClick={() => navigate(cta.ctaRoute)} variant="lime">{cta.ctaLabel}</Button>
+          <Button to={cta.ctaRoute} variant="lime">{cta.ctaLabel}</Button>
         </Reveal>
       </section>
     )}
